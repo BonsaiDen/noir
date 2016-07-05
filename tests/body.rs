@@ -175,9 +175,6 @@ fn test_body_with_expected_json() {
 
     let actual = {
         API::post("/echo")
-            .with_header(ContentType(
-                Mime(TopLevel::Application, SubLevel::Json, vec![])
-            ))
             .with_body(object! {
                 "key" => "value",
                 "list" => vec![2, 3, 4],
@@ -218,9 +215,6 @@ fn test_body_with_expected_json_mismatch() {
 
     let actual = {
         API::post("/echo")
-            .with_header(ContentType(
-                Mime(TopLevel::Application, SubLevel::Json, vec![])
-            ))
             .with_body(object! {
                 "key" => "different value",
                 "list" => vec![2, 3],
@@ -279,9 +273,6 @@ fn test_body_with_expected_json_mismatch_exact() {
 
     let actual = {
         API::post("/echo")
-            .with_header(ContentType(
-                Mime(TopLevel::Application, SubLevel::Json, vec![])
-            ))
             .with_body(object! {
                 "key" => "different value",
                 "list" => vec![2, 3],
@@ -388,6 +379,85 @@ fn test_body_with_expected_json_invalid_utf8() {
 
 
 "#, actual);
+
+}
+
+
+// Set Headers from Body ------------------------------------------------------
+#[test]
+fn test_body_set_header_from_body_raw() {
+
+    let actual = {
+        API::post("/echo")
+            .with_body(vec![1, 2, 3, 4, 5])
+            .expected_body(vec![1, 2, 3, 4, 5])
+            .expected_header(ContentType(
+                Mime(TopLevel::Application, SubLevel::OctetStream, vec![])
+            ))
+            .collect()
+    };
+
+    assert_pass!(actual);
+
+}
+
+#[test]
+fn test_body_set_header_from_body_text() {
+
+    let actual = {
+        API::post("/echo")
+            .with_body("Hello World")
+            .expected_body("Hello World")
+            .expected_header(ContentType(
+                Mime(TopLevel::Text, SubLevel::Plain, vec![])
+            ))
+            .collect()
+    };
+
+    assert_pass!(actual);
+
+}
+
+#[test]
+fn test_body_set_header_from_body_json() {
+
+    let actual = {
+        API::post("/echo")
+            .with_body(object! {
+                "key" => "value"
+            })
+            .expected_body(object! {
+                "key" => "value"
+            })
+            .expected_header(ContentType(
+                Mime(TopLevel::Application, SubLevel::Json, vec![])
+            ))
+            .collect()
+    };
+
+    assert_pass!(actual);
+
+}
+
+#[test]
+fn test_body_override_header_from_body() {
+
+    let actual = {
+        API::post("/echo")
+            .with_header(ContentType(
+                Mime(TopLevel::Text, SubLevel::Plain, vec![])
+            ))
+            .with_body(object! {
+                "key" => "value"
+            })
+            .expected_body("{\"key\":\"value\"}")
+            .expected_header(ContentType(
+                Mime(TopLevel::Text, SubLevel::Plain, vec![])
+            ))
+            .collect()
+    };
+
+    assert_pass!(actual);
 
 }
 

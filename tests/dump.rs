@@ -35,6 +35,7 @@ fn test_dump_response_with_raw_body() {
 
         <bn>        Accept: <bp>application/json
         <bn>Content-Length: <bp>64
+        <bn>  Content-Type: <bp>application/octet-stream
         <bn>          Date: <bp>
         <bn>          Host: <bp>localhost:4000
 

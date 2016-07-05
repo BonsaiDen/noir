@@ -95,6 +95,7 @@ fn test_provided_response_dump_raw() {
     <br> 1.1) <by>Request <by>headers dump:
 
               <bn>Content-Length: <bp>16
+              <bn>  Content-Type: <bp>application/octet-stream
               <bn>          Host: <bp>example.com
 
           <by>Request <by>raw body dump of <bn>16 bytes<by>:

@@ -16,7 +16,7 @@ use colored::*;
 use hyper::method::Method;
 use hyper::server::Response as ServerResponse;
 use hyper::status::StatusCode;
-use hyper::header::{Header, Headers, HeaderFormat};
+use hyper::header::{Header, Headers, HeaderFormat, ContentType};
 
 
 // Internal Dependencies ------------------------------------------------------
@@ -105,6 +105,11 @@ impl<E: HttpEndpoint> HttpResponse<E> {
     }
 
     /// Sets the response body.
+    ///
+    /// Also sets the `Content-Type` header of the response based on the type
+    /// of the `body` argument.
+    ///
+    /// The set `Content-Type` can be overriden via `HttpResponse::with_header`.
     pub fn with_body<S: Into<HttpBody>>(mut self, body: S) -> Self {
         self.response_body = Some(body.into());
         self
@@ -252,6 +257,25 @@ impl<E: HttpEndpoint> MockResponse for HttpResponse<E> {
         } else {
             let mut data: Vec<u8> = Vec::new();
             {
+
+                // Convert body into Mime and Vec<u8>
+                let (content_mime, mut body) = if let Some(body) = self.response_body.take() {
+                    util::http_body_into_parts(body)
+
+                } else {
+                    (None, None)
+                };
+
+                // Set Content-Type based on body data if:
+                // A. The body has a Mime
+                // B. No other ContentType has been set on the request
+                if let Some(content_mime) = content_mime {
+                    if !self.response_headers.has::<ContentType>() {
+                        self.response_headers.set(ContentType(content_mime));
+                    }
+                }
+
+                // Create Response
                 let mut res = ServerResponse::new(
                     &mut data, &mut self.response_headers
                 );
@@ -262,8 +286,8 @@ impl<E: HttpEndpoint> MockResponse for HttpResponse<E> {
                 }
 
                 // Send body if specified
-                if let Some(body) = self.response_body.take() {
-                    res.send(&util::http_body_into_vec(body)[..]).ok();
+                if let Some(body) = body.take() {
+                    res.send(&body[..]).ok();
 
                 // Empty body
                 } else {

@@ -460,3 +460,89 @@ fn test_provided_response_with_expected_body_json_invalid_utf8() {
 "#, actual);
 }
 
+#[test]
+fn test_provided_response_set_header_from_body_raw() {
+
+    let actual = {
+        API::get("/responses/one")
+            .provide(responses![
+                EXAMPLE.get("/one").with_body(vec![1, 2, 3, 4, 5])
+            ])
+            .expected_header(ContentType(
+                Mime(TopLevel::Application, SubLevel::OctetStream, vec![])
+            ))
+            .expected_body(vec![1, 2, 3, 4, 5])
+            .collect()
+    };
+
+    assert_pass!(actual);
+
+}
+
+#[test]
+fn test_provided_response_set_header_from_body_text() {
+
+    let actual = {
+        API::get("/responses/one")
+            .provide(responses![
+                EXAMPLE.get("/one").with_body("Hello World")
+            ])
+            .expected_header(ContentType(
+                Mime(TopLevel::Text, SubLevel::Plain, vec![])
+            ))
+            .expected_body("Hello World")
+            .collect()
+    };
+
+    assert_pass!(actual);
+
+}
+
+#[test]
+fn test_provided_response_set_header_from_body_json() {
+
+    let actual = {
+        API::get("/responses/one")
+            .provide(responses![
+                EXAMPLE.get("/one").with_body(object! {
+                    "key" => "value"
+                })
+            ])
+            .expected_header(ContentType(
+                Mime(TopLevel::Application, SubLevel::Json, vec![])
+            ))
+            .expected_body(object! {
+                "key" => "value"
+            })
+            .collect()
+    };
+
+    assert_pass!(actual);
+
+}
+
+#[test]
+fn test_provided_response_override_header_from_body() {
+
+    let actual = {
+        API::get("/responses/one")
+            .provide(responses![
+                EXAMPLE.get("/one")
+                    .with_header(ContentType(
+                        Mime(TopLevel::Text, SubLevel::Plain, vec![])
+                    ))
+                    .with_body(object! {
+                        "key" => "value"
+                    })
+            ])
+            .expected_header(ContentType(
+                Mime(TopLevel::Text, SubLevel::Plain, vec![])
+            ))
+            .expected_body("{\"key\":\"value\"}")
+            .collect()
+    };
+
+    assert_pass!(actual);
+
+}
+

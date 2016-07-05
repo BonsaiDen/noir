@@ -14,6 +14,7 @@ use std::str;
 use json;
 use colored::*;
 use difference;
+use hyper::mime::Mime;
 use hyper::status::StatusCode;
 use hyper::header::{Headers, HeaderView};
 
@@ -27,8 +28,8 @@ use super::{
 
 
 // HTTP Utilities -------------------------------------------------------------
-pub fn http_body_into_vec(body: HttpBody) -> Vec<u8> {
-    body.data
+pub fn http_body_into_parts(body: HttpBody) -> (Option<Mime>, Option<Vec<u8>>) {
+    (body.mime, Some(body.data))
 }
 
 pub fn http_header_into_tuple(header: HttpHeader) -> (String, Vec<u8>) {

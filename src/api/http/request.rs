@@ -18,7 +18,7 @@ use hyper::Client;
 use hyper::method::Method;
 use hyper::client::Response;
 use hyper::status::StatusCode;
-use hyper::header::{Header, Headers, HeaderFormat};
+use hyper::header::{Header, Headers, HeaderFormat, ContentType};
 
 
 // Internal Dependencies ------------------------------------------------------
@@ -166,6 +166,11 @@ impl<A: HttpApi> HttpRequest<A> {
     }
 
     /// Sets the request body.
+    ///
+    /// Also sets the `Content-Type` header of the request based on the type
+    /// of the `body` argument.
+    ///
+    /// The set `Content-Type` can be overriden via `HttpRequest::with_header`.
     pub fn with_body<S: Into<HttpBody>>(mut self, body: S) -> Self {
         self.request_body = Some(body.into());
         self
@@ -387,29 +392,43 @@ impl<A: HttpApi> HttpRequest<A> {
 
     fn request(&mut self) -> (Vec<String>, usize) {
 
-        // Convert body into Vec<u8>
-        let body = if let Some(body) = self.request_body.take() {
-            util::http_body_into_vec(body)
+        // Convert body into Mime and Vec<u8>
+        let (content_mime, body) = if let Some(body) = self.request_body.take() {
+            util::http_body_into_parts(body)
 
         } else {
-            Vec::new()
+            (None, None)
         };
 
-        // Setup request
+        // Set Content-Type based on body data if:
+        // A. The body has a Mime
+        // B. No other ContentType has been set on the request
+        if let Some(content_mime) = content_mime {
+            if !self.request_headers.has::<ContentType>() {
+                self.request_headers.set(ContentType(content_mime));
+            }
+        }
+
+        // Create Client
         let mut client = Client::new();
         client.set_read_timeout(Some(Duration::from_millis(1000)));
         client.set_write_timeout(Some(Duration::from_millis(1000)));
 
-        let request = client.request(
+        // Setup Request
+        let mut request = client.request(
             self.method.clone(),
             self.api.url_with_path(self.path.as_str()).as_str()
 
         ).headers(
             self.request_headers.clone()
-
-        ).body(
-            &body[..]
         );
+
+        // Set body, if presetn
+        if let Some(body) = body.as_ref() {
+            request = request.body(
+                &body[..]
+            );
+        }
 
         // Provide responses to request interceptors
         ResponseProvider::provide(
