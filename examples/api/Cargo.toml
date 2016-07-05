@@ -1,0 +1,10 @@
+[package]
+name = "web"
+version = "0.1.0"
+authors = ["Ivo Wetzel <ivo.wetzel@googlemail.com>"]
+
+[dependencies]
+noir = { version = "0.1.0", path="../noir" }
+hyper = "0.9"
+nickel = "*"
+json = "0.5"

@@ -1,0 +1,21 @@
+language: rust
+rust:
+  - stable
+  - beta
+
+env:
+  - FEATURES=""
+
+matrix:
+  allow_failure:
+    - rust: nightly
+      env: FEATURES="lint"
+
+  include:
+    - rust: nightly
+      env: FEATURES="lint"
+
+script:
+  - cargo build --features "${FEATURES}" --verbose
+  - cargo test --features "${FEATURES}" --verbose
+

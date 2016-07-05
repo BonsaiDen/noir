@@ -1,0 +1,19 @@
+[package]
+name = "noir"
+version = "0.1.0"
+authors = ["Ivo Wetzel <ivo.wetzel@googlemail.com>"]
+
+[dependencies]
+url = "1.1"
+rand = "0.3"
+json = "0.8"
+hyper = "0.9"
+colored = "1.2"
+httparse = "1.1"
+difference = "0.4"
+lazy_static = "0.2"
+clippy = { version = "0.0.77", optional = true }
+
+[features]
+lint = ["clippy"]
+
