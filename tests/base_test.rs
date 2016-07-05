@@ -1,8 +1,6 @@
 macro_rules! test { () => {
 
 // Crates ---------------------------------------------------------------------
-#[macro_use] extern crate json;
-#[macro_use] extern crate noir;
 extern crate colored;
 extern crate hyper;
 
