@@ -2,6 +2,12 @@
 name = "noir"
 version = "0.1.0"
 authors = ["Ivo Wetzel <ivo.wetzel@googlemail.com>"]
+description="rust based, DSL alike and request driven, black box testing library for HTTP APIs."
+documentation = "https://bonsaiden.github.io/noir/doc/noir"
+repository = "https://github.com/BonsaiDen/noir.git"
+readme = "README.md"
+keywords = [ "testing", "http", "api", "mock", "dsl"]
+license="MIT/Apache-2.0"
 
 [dependencies]
 url = "1.1"
