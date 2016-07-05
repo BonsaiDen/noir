@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `noir` crate.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, noir">
+
+    <title>noir - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../rustdoc.css">
+    <link rel="stylesheet" type="text/css" href="../main.css">
+    
+
+    
+    
+</head>
+<body class="rustdoc">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        
+        <p class='location'></p><script>window.sidebarCurrent = {name: 'noir', ty: 'mod', relpath: '../'};</script>
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content mod">
+<h1 class='fqn'><span class='in-band'>Crate <a class='mod' href=''>noir</a></span><span class='out-of-band'><span id='render-detail'>
+                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                       [<span class='inner'>&#x2212;</span>]
+                   </a>
+               </span><a id='src-0' class='srclink' href='../src/noir/src/lib.rs.html#9-115' title='goto source code'>[src]</a></span></h1>
+<div class='docblock'><p><strong>noir</strong> is a request driven, black box testing library for HTTP based APIs.</p>
+</div><h2 id='macros' class='section-header'><a href="#macros">Macros</a></h2>
+<table>
+                       <tr class=' module-item'>
+                           <td><a class='macro' href='macro.headers!.html'
+                                  title='noir::headers!'>headers!</a></td>
+                           <td class='docblock short'>
+                                <p>A convenience macro for creating a vector of <code>HttpHeader</code> items.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='macro' href='macro.hyper_client!.html'
+                                  title='noir::hyper_client!'>hyper_client!</a></td>
+                           <td class='docblock short'>
+                                <p>A macro for intercepting <code>hyper::Client::new()</code> calls made during tests.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='macro' href='macro.mocks!.html'
+                                  title='noir::mocks!'>mocks!</a></td>
+                           <td class='docblock short'>
+                                <p>A convenience macro for creating a vector of <code>Box&lt;MockProvider&gt;</code> items.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='macro' href='macro.query!.html'
+                                  title='noir::query!'>query!</a></td>
+                           <td class='docblock short'>
+                                <p>A macro for creating a <code>HttpQueryString</code> instance.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='macro' href='macro.responses!.html'
+                                  title='noir::responses!'>responses!</a></td>
+                           <td class='docblock short'>
+                                <p>A convenience macro for creating a vector of <code>Box&lt;MockResponse&gt;</code> items.</p>
+                           </td>
+                       </tr></table><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
+<table>
+                       <tr class=' module-item'>
+                           <td><a class='struct' href='struct.HttpBody.html'
+                                  title='noir::HttpBody'>HttpBody</a></td>
+                           <td class='docblock short'>
+                                <p>An abstraction over different data types used for HTTP request bodies.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='struct' href='struct.HttpHeader.html'
+                                  title='noir::HttpHeader'>HttpHeader</a></td>
+                           <td class='docblock short'>
+                                <p>An abstraction over different <code>hyper::Header</code> implementations.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='struct' href='struct.HttpQueryString.html'
+                                  title='noir::HttpQueryString'>HttpQueryString</a></td>
+                           <td class='docblock short'>
+                                <p>An abstraction over a HTTP query string.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='struct' href='struct.HttpRequest.html'
+                                  title='noir::HttpRequest'>HttpRequest</a></td>
+                           <td class='docblock short'>
+                                <p>A HTTP request for API testing.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='struct' href='struct.HttpResponse.html'
+                                  title='noir::HttpResponse'>HttpResponse</a></td>
+                           <td class='docblock short'>
+                                <p>A mocked HTTP response that is being provided to a testable API.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='struct' href='struct.MockResponseProvider.html'
+                                  title='noir::MockResponseProvider'>MockResponseProvider</a></td>
+                           <td class='docblock short'>
+                                <p>An interface for <code>MockRequest</code> trait implementations for consuming
+matching <code>MockResponse</code> objects that were provided during the active test.</p>
+                           </td>
+                       </tr></table><h2 id='traits' class='section-header'><a href="#traits">Traits</a></h2>
+<table>
+                       <tr class=' module-item'>
+                           <td><a class='trait' href='trait.HttpApi.html'
+                                  title='noir::HttpApi'>HttpApi</a></td>
+                           <td class='docblock short'>
+                                <p>A trait for the description of a testable, HTTP based api.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='trait' href='trait.HttpEndpoint.html'
+                                  title='noir::HttpEndpoint'>HttpEndpoint</a></td>
+                           <td class='docblock short'>
+                                <p>A trait for the description of a HTTP based endpoint used to provided
+mocked responses to a testable API.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='trait' href='trait.MockProvider.html'
+                                  title='noir::MockProvider'>MockProvider</a></td>
+                           <td class='docblock short'>
+                                <p>A trait for implementation of a custom mock provider.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='trait' href='trait.MockRequest.html'
+                                  title='noir::MockRequest'>MockRequest</a></td>
+                           <td class='docblock short'>
+                                <p>A trait for implementation of a request matched against concrete types of
+<code>MockResponse</code>.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='trait' href='trait.MockResponse.html'
+                                  title='noir::MockResponse'>MockResponse</a></td>
+                           <td class='docblock short'>
+                                <p>A trait for implementation of a response provided to a concrete type of
+<code>MockRequest</code>.</p>
+                           </td>
+                       </tr></table><h2 id='types' class='section-header'><a href="#types">Type Definitions</a></h2>
+<table>
+                       <tr class=' module-item'>
+                           <td><a class='type' href='type.MockRequestResponse.html'
+                                  title='noir::MockRequestResponse'>MockRequestResponse</a></td>
+                           <td class='docblock short'>
+                                <p>A response to a request made against a mocked endpoint.</p>
+                           </td>
+                       </tr></table></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>&larrb;</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>&rarrb;</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                    <dt>+</dt>
+                    <dd>Collapse/expand all sections</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code> or <code>* -> vec</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../";
+        window.currentCrate = "noir";
+        window.playgroundUrl = "";
+    </script>
+    <script src="../jquery.js"></script>
+    <script src="../main.js"></script>
+    
+    <script defer src="../search-index.js"></script>
+</body>
+</html>
