@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["HttpResponse","A Mocked HTTP response provided to `hyper::Client` calls."]],"trait":[["HttpEndpoint","A HTTP Endpoint which provides mocked HTTP responses to an API server."]]});

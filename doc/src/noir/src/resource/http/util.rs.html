@@ -421,6 +421,7 @@
 <span id="377">377</span>
 <span id="378">378</span>
 <span id="379">379</span>
+<span id="380">380</span>
 </pre><pre class='rust '>
 <span class='comment'>// Copyright (c) 2016 Ivo Wetzel</span>
 
@@ -438,6 +439,7 @@
 <span class='kw'>use</span> <span class='ident'>json</span>;
 <span class='kw'>use</span> <span class='ident'>colored</span>::<span class='op'>*</span>;
 <span class='kw'>use</span> <span class='ident'>difference</span>;
+<span class='kw'>use</span> <span class='ident'>hyper</span>::<span class='ident'>mime</span>::<span class='ident'>Mime</span>;
 <span class='kw'>use</span> <span class='ident'>hyper</span>::<span class='ident'>status</span>::<span class='ident'>StatusCode</span>;
 <span class='kw'>use</span> <span class='ident'>hyper</span>::<span class='ident'>header</span>::{<span class='ident'>Headers</span>, <span class='ident'>HeaderView</span>};
 
@@ -451,8 +453,8 @@
 
 
 <span class='comment'>// HTTP Utilities -------------------------------------------------------------</span>
-<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>http_body_into_vec</span>(<span class='ident'>body</span>: <span class='ident'>HttpBody</span>) <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span> {
-    <span class='ident'>body</span>.<span class='ident'>data</span>
+<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>http_body_into_parts</span>(<span class='ident'>body</span>: <span class='ident'>HttpBody</span>) <span class='op'>-&gt;</span> (<span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Mime</span><span class='op'>&gt;</span>, <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;&gt;</span>) {
+    (<span class='ident'>body</span>.<span class='ident'>mime</span>, <span class='prelude-val'>Some</span>(<span class='ident'>body</span>.<span class='ident'>data</span>))
 }
 
 <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>http_header_into_tuple</span>(<span class='ident'>header</span>: <span class='ident'>HttpHeader</span>) <span class='op'>-&gt;</span> (<span class='ident'>String</span>, <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>) {
