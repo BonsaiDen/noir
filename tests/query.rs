@@ -92,3 +92,18 @@ fn test_with_query_none_string_types() {
 
 }
 
+
+#[test]
+fn test_with_query_ignore_hash() {
+
+    let actual = {
+        API::get("/query#hash")
+            .with_query(query!{})
+            .expected_body("Route not found: GET /query")
+            .collect()
+    };
+
+    assert_pass!(actual);
+
+}
+

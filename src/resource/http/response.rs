@@ -11,7 +11,6 @@ use std::io::Error;
 
 
 // External Dependencies ------------------------------------------------------
-use url::Url;
 use colored::*;
 use hyper::method::Method;
 use hyper::server::Response as ServerResponse;
@@ -80,28 +79,8 @@ impl<E: HttpEndpoint> HttpResponse<E> {
     /// This will override any existing query string previously set or derived
     /// from the request's path.
     pub fn with_query(mut self, query: HttpQueryString) -> Self {
-
-        // Parse existing URL
-        let url = self.endpoint.url_with_path(self.path.as_str());
-        let mut uri = Url::parse(url.as_str()).unwrap();
-
-        // Set new query string
-        let query: Option<String> = query.into();
-        match query {
-            Some(query) => uri.set_query(Some(query.as_str())),
-            None => uri.set_query(None)
-        }
-
-        // Adjust path with new query string
-        self.path = if let Some(query) = uri.query() {
-            format!("{}?{}", uri.path(), query)
-
-        } else {
-            uri.path().to_string()
-        };
-
+        self.path = util::path_with_query(self.path.as_str(), query);
         self
-
     }
 
     /// Sets the response body.

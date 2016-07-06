@@ -13,9 +13,9 @@ use std::io::Read;
 
 // External Dependencies ------------------------------------------------------
 use json;
-use url::Url;
 use colored::*;
 use hyper::client::Response;
+use url::form_urlencoded::Serializer;
 use hyper::header::{Header, Headers, HeaderFormat, ContentType};
 use hyper::mime::{Mime, TopLevel, SubLevel};
 
@@ -128,51 +128,51 @@ impl<H: Header + HeaderFormat> From<H> for HttpHeader {
 /// # #[macro_use] extern crate noir;
 /// # fn main() {
 /// // The query object...
-/// let qs: Option<String> = (query! {
+/// let qs = query! {
 ///     "key" => "value",
 ///     "array[]" => vec!["item1", "item2","item3"],
 ///     "number" => 42,
 ///     "valid" => true
 ///
-/// }).into();
+/// };
 ///
 /// // ...will result in the following query string:
 /// assert_eq!(
-///     qs.unwrap(),
+///     qs.to_string(),
 ///     "key=value&array%5B%5D=item1&array%5B%5D=item2&array%5B%5D=item3&number=42&valid=true"
 /// );
 /// # }
 /// ```
 pub struct HttpQueryString {
-    items: Vec<HttpQueryStringItem>
+    fields: Vec<HttpQueryStringItem>
 }
 
 #[doc(hidden)]
 impl HttpQueryString {
-    pub fn new(items: Vec<HttpQueryStringItem>) -> HttpQueryString {
+    pub fn new(fields: Vec<HttpQueryStringItem>) -> HttpQueryString {
         HttpQueryString {
-            items: items
+            fields: fields
         }
     }
 }
 
 #[doc(hidden)]
-impl Into<Option<String>> for HttpQueryString {
-    fn into(self) -> Option<String> {
+impl ToString for HttpQueryString {
+    fn to_string(&self) -> String {
 
-        let mut uri = Url::parse("http://query.string/").unwrap();
+        let mut query = Serializer::new(String::new());
 
-        for item in self.items {
+        for item in &self.fields {
             match item {
-                HttpQueryStringItem::Value(key, value) => {
-                    uri.query_pairs_mut().append_pair(
+                &HttpQueryStringItem::Value(ref key, ref value) => {
+                    query.append_pair(
                         key.as_str(),
                         value.as_str()
                     );
                 },
-                HttpQueryStringItem::Array(key, values) => {
+                &HttpQueryStringItem::Array(ref key, ref values) => {
                     for value in values {
-                        uri.query_pairs_mut().append_pair(
+                        query.append_pair(
                             key.as_str(),
                             value.as_str()
                         );
@@ -181,10 +181,7 @@ impl Into<Option<String>> for HttpQueryString {
             }
         }
 
-        match uri.query() {
-            Some(query) => Some(query.to_string()),
-            None => None
-        }
+        query.finish()
 
     }
 }

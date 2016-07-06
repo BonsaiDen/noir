@@ -22,12 +22,30 @@ use hyper::header::{Headers, HeaderView};
 // Internal Dependencies ------------------------------------------------------
 use util::json as json_util;
 use super::{
-    HttpHeader, HttpBody, HttpLike, ParsedHttpBody,
+    HttpHeader, HttpBody, HttpLike, HttpQueryString, ParsedHttpBody,
     parse_http_body, parse_json
 };
 
 
 // HTTP Utilities -------------------------------------------------------------
+pub fn path_with_query(path: &str, query: HttpQueryString) -> String {
+
+    let new_query = query.to_string();
+
+    // Ignore hash and old query string
+    let (path, _) = path.split_at(path.find('#').unwrap_or(path.len()));
+    let (path, _) = path.split_at(path.find('?').unwrap_or(path.len()));
+
+    // Insert new query string
+    if new_query.is_empty() {
+        path.to_string()
+
+    } else {
+        format!("{}?{}", path, new_query)
+    }
+
+}
+
 pub fn http_body_into_parts(body: HttpBody) -> (Option<Mime>, Option<Vec<u8>>) {
     (body.mime, Some(body.data))
 }
