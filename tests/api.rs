@@ -13,7 +13,7 @@ impl HttpApi for TimeoutAPI {
     }
 
     fn port(&self) -> u16 {
-        4000
+        4001
     }
 
     fn start(&self) {
