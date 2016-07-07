@@ -30,7 +30,7 @@ fn test_api_start_timeout() {
     };
 
     assert_fail!(r#"
-<br>Noir Api Failure: <by>Server for \"<bc>http://localhost:4000\" <by>did not respond within <bn>1000ms<by>.
+<br>Noir Api Failure: <by>Server for \"<bc>http://localhost:4001\" <by>did not respond within <bn>1000ms<by>.
 
 "#, actual);
 
