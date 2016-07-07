@@ -3,10 +3,13 @@ environment:
   matrix:
   - TARGET: x86_64-pc-windows-msvc
     VERSION: 1.10.0
+    BITS: 64
   - TARGET: i686-pc-windows-msvc
     VERSION: 1.10.0
+    BITS: 32
   - TARGET: i686-pc-windows-gnu
     VERSION: 1.10.0
+    BITS: 32
 
 install:
   - ps: Start-FileDownload "http://slproweb.com/download/Win${env:BITS}OpenSSL-1_0_2h.exe"
