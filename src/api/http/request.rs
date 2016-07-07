@@ -307,11 +307,11 @@ impl<A: HttpApi> HttpRequest<A> {
         // Handle cases where the API test server did not start in time
         if self.api_timed_out {
             return Err(format!(
-                "\n{}\n\n    {} \"{}\" {} {}{}\n\n",
+                "\n{} {} \"{}\" {} {}{}\n\n",
                 "Noir Api Failure:".red().bold(),
-                "Specified server to test at".yellow(),
-                self.api.url().as_str().blue().bold(),
-                "did not start within".yellow(),
+                "Server for".yellow(),
+                self.api.url().as_str().cyan().bold(),
+                "did not respond within".yellow(),
                 "1000ms".cyan(),
                 ".".yellow()
             ));

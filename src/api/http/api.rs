@@ -8,9 +8,10 @@
 
 // STD Dependencies -----------------------------------------------------------
 use std::thread;
+use std::cell::RefCell;
 use std::time::Duration;
 use std::sync::{Arc, Mutex};
-use std::sync::atomic::{AtomicBool, Ordering};
+use std::collections::HashMap;
 
 
 // External Dependencies ------------------------------------------------------
@@ -156,15 +157,14 @@ fn request<A: HttpApi + 'static>(
 
 ) -> HttpRequest<A> {
 
-    // TODO IW: Support multiple APIs?
     let mut api_timed_out = false;
-    if let Ok(started) = API_THREAD_STARTED.lock() {
+    if let Ok(started) = API_THREADS_STARTED.lock() {
 
-        // Start server in background if required
-        if !started.load(Ordering::Relaxed) {
+        let host = api.host();
+        let mut thread_map = started.borrow_mut();
+        if !thread_map.contains_key(&host) {
 
-            started.store(true, Ordering::Relaxed);
-
+            // Start server in the background
             thread::spawn(move || {
                 api.start();
             });
@@ -184,6 +184,10 @@ fn request<A: HttpApi + 'static>(
             // API server didn't start in time
             if ticks == 100 {
                 api_timed_out = true;
+
+            // Insert into map
+            } else {
+                thread_map.insert(host, true);
             }
 
         }
@@ -195,8 +199,8 @@ fn request<A: HttpApi + 'static>(
 }
 
 lazy_static! {
-    static ref API_THREAD_STARTED: Arc<Mutex<AtomicBool>> = {
-        Arc::new(Mutex::new(AtomicBool::new(false)))
+    static ref API_THREADS_STARTED: Arc<Mutex<RefCell<HashMap<String, bool>>>> = {
+        Arc::new(Mutex::new(RefCell::new(HashMap::new())))
     };
 }
 
