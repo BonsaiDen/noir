@@ -21,16 +21,13 @@ use url::form_urlencoded::Serializer;
 /// ```rust
 /// # #[macro_use] extern crate noir;
 /// # fn main() {
-/// // The query object...
 /// let qs = query! {
 ///     "key" => "value",
 ///     "array[]" => vec!["item1", "item2","item3"],
 ///     "number" => 42,
 ///     "valid" => true
-///
 /// };
 ///
-/// // ...will result in the following query string:
 /// assert_eq!(
 ///     qs.to_string(),
 ///     "key=value&array%5B%5D=item1&array%5B%5D=item2&array%5B%5D=item3&number=42&valid=true"
@@ -41,6 +38,8 @@ pub struct HttpQueryString {
     fields: Vec<HttpQueryStringItem>
 }
 
+
+// Internal -------------------------------------------------------------------
 #[doc(hidden)]
 impl HttpQueryString {
     pub fn new(fields: Vec<HttpQueryStringItem>) -> HttpQueryString {

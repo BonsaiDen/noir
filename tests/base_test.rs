@@ -115,6 +115,34 @@ fn handle(mut req: Request, mut res: Response) {
                 "".to_string()
             },
 
+            (Method::Post, "/form") => {
+
+                let mut body = String::new();
+                req.read_to_string(&mut body).unwrap();
+
+                let boundary = if let Some(&ContentType(ref mime)) = req.headers.get::<ContentType>() {
+                    if let &Mime(TopLevel::Application, SubLevel::FormData, ref attrs) = mime {
+                        Some(attrs[0].1.as_str().to_string())
+
+                    } else {
+                        None
+                    }
+
+                } else {
+                    None
+                };
+
+                if let Some(boundary) = boundary {
+                    body = body.replace(boundary.as_str(), "<boundary>");
+                }
+
+                res.headers_mut().set(
+                    ContentType(Mime(TopLevel::Text, SubLevel::Plain, vec![]))
+                );
+                body
+
+            },
+
             (m, p) => {
                 res.headers_mut().set(
                     ContentType(Mime(TopLevel::Text, SubLevel::Plain, vec![]))

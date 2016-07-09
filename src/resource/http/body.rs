@@ -21,7 +21,8 @@ use hyper::mime::{Mime, TopLevel, SubLevel};
 
 // Internal Dependencies ------------------------------------------------------
 use util;
-use super::HttpLike;
+use super::{HttpLike, HttpFormData};
+use super::form::http_form_into_body_parts;
 use super::util::{parse_json, diff_text};
 
 
@@ -29,6 +30,12 @@ use super::util::{parse_json, diff_text};
 pub struct HttpBody {
     data: Vec<u8>,
     mime: Option<Mime>
+}
+
+
+// Internal -------------------------------------------------------------------
+pub fn http_body_into_parts(body: HttpBody) -> (Option<Mime>, Option<Vec<u8>>) {
+    (body.mime, Some(body.data))
 }
 
 #[doc(hidden)]
@@ -44,7 +51,7 @@ impl<'a> From<&'a mut Response> for HttpBody {
 }
 
 impl From<Vec<u8>> for HttpBody {
-    /// Creates a HTTP body out of a byte vector.
+    /// Creates a HTTP body from a byte vector.
     fn from(vec: Vec<u8>) -> HttpBody {
         HttpBody {
             data: vec,
@@ -54,7 +61,7 @@ impl From<Vec<u8>> for HttpBody {
 }
 
 impl From<&'static str> for HttpBody {
-    /// Creates a HTTP body out of a string slice.
+    /// Creates a HTTP body from a string slice.
     fn from(string: &'static str) -> HttpBody {
         HttpBody {
             data: string.into(),
@@ -64,7 +71,7 @@ impl From<&'static str> for HttpBody {
 }
 
 impl From<String> for HttpBody {
-    /// Creates a HTTP body out of `String`.
+    /// Creates a HTTP body from a `String`.
     fn from(string: String) -> HttpBody {
         HttpBody {
             data: string.into(),
@@ -74,7 +81,7 @@ impl From<String> for HttpBody {
 }
 
 impl From<json::JsonValue> for HttpBody {
-    /// Creates a HTTP body out of JSON value.
+    /// Creates a HTTP body from a JSON value.
     fn from(json: json::JsonValue) -> HttpBody {
         HttpBody {
             data: json::stringify(json).into(),
@@ -83,8 +90,16 @@ impl From<json::JsonValue> for HttpBody {
     }
 }
 
-pub fn http_body_into_parts(body: HttpBody) -> (Option<Mime>, Option<Vec<u8>>) {
-    (body.mime, Some(body.data))
+impl From<HttpFormData> for HttpBody {
+
+    /// Creates a HTTP body from form data.
+    fn from(form: HttpFormData) -> HttpBody {
+        let (mime_type, body) = http_form_into_body_parts(form);
+        HttpBody {
+            data: body,
+            mime: Some(mime_type)
+        }
+    }
 }
 
 pub fn validate_http_request_body<T: HttpLike>(
@@ -152,6 +167,8 @@ pub fn validate_http_request_body<T: HttpLike>(
                 }
 
             },
+            // TODO handle deep compare of forms when validating requests to
+            // external resources
             ParsedHttpBody::Raw(data) => {
                 format!(
                     "{} {}\n\n       [{}]\n\n    {}\n\n       [{}]",
@@ -202,8 +219,6 @@ pub fn validate_http_request_body<T: HttpLike>(
 
 }
 
-
-// Internal body parsing helpers ----------------------------------------------
 pub enum ParsedHttpBody<'a> {
     Text(&'a str),
     Json(json::JsonValue),

@@ -21,6 +21,7 @@
 extern crate url;
 #[macro_use]
 extern crate json;
+extern crate rand;
 extern crate hyper;
 extern crate colored;
 extern crate httparse;
@@ -48,7 +49,8 @@ pub use resource::http::{
     HttpResponse,
     HttpHeader,
     HttpBody,
-    HttpQueryString
+    HttpQueryString,
+    HttpFormData
 };
 
 
@@ -64,6 +66,7 @@ macro_rules! responses {
             temp_vec
         }
     );
+    // TODO fix macro name and test
     ( $( $x:expr, )* ) => ( res![ $($x ),* ] )
 }
 
@@ -79,6 +82,7 @@ macro_rules! mocks {
             temp_vec
         }
     );
+    // TODO fix macro name and test
     ( $( $x:expr, )* ) => ( res![ $($x ),* ] )
 }
 
@@ -94,12 +98,14 @@ macro_rules! headers {
             temp_vec
         }
     );
+    // TODO fix macro name and test
     ( $( $x:expr, )* ) => ( res![ $($x ),* ] )
 }
 
 /// A macro for creating a `HttpQueryString` instance.
 #[macro_export]
 macro_rules! query {
+    // TODO IW: Support trailing comma
     {} => ($crate::HttpQueryString::new(vec![]));
 
     { $( $key:expr => $value:expr ),* } => ({
@@ -111,6 +117,24 @@ macro_rules! query {
         )*
 
         $crate::HttpQueryString::new(items)
+    })
+}
+
+/// A macro for creating a `HttpFormData ` instance.
+#[macro_export]
+macro_rules! form {
+    // TODO IW: Support trailing comma
+    {} => ($crate::HttpFormData::new(vec![]));
+
+    { $( $key:expr => $value:expr ),* } => ({
+
+        let mut fields = Vec::new();
+
+        $(
+            fields.push(($key, $value).into());
+        )*
+
+        $crate::HttpFormData::new(fields)
     })
 }
 

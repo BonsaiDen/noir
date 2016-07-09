@@ -15,6 +15,7 @@ use hyper::client::Response;
 mod body;
 mod header;
 mod query;
+mod form;
 
 mod endpoint;
 mod request;
@@ -26,6 +27,8 @@ pub mod util;
 pub use self::body::HttpBody;
 pub use self::header::HttpHeader;
 pub use self::query::HttpQueryString;
+pub use self::form::HttpFormData;
+
 pub use self::request::HttpRequest;
 pub use self::endpoint::HttpEndpoint;
 pub use self::response::HttpResponse;
