@@ -1,7 +1,7 @@
 environment:
   RUST_TEST_THREADS: 1
-  OPENSSL_LIB_DIR: "C:/OpenSSL"
-  OPENSSL_INCLUDE_DIR: "C:/OpenSSL"
+  OPENSSL_LIB_DIR: "C:/OpenSSL/lib"
+  OPENSSL_INCLUDE_DIR: "C:/OpenSSL/include"
   matrix:
   - TARGET: x86_64-pc-windows-msvc
     VERSION: 1.10.0
@@ -16,6 +16,7 @@ environment:
 install:
   - ps: Start-FileDownload "http://slproweb.com/download/Win${env:BITS}OpenSSL-1_0_2h.exe"
   - Win%BITS%OpenSSL-1_0_2h.exe /SILENT /VERYSILENT /SP- /DIR="C:\OpenSSL"
+  - dir C:\OpenSSL
   - ps: Start-FileDownload "https://static.rust-lang.org/dist/rust-${env:VERSION}-${env:TARGET}.exe"
   - rust-%VERSION%-%TARGET%.exe /VERYSILENT /NORESTART /DIR="C:\rust"
   - SET PATH=%PATH%;C:\rust\bin
