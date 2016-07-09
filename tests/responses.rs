@@ -23,6 +23,21 @@ fn test_responses_provided() {
 }
 
 #[test]
+fn test_responses_provided_trailing_comma() {
+
+    let actual = {
+        API::get("/responses/one")
+            .provide(responses![
+                EXAMPLE.get("/one"),
+            ])
+            .collect()
+    };
+
+    assert_pass!(actual);
+
+}
+
+#[test]
 fn test_responses_provided_missing() {
 
     let actual = {

@@ -35,6 +35,21 @@ fn test_headers_expected_multiple() {
 }
 
 #[test]
+fn test_headers_expected_multiple_trailing_comma() {
+
+    let actual = {
+        API::get("/get/hello")
+            .expected_headers(headers![
+                Server("Servername".to_string()),
+            ])
+            .collect()
+    };
+
+    assert_pass!(actual);
+
+}
+
+#[test]
 fn test_headers_expected_mismatch() {
 
     let actual = {

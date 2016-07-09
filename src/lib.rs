@@ -66,8 +66,7 @@ macro_rules! responses {
             temp_vec
         }
     );
-    // TODO fix macro name and test
-    ( $( $x:expr, )* ) => ( res![ $($x ),* ] )
+    ( $( $x:expr, )* ) => ( responses![ $($x ),* ] )
 }
 
 /// A convenience macro for creating a vector of `Box<MockProvider>` items.
@@ -82,8 +81,7 @@ macro_rules! mocks {
             temp_vec
         }
     );
-    // TODO fix macro name and test
-    ( $( $x:expr, )* ) => ( res![ $($x ),* ] )
+    ( $( $x:expr, )* ) => ( mocks![ $($x ),* ] )
 }
 
 /// A convenience macro for creating a vector of `HttpHeader` items.
@@ -98,16 +96,13 @@ macro_rules! headers {
             temp_vec
         }
     );
-    // TODO fix macro name and test
-    ( $( $x:expr, )* ) => ( res![ $($x ),* ] )
+    ( $( $x:expr, )* ) => ( headers![ $($x ),* ] )
 }
 
 /// A macro for creating a `HttpQueryString` instance.
 #[macro_export]
 macro_rules! query {
-    // TODO IW: Support trailing comma
     {} => ($crate::HttpQueryString::new(vec![]));
-
     { $( $key:expr => $value:expr ),* } => ({
 
         let mut items = Vec::new();
@@ -117,15 +112,14 @@ macro_rules! query {
         )*
 
         $crate::HttpQueryString::new(items)
-    })
+    });
+    ( $( $key:expr => $value:expr, )* ) => ( query![ $($key => $value),* ] )
 }
 
 /// A macro for creating a `HttpFormData ` instance.
 #[macro_export]
 macro_rules! form {
-    // TODO IW: Support trailing comma
     {} => ($crate::HttpFormData::new(vec![]));
-
     { $( $key:expr => $value:expr ),* } => ({
 
         let mut fields = Vec::new();
@@ -135,6 +129,7 @@ macro_rules! form {
         )*
 
         $crate::HttpFormData::new(fields)
-    })
+    });
+    ( $( $key:expr => $value:expr, )* ) => ( form![ $($key => $value),* ] )
 }
 

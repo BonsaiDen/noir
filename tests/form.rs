@@ -24,6 +24,23 @@ fn test_with_form_body_url_encoded() {
 }
 
 #[test]
+fn test_with_form_body_url_encoded_trailing_comma() {
+
+    let actual = {
+        API::post("/form")
+            .with_body(form! {
+                "field" => "someValue",
+                "array[]" => vec![1, 2, 3, 4, 5],
+            })
+            .expected_body("field=someValue&array%5B%5D=1&array%5B%5D=2&array%5B%5D=3&array%5B%5D=4&array%5B%5D=5")
+            .collect()
+    };
+
+    assert_pass!(actual);
+
+}
+
+#[test]
 fn test_with_form_body_url_multipart_vec_file() {
 
     let actual = {

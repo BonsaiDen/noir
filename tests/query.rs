@@ -26,6 +26,25 @@ fn test_with_query_set() {
 }
 
 #[test]
+fn test_with_query_set_trailing_comma() {
+
+    let actual = {
+        API::get("/query")
+            .with_query(query!{
+                "key" => "value",
+                "array[]" => vec!["item1", "item2", "item3"],
+                "foo" => "bar",
+                "single" => vec!["item"],
+            })
+            .expected_body("Route not found: GET /query?key=value&array%5B%5D=item1&array%5B%5D=item2&array%5B%5D=item3&foo=bar&single=item")
+            .collect()
+    };
+
+    assert_pass!(actual);
+
+}
+
+#[test]
 fn test_with_query_set_empty() {
 
     let actual = {
