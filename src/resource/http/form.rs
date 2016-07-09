@@ -99,7 +99,7 @@ impl HttpFormData {
 
             let mut body = Vec::new();
             let mut rng = rand::thread_rng();
-            let mut parts: Vec<(Vec<u8>, Vec<u8>, bool)> = Vec::new();
+            let mut parts: Vec<(Vec<u8>, Vec<u8>)> = Vec::new();
 
             // Convert form fields into multiparts
             for field in self.fields {
@@ -111,8 +111,7 @@ impl HttpFormData {
                                 name
 
                             ).as_bytes().to_vec(),
-                            value.as_bytes().to_vec(),
-                            false
+                            value.as_bytes().to_vec()
                         ));
                     },
                     HttpFormDataField::Array(name, values) => {
@@ -123,8 +122,7 @@ impl HttpFormData {
                                     name
 
                                 ).as_bytes().to_vec(),
-                                value.as_bytes().to_vec(),
-                                false
+                                value.as_bytes().to_vec()
                             ));
                         }
                     },
@@ -137,8 +135,7 @@ impl HttpFormData {
                                 mime
 
                             ).as_bytes().to_vec(),
-                            data,
-                            true
+                            data
                         ));
                     },
                     HttpFormDataField::FileFs(name, filename, mime, mut file) => {
@@ -152,8 +149,7 @@ impl HttpFormData {
                                 mime
 
                             ).as_bytes().to_vec(),
-                            data,
-                            true
+                            data
                         ));
                     }
                 }
@@ -166,19 +162,13 @@ impl HttpFormData {
             let boundary_line = full_boundary.as_bytes();
 
             // Build body payload
-            for (mut headers, mut data, pad) in parts {
-
+            for (mut headers, mut data) in parts {
                 body.extend_from_slice(boundary_line);
                 body.append(&mut headers);
                 body.append(&mut data);
-
-                if pad {
-                    body.extend_from_slice("\r\n".as_bytes());
-                }
-
             }
 
-            body.extend_from_slice(format!("--{}--\r\n", boundary).as_bytes());
+            body.extend_from_slice(format!("\r\n--{}--\r\n", boundary).as_bytes());
 
             (
                 Mime(TopLevel::Application, self.mime, vec![
