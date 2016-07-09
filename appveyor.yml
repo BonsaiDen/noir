@@ -1,11 +1,11 @@
 environment:
   RUST_TEST_THREADS: 1
-  OPENSSL_LIB_DIR: "C:/OpenSSL/lib"
+  OPENSSL_LIB_DIR: "C:/OpenSSL"
   OPENSSL_INCLUDE_DIR: "C:/OpenSSL/include"
   matrix:
   - TARGET: x86_64-pc-windows-msvc
     VERSION: 1.10.0
-    BITS: 64
+    BITS: 32
   - TARGET: i686-pc-windows-msvc
     VERSION: 1.10.0
     BITS: 32
