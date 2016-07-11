@@ -1,0 +1,1 @@
+initSidebarItems({"trait":[["HttpEndpoint","A trait for the description of a HTTP based endpoint used to provided mocked responses to a testable API."]]});

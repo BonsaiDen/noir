@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["HttpQueryString","An abstraction over a HTTP query string."]]});

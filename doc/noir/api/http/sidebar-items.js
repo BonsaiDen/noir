@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["HttpRequest","A HTTP request for API testing."]],"trait":[["HttpApi","A trait for the description of a testable, HTTP based api."]]});

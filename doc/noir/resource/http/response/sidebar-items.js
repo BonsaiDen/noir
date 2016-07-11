@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["HttpResponse","A mocked HTTP response that is being provided to a testable API."]]});

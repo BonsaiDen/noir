@@ -430,27 +430,6 @@
 <span id="386">386</span>
 <span id="387">387</span>
 <span id="388">388</span>
-<span id="389">389</span>
-<span id="390">390</span>
-<span id="391">391</span>
-<span id="392">392</span>
-<span id="393">393</span>
-<span id="394">394</span>
-<span id="395">395</span>
-<span id="396">396</span>
-<span id="397">397</span>
-<span id="398">398</span>
-<span id="399">399</span>
-<span id="400">400</span>
-<span id="401">401</span>
-<span id="402">402</span>
-<span id="403">403</span>
-<span id="404">404</span>
-<span id="405">405</span>
-<span id="406">406</span>
-<span id="407">407</span>
-<span id="408">408</span>
-<span id="409">409</span>
 </pre><pre class='rust '>
 <span class='comment'>// Copyright (c) 2016 Ivo Wetzel</span>
 
@@ -465,7 +444,6 @@
 
 
 <span class='comment'>// External Dependencies ------------------------------------------------------</span>
-<span class='kw'>use</span> <span class='ident'>url</span>::<span class='ident'>Url</span>;
 <span class='kw'>use</span> <span class='ident'>colored</span>::<span class='op'>*</span>;
 <span class='kw'>use</span> <span class='ident'>hyper</span>::<span class='ident'>method</span>::<span class='ident'>Method</span>;
 <span class='kw'>use</span> <span class='ident'>hyper</span>::<span class='ident'>server</span>::<span class='ident'>Response</span> <span class='kw'>as</span> <span class='ident'>ServerResponse</span>;
@@ -534,28 +512,8 @@
     <span class='doccomment'>/// This will override any existing query string previously set or derived</span>
     <span class='doccomment'>/// from the request&#39;s path.</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>with_query</span>(<span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>query</span>: <span class='ident'>HttpQueryString</span>) <span class='op'>-&gt;</span> <span class='self'>Self</span> {
-
-        <span class='comment'>// Parse existing URL</span>
-        <span class='kw'>let</span> <span class='ident'>url</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>endpoint</span>.<span class='ident'>url_with_path</span>(<span class='self'>self</span>.<span class='ident'>path</span>.<span class='ident'>as_str</span>());
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>uri</span> <span class='op'>=</span> <span class='ident'>Url</span>::<span class='ident'>parse</span>(<span class='ident'>url</span>.<span class='ident'>as_str</span>()).<span class='ident'>unwrap</span>();
-
-        <span class='comment'>// Set new query string</span>
-        <span class='kw'>let</span> <span class='ident'>query</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>query</span>.<span class='ident'>into</span>();
-        <span class='kw'>match</span> <span class='ident'>query</span> {
-            <span class='prelude-val'>Some</span>(<span class='ident'>query</span>) <span class='op'>=&gt;</span> <span class='ident'>uri</span>.<span class='ident'>set_query</span>(<span class='prelude-val'>Some</span>(<span class='ident'>query</span>.<span class='ident'>as_str</span>())),
-            <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='ident'>uri</span>.<span class='ident'>set_query</span>(<span class='prelude-val'>None</span>)
-        }
-
-        <span class='comment'>// Adjust path with new query string</span>
-        <span class='self'>self</span>.<span class='ident'>path</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>query</span>) <span class='op'>=</span> <span class='ident'>uri</span>.<span class='ident'>query</span>() {
-            <span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;{}?{}&quot;</span>, <span class='ident'>uri</span>.<span class='ident'>path</span>(), <span class='ident'>query</span>)
-
-        } <span class='kw'>else</span> {
-            <span class='ident'>uri</span>.<span class='ident'>path</span>().<span class='ident'>to_string</span>()
-        };
-
+        <span class='self'>self</span>.<span class='ident'>path</span> <span class='op'>=</span> <span class='ident'>util</span>::<span class='ident'>path_with_query</span>(<span class='self'>self</span>.<span class='ident'>path</span>.<span class='ident'>as_str</span>(), <span class='ident'>query</span>);
         <span class='self'>self</span>
-
     }
 
     <span class='doccomment'>/// Sets the response body.</span>
@@ -643,7 +601,7 @@
     <span class='doccomment'>/// If the actual response body does not match the expected one.</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>expected_body</span><span class='op'>&lt;</span><span class='ident'>S</span>: <span class='ident'>Into</span><span class='op'>&lt;</span><span class='ident'>HttpBody</span><span class='op'>&gt;&gt;</span>(<span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>body</span>: <span class='ident'>S</span>) <span class='op'>-&gt;</span> <span class='self'>Self</span> {
         <span class='self'>self</span>.<span class='ident'>expected_body</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>body</span>.<span class='ident'>into</span>());
-        <span class='self'>self</span>.<span class='ident'>expected_exact_body</span> <span class='op'>=</span> <span class='bool-val'>false</span>;
+        <span class='self'>self</span>.<span class='ident'>expected_exact_body</span> <span class='op'>=</span> <span class='boolvalue'>false</span>;
         <span class='self'>self</span>
     }
 
@@ -666,7 +624,7 @@
     <span class='doccomment'>/// If the actual response body does not match the expected one.</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>expected_exact_body</span><span class='op'>&lt;</span><span class='ident'>S</span>: <span class='ident'>Into</span><span class='op'>&lt;</span><span class='ident'>HttpBody</span><span class='op'>&gt;&gt;</span>(<span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>body</span>: <span class='ident'>S</span>) <span class='op'>-&gt;</span> <span class='self'>Self</span> {
         <span class='self'>self</span>.<span class='ident'>expected_body</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>body</span>.<span class='ident'>into</span>());
-        <span class='self'>self</span>.<span class='ident'>expected_exact_body</span> <span class='op'>=</span> <span class='bool-val'>true</span>;
+        <span class='self'>self</span>.<span class='ident'>expected_exact_body</span> <span class='op'>=</span> <span class='boolvalue'>true</span>;
         <span class='self'>self</span>
     }
 
@@ -676,7 +634,7 @@
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// Always.</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>dump</span>(<span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='self'>Self</span> {
-        <span class='self'>self</span>.<span class='ident'>dump_request</span> <span class='op'>=</span> <span class='bool-val'>true</span>;
+        <span class='self'>self</span>.<span class='ident'>dump_request</span> <span class='op'>=</span> <span class='boolvalue'>true</span>;
         <span class='self'>self</span>
     }
 
@@ -693,7 +651,7 @@
                 <span class='op'>&amp;&amp;</span> <span class='self'>self</span>.<span class='ident'>path</span> <span class='op'>==</span> <span class='ident'>request</span>.<span class='ident'>path</span>
 
         } <span class='kw'>else</span> {
-            <span class='bool-val'>false</span>
+            <span class='boolvalue'>false</span>
         }
     }
 
@@ -845,7 +803,7 @@
         <span class='ident'>method</span>: <span class='ident'>method</span>,
         <span class='ident'>path</span>: <span class='ident'>path</span>.<span class='ident'>to_string</span>(),
 
-        <span class='ident'>dump_request</span>: <span class='bool-val'>false</span>,
+        <span class='ident'>dump_request</span>: <span class='boolvalue'>false</span>,
 
         <span class='ident'>response_status</span>: <span class='prelude-val'>None</span>,
         <span class='ident'>response_headers</span>: <span class='ident'>Headers</span>::<span class='ident'>new</span>(),
@@ -855,7 +813,7 @@
         <span class='ident'>unexpected_headers</span>: <span class='ident'>Vec</span>::<span class='ident'>new</span>(),
         <span class='ident'>expected_headers</span>: <span class='ident'>Headers</span>::<span class='ident'>new</span>(),
         <span class='ident'>expected_body</span>: <span class='prelude-val'>None</span>,
-        <span class='ident'>expected_exact_body</span>: <span class='bool-val'>false</span>,
+        <span class='ident'>expected_exact_body</span>: <span class='boolvalue'>false</span>,
 
         <span class='ident'>request</span>: <span class='prelude-val'>None</span>
     }

@@ -47,11 +47,12 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-1366' class='srclink' href='../src/noir/src/lib.rs.html#102-115' title='goto source code'>[src]</a></span></h1>
+               </span><a id='src-1727' class='srclink' href='../src/noir/src/lib.rs.html#104-117' title='goto source code'>[src]</a></span></h1>
 <pre class='rust macro'>
 <span class='macro'>macro_rules</span><span class='macro'>!</span> <span class='ident'>query</span> {
     {} <span class='op'>=&gt;</span> { ... };
     { $( <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>key</span>:<span class='ident'>expr</span> <span class='op'>=&gt;</span> <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>value</span>:<span class='ident'>expr</span> ),<span class='op'>*</span> } <span class='op'>=&gt;</span> { ... };
+    ( $( <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>key</span>:<span class='ident'>expr</span> <span class='op'>=&gt;</span> <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>value</span>:<span class='ident'>expr</span>, )<span class='op'>*</span> ) <span class='op'>=&gt;</span> { ... };
 }</pre>
 <div class='docblock'><p>A macro for creating a <code>HttpQueryString</code> instance.</p>
 </div></section>

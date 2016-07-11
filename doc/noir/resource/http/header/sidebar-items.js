@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["HttpHeader","An abstraction over different `hyper::Header` implementations."]]});

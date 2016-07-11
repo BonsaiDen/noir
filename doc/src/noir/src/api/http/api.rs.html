@@ -244,6 +244,10 @@
 <span id="200">200</span>
 <span id="201">201</span>
 <span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
 </pre><pre class='rust '>
 <span class='comment'>// Copyright (c) 2016 Ivo Wetzel</span>
 
@@ -255,9 +259,10 @@
 
 <span class='comment'>// STD Dependencies -----------------------------------------------------------</span>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>thread</span>;
+<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>cell</span>::<span class='ident'>RefCell</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>time</span>::<span class='ident'>Duration</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>sync</span>::{<span class='ident'>Arc</span>, <span class='ident'>Mutex</span>};
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>sync</span>::<span class='ident'>atomic</span>::{<span class='ident'>AtomicBool</span>, <span class='ident'>Ordering</span>};
+<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>collections</span>::<span class='ident'>HashMap</span>;
 
 
 <span class='comment'>// External Dependencies ------------------------------------------------------</span>
@@ -403,15 +408,14 @@
 
 ) <span class='op'>-&gt;</span> <span class='ident'>HttpRequest</span><span class='op'>&lt;</span><span class='ident'>A</span><span class='op'>&gt;</span> {
 
-    <span class='comment'>// TODO IW: Support multiple APIs?</span>
-    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>api_timed_out</span> <span class='op'>=</span> <span class='bool-val'>false</span>;
-    <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Ok</span>(<span class='ident'>started</span>) <span class='op'>=</span> <span class='ident'>API_THREAD_STARTED</span>.<span class='ident'>lock</span>() {
+    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>api_timed_out</span> <span class='op'>=</span> <span class='boolvalue'>false</span>;
+    <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Ok</span>(<span class='ident'>started</span>) <span class='op'>=</span> <span class='ident'>API_THREADS_STARTED</span>.<span class='ident'>lock</span>() {
 
-        <span class='comment'>// Start server in background if required</span>
-        <span class='kw'>if</span> <span class='op'>!</span><span class='ident'>started</span>.<span class='ident'>load</span>(<span class='ident'>Ordering</span>::<span class='ident'>Relaxed</span>) {
+        <span class='kw'>let</span> <span class='ident'>host</span> <span class='op'>=</span> <span class='ident'>api</span>.<span class='ident'>host</span>();
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>thread_map</span> <span class='op'>=</span> <span class='ident'>started</span>.<span class='ident'>borrow_mut</span>();
+        <span class='kw'>if</span> <span class='op'>!</span><span class='ident'>thread_map</span>.<span class='ident'>contains_key</span>(<span class='kw-2'>&amp;</span><span class='ident'>host</span>) {
 
-            <span class='ident'>started</span>.<span class='ident'>store</span>(<span class='bool-val'>true</span>, <span class='ident'>Ordering</span>::<span class='ident'>Relaxed</span>);
-
+            <span class='comment'>// Start server in the background</span>
             <span class='ident'>thread</span>::<span class='ident'>spawn</span>(<span class='kw'>move</span> <span class='op'>||</span> {
                 <span class='ident'>api</span>.<span class='ident'>start</span>();
             });
@@ -430,7 +434,11 @@
 
             <span class='comment'>// API server didn&#39;t start in time</span>
             <span class='kw'>if</span> <span class='ident'>ticks</span> <span class='op'>==</span> <span class='number'>100</span> {
-                <span class='ident'>api_timed_out</span> <span class='op'>=</span> <span class='bool-val'>true</span>;
+                <span class='ident'>api_timed_out</span> <span class='op'>=</span> <span class='boolvalue'>true</span>;
+
+            <span class='comment'>// Insert into map</span>
+            } <span class='kw'>else</span> {
+                <span class='ident'>thread_map</span>.<span class='ident'>insert</span>(<span class='ident'>host</span>, <span class='boolvalue'>true</span>);
             }
 
         }
@@ -442,8 +450,8 @@
 }
 
 <span class='macro'>lazy_static</span><span class='macro'>!</span> {
-    <span class='kw'>static</span> <span class='kw-2'>ref</span> <span class='ident'>API_THREAD_STARTED</span>: <span class='ident'>Arc</span><span class='op'>&lt;</span><span class='ident'>Mutex</span><span class='op'>&lt;</span><span class='ident'>AtomicBool</span><span class='op'>&gt;&gt;</span> <span class='op'>=</span> {
-        <span class='ident'>Arc</span>::<span class='ident'>new</span>(<span class='ident'>Mutex</span>::<span class='ident'>new</span>(<span class='ident'>AtomicBool</span>::<span class='ident'>new</span>(<span class='bool-val'>false</span>)))
+    <span class='kw'>static</span> <span class='kw-2'>ref</span> <span class='ident'>API_THREADS_STARTED</span>: <span class='ident'>Arc</span><span class='op'>&lt;</span><span class='ident'>Mutex</span><span class='op'>&lt;</span><span class='ident'>RefCell</span><span class='op'>&lt;</span><span class='ident'>HashMap</span><span class='op'>&lt;</span><span class='ident'>String</span>, <span class='ident'>bool</span><span class='op'>&gt;&gt;</span><span class='op'>&gt;&gt;</span> <span class='op'>=</span> {
+        <span class='ident'>Arc</span>::<span class='ident'>new</span>(<span class='ident'>Mutex</span>::<span class='ident'>new</span>(<span class='ident'>RefCell</span>::<span class='ident'>new</span>(<span class='ident'>HashMap</span>::<span class='ident'>new</span>())))
     };
 }
 

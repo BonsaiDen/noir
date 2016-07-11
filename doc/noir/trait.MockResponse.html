@@ -47,7 +47,7 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-426' class='srclink' href='../src/noir/src/mock/mod.rs.html#26-60' title='goto source code'>[src]</a></span></h1>
+               </span><a id='src-427' class='srclink' href='../src/noir/src/mock/mod.rs.html#26-60' title='goto source code'>[src]</a></span></h1>
 <pre class='rust trait'>pub trait MockResponse: <a class='trait' href='https://doc.rust-lang.org/nightly/core/marker/trait.Send.html' title='core::marker::Send'>Send</a> {
     fn <a href='#tymethod.matches' class='fnname'>matches</a>(&amp;self, &amp;<a class='struct' href='https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html' title='alloc::boxed::Box'>Box</a>&lt;<a class='trait' href='../noir/trait.MockRequest.html' title='noir::MockRequest'>MockRequest</a>&gt;) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>;
     fn <a href='#tymethod.respond' class='fnname'>respond</a>(&amp;mut self, <a class='struct' href='https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html' title='alloc::boxed::Box'>Box</a>&lt;<a class='trait' href='../noir/trait.MockRequest.html' title='noir::MockRequest'>MockRequest</a>&gt;) -&gt; <a class='type' href='../noir/type.MockRequestResponse.html' title='noir::MockRequestResponse'>MockRequestResponse</a>;
@@ -84,7 +84,7 @@ a vector of error messages listing any differences.</p>
 </div></div>
         <h2 id='implementors'>Implementors</h2>
         <ul class='item-list' id='implementors-list'>
-    <li><code>impl&lt;E:&nbsp;<a class='trait' href='../noir/trait.HttpEndpoint.html' title='noir::HttpEndpoint'>HttpEndpoint</a>&gt; MockResponse for <a class='struct' href='../noir/struct.HttpResponse.html' title='noir::HttpResponse'>HttpResponse</a>&lt;E&gt;</code></li>
+    <li><code>impl&lt;E: <a class='trait' href='../noir/trait.HttpEndpoint.html' title='noir::HttpEndpoint'>HttpEndpoint</a>&gt; MockResponse for <a class='struct' href='../noir/struct.HttpResponse.html' title='noir::HttpResponse'>HttpResponse</a>&lt;E&gt;</code></li>
 </ul><script type="text/javascript" async
                          src="../implementors/noir/trait.MockResponse.js">
                  </script></section>

@@ -647,24 +647,6 @@
 <span id="603">603</span>
 <span id="604">604</span>
 <span id="605">605</span>
-<span id="606">606</span>
-<span id="607">607</span>
-<span id="608">608</span>
-<span id="609">609</span>
-<span id="610">610</span>
-<span id="611">611</span>
-<span id="612">612</span>
-<span id="613">613</span>
-<span id="614">614</span>
-<span id="615">615</span>
-<span id="616">616</span>
-<span id="617">617</span>
-<span id="618">618</span>
-<span id="619">619</span>
-<span id="620">620</span>
-<span id="621">621</span>
-<span id="622">622</span>
-<span id="623">623</span>
 </pre><pre class='rust '>
 <span class='comment'>// Copyright (c) 2016 Ivo Wetzel</span>
 
@@ -680,7 +662,6 @@
 
 
 <span class='comment'>// External Dependencies ------------------------------------------------------</span>
-<span class='kw'>use</span> <span class='ident'>url</span>::<span class='ident'>Url</span>;
 <span class='kw'>use</span> <span class='ident'>colored</span>::<span class='op'>*</span>;
 <span class='kw'>use</span> <span class='ident'>hyper</span>::<span class='ident'>Client</span>;
 <span class='kw'>use</span> <span class='ident'>hyper</span>::<span class='ident'>method</span>::<span class='ident'>Method</span>;
@@ -809,28 +790,8 @@
     <span class='doccomment'>/// This will override any existing query string previously set or derived</span>
     <span class='doccomment'>/// from the request&#39;s path.</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>with_query</span>(<span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>query</span>: <span class='ident'>HttpQueryString</span>) <span class='op'>-&gt;</span> <span class='self'>Self</span> {
-
-        <span class='comment'>// Parse existing URL</span>
-        <span class='kw'>let</span> <span class='ident'>url</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>api</span>.<span class='ident'>url_with_path</span>(<span class='self'>self</span>.<span class='ident'>path</span>.<span class='ident'>as_str</span>());
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>uri</span> <span class='op'>=</span> <span class='ident'>Url</span>::<span class='ident'>parse</span>(<span class='ident'>url</span>.<span class='ident'>as_str</span>()).<span class='ident'>unwrap</span>();
-
-        <span class='comment'>// Set new query string</span>
-        <span class='kw'>let</span> <span class='ident'>query</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>query</span>.<span class='ident'>into</span>();
-        <span class='kw'>match</span> <span class='ident'>query</span> {
-            <span class='prelude-val'>Some</span>(<span class='ident'>query</span>) <span class='op'>=&gt;</span> <span class='ident'>uri</span>.<span class='ident'>set_query</span>(<span class='prelude-val'>Some</span>(<span class='ident'>query</span>.<span class='ident'>as_str</span>())),
-            <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='ident'>uri</span>.<span class='ident'>set_query</span>(<span class='prelude-val'>None</span>)
-        }
-
-        <span class='comment'>// Adjust path with new query string</span>
-        <span class='self'>self</span>.<span class='ident'>path</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>query</span>) <span class='op'>=</span> <span class='ident'>uri</span>.<span class='ident'>query</span>() {
-            <span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;{}?{}&quot;</span>, <span class='ident'>uri</span>.<span class='ident'>path</span>(), <span class='ident'>query</span>)
-
-        } <span class='kw'>else</span> {
-            <span class='ident'>uri</span>.<span class='ident'>path</span>().<span class='ident'>to_string</span>()
-        };
-
+        <span class='self'>self</span>.<span class='ident'>path</span> <span class='op'>=</span> <span class='ident'>util</span>::<span class='ident'>path_with_query</span>(<span class='self'>self</span>.<span class='ident'>path</span>.<span class='ident'>as_str</span>(), <span class='ident'>query</span>);
         <span class='self'>self</span>
-
     }
 
     <span class='doccomment'>/// Sets the request body.</span>
@@ -919,7 +880,7 @@
     <span class='doccomment'>/// If the actual response body does not match the expected one.</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>expected_body</span><span class='op'>&lt;</span><span class='ident'>S</span>: <span class='ident'>Into</span><span class='op'>&lt;</span><span class='ident'>HttpBody</span><span class='op'>&gt;&gt;</span>(<span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>body</span>: <span class='ident'>S</span>) <span class='op'>-&gt;</span> <span class='self'>Self</span> {
         <span class='self'>self</span>.<span class='ident'>expected_body</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>body</span>.<span class='ident'>into</span>());
-        <span class='self'>self</span>.<span class='ident'>expected_exact_body</span> <span class='op'>=</span> <span class='bool-val'>false</span>;
+        <span class='self'>self</span>.<span class='ident'>expected_exact_body</span> <span class='op'>=</span> <span class='boolvalue'>false</span>;
         <span class='self'>self</span>
     }
 
@@ -942,7 +903,7 @@
     <span class='doccomment'>/// If the actual response body does not match the expected one.</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>expected_exact_body</span><span class='op'>&lt;</span><span class='ident'>S</span>: <span class='ident'>Into</span><span class='op'>&lt;</span><span class='ident'>HttpBody</span><span class='op'>&gt;&gt;</span>(<span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>body</span>: <span class='ident'>S</span>) <span class='op'>-&gt;</span> <span class='self'>Self</span> {
         <span class='self'>self</span>.<span class='ident'>expected_body</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>body</span>.<span class='ident'>into</span>());
-        <span class='self'>self</span>.<span class='ident'>expected_exact_body</span> <span class='op'>=</span> <span class='bool-val'>true</span>;
+        <span class='self'>self</span>.<span class='ident'>expected_exact_body</span> <span class='op'>=</span> <span class='boolvalue'>true</span>;
         <span class='self'>self</span>
     }
 
@@ -967,7 +928,7 @@
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// Always.</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>dump</span>(<span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='self'>Self</span> {
-        <span class='self'>self</span>.<span class='ident'>dump_response</span> <span class='op'>=</span> <span class='bool-val'>true</span>;
+        <span class='self'>self</span>.<span class='ident'>dump_response</span> <span class='op'>=</span> <span class='boolvalue'>true</span>;
         <span class='self'>self</span>
     }
 
@@ -985,7 +946,7 @@
 
     <span class='doccomment'>/// Directly execute the test request and collect any error message output.</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>collect</span>(<span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span>(), <span class='ident'>String</span><span class='op'>&gt;</span> {
-        <span class='self'>self</span>.<span class='ident'>run_on_drop</span> <span class='op'>=</span> <span class='bool-val'>false</span>;
+        <span class='self'>self</span>.<span class='ident'>run_on_drop</span> <span class='op'>=</span> <span class='boolvalue'>false</span>;
         <span class='self'>self</span>.<span class='ident'>run</span>()
     }
 
@@ -996,11 +957,11 @@
         <span class='comment'>// Handle cases where the API test server did not start in time</span>
         <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>api_timed_out</span> {
             <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='macro'>format</span><span class='macro'>!</span>(
-                <span class='string'>&quot;\n{}\n\n    {} \&quot;{}\&quot; {} {}{}\n\n&quot;</span>,
+                <span class='string'>&quot;\n{} {} \&quot;{}\&quot; {} {}{}\n\n&quot;</span>,
                 <span class='string'>&quot;Noir Api Failure:&quot;</span>.<span class='ident'>red</span>().<span class='ident'>bold</span>(),
-                <span class='string'>&quot;Specified server to test at&quot;</span>.<span class='ident'>yellow</span>(),
-                <span class='self'>self</span>.<span class='ident'>api</span>.<span class='ident'>url</span>().<span class='ident'>as_str</span>().<span class='ident'>blue</span>().<span class='ident'>bold</span>(),
-                <span class='string'>&quot;did not start within&quot;</span>.<span class='ident'>yellow</span>(),
+                <span class='string'>&quot;Server for&quot;</span>.<span class='ident'>yellow</span>(),
+                <span class='self'>self</span>.<span class='ident'>api</span>.<span class='ident'>url</span>().<span class='ident'>as_str</span>().<span class='ident'>cyan</span>().<span class='ident'>bold</span>(),
+                <span class='string'>&quot;did not respond within&quot;</span>.<span class='ident'>yellow</span>(),
                 <span class='string'>&quot;1000ms&quot;</span>.<span class='ident'>cyan</span>(),
                 <span class='string'>&quot;.&quot;</span>.<span class='ident'>yellow</span>()
             ));
@@ -1211,7 +1172,10 @@
 
 
 <span class='comment'>// Helper ---------------------------------------------------------------------</span>
-<span class='kw'>fn</span> <span class='ident'>format_response_errors</span>(<span class='ident'>header</span>: <span class='ident'>String</span>, <span class='ident'>offset</span>: <span class='ident'>usize</span>, <span class='ident'>errors</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>String</span> {
+<span class='kw'>fn</span> <span class='ident'>format_response_errors</span>(
+    <span class='ident'>header</span>: <span class='ident'>String</span>, <span class='ident'>offset</span>: <span class='ident'>usize</span>, <span class='ident'>errors</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;</span>
+
+) <span class='op'>-&gt;</span> <span class='ident'>String</span> {
 
     <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>formatted</span> <span class='op'>=</span> <span class='macro'>format</span><span class='macro'>!</span>(
         <span class='string'>&quot;{} {}&quot;</span>,
@@ -1264,7 +1228,7 @@
         <span class='ident'>path</span>: <span class='ident'>path</span>.<span class='ident'>to_string</span>(),
 
         <span class='ident'>api_timed_out</span>: <span class='ident'>api_timed_out</span>,
-        <span class='ident'>dump_response</span>: <span class='bool-val'>false</span>,
+        <span class='ident'>dump_response</span>: <span class='boolvalue'>false</span>,
 
         <span class='ident'>provided_responses</span>: <span class='ident'>Vec</span>::<span class='ident'>new</span>(),
         <span class='ident'>provided_mocks</span>: <span class='ident'>Vec</span>::<span class='ident'>new</span>(),
@@ -1275,11 +1239,11 @@
         <span class='ident'>expected_status</span>: <span class='prelude-val'>None</span>,
         <span class='ident'>expected_headers</span>: <span class='ident'>Headers</span>::<span class='ident'>new</span>(),
         <span class='ident'>expected_body</span>: <span class='prelude-val'>None</span>,
-        <span class='ident'>expected_exact_body</span>: <span class='bool-val'>false</span>,
+        <span class='ident'>expected_exact_body</span>: <span class='boolvalue'>false</span>,
 
         <span class='ident'>unexpected_headers</span>: <span class='ident'>Vec</span>::<span class='ident'>new</span>(),
 
-        <span class='ident'>run_on_drop</span>: <span class='bool-val'>true</span>
+        <span class='ident'>run_on_drop</span>: <span class='boolvalue'>true</span>
     }
 }
 
