@@ -124,7 +124,7 @@ impl Write for MockStream {
                     self.host.to_string(),
                     self.port,
                     req,
-                    self.request[size..].to_vec().into()
+                    self.request[size..].to_vec()
                 ));
 
                 match MockResponseProvider::response_from_request(request) {

@@ -239,3 +239,72 @@ fn test_provided_response_dump_json_invalid_utf8() {
 
 }
 
+#[test]
+fn test_provided_response_dump_form() {
+
+    use std::fs::File;
+
+    let actual = {
+        API::post("/response/forward")
+            .provide(responses![
+                EXAMPLE.post("/forward").dump()
+            ])
+            .with_body(form! {
+                "field" => "someValue\n",
+                "array[]" => vec!["1", "2", "3", "4", "5\n"],
+                "vec_file" => (
+                    "file.bin",
+                    Mime(TopLevel::Application, SubLevel::OctetStream, vec![]),
+                    vec![1, 2, 3, 4, 5, 6, 7, 8]
+                ),
+                "str_file" => (
+                    "readme.md",
+                    Mime(TopLevel::Text, SubLevel::Plain, vec![]),
+                    "Hello World"
+                ),
+                "fs_file" => (
+                    "form_test.md",
+                    Mime(TopLevel::Text, SubLevel::Plain, vec![]),
+                    File::open("./tests/form_test.md").unwrap()
+                )
+            })
+            .collect()
+    };
+
+    assert_fail!(r#"
+<br>Response Failure: <bc>POST <by>request to \"<bc>http://localhost:4000<bc>/response/forward\" <by>returned <br>1 <by>error(s)
+
+<br> 1) <br>Request Failure: <bc>POST <by>response provided for \"<bc>https://example.com<bc>/forward\" <by>returned <br>1 <by>error(s)
+
+    <br> 1.1) <by>Request <by>headers dump:
+
+              <bn>Content-Length: <bp>857
+              <bn>  Content-Type: <bp>application/form-data; boundary=boundary12345
+              <bn>          Host: <bp>example.com
+
+          <by>Request <by>form dump with <bn>5 fields<by>:
+
+              <bc> 1) <by>Field \"<bn>field\" <by>dump:
+
+                    \"<bp>someValue\\n\"
+
+              <bc> 2) <by>Array \"<bn>array[]\" (<bp>5 items) <by>dump:
+
+                    \"<bp>1\", \"<bp>2\", \"<bp>3\", \"<bp>4\", \"<bp>5\\n\"
+
+              <bc> 3) <by>File \"<bn>vec_file\" (\"<bp>file.bin\", <bp>application/octet-stream) <by>raw body dump of <bn>8 bytes<by>:
+
+                   [<bp>0x01, <bp>0x02, <bp>0x03, <bp>0x04, <bp>0x05, <bp>0x06, <bp>0x07, <bp>0x08]
+
+              <bc> 4) <by>File \"<bn>str_file\" (\"<bp>readme.md\", <bp>text/plain) <by>body dump:
+
+                    \"<bp>Hello World\"
+
+              <bc> 5) <by>File \"<bn>fs_file\" (\"<bp>form_test.md\", <bp>text/plain) <by>body dump:
+
+                    \"<bp>Form Test Data File\\n\"
+
+
+"#, actual);
+}
+

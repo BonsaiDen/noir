@@ -22,7 +22,7 @@ use hyper::mime::{Mime, TopLevel, SubLevel};
 // Internal Dependencies ------------------------------------------------------
 use util;
 use super::{HttpLike, HttpFormData};
-use super::form::http_form_into_body_parts;
+use super::form::{http_form_into_body_parts, parse_form_data};
 use super::util::{parse_json, diff_text};
 
 
@@ -34,6 +34,22 @@ pub struct HttpBody {
 
 
 // Internal -------------------------------------------------------------------
+pub fn http_body_from_parts(data: Vec<u8>, headers: &Headers) -> HttpBody {
+
+    let mime = if let Some(&ContentType(ref mime)) = headers.get::<ContentType>() {
+        mime.clone()
+
+    } else {
+        Mime(TopLevel::Application, SubLevel::OctetStream, vec![])
+    };
+
+    HttpBody {
+        data: data,
+        mime: Some(mime)
+    }
+
+}
+
 pub fn http_body_into_parts(body: HttpBody) -> (Option<Mime>, Option<Vec<u8>>) {
     (body.mime, Some(body.data))
 }
@@ -43,10 +59,7 @@ impl<'a> From<&'a mut Response> for HttpBody {
     fn from(res: &mut Response) -> HttpBody {
         let mut body: Vec<u8> = Vec::new();
         res.read_to_end(&mut body).unwrap();
-        HttpBody {
-            data: body,
-            mime: None
-        }
+        http_body_from_parts(body, &res.headers)
     }
 }
 
@@ -91,7 +104,6 @@ impl From<json::JsonValue> for HttpBody {
 }
 
 impl From<HttpFormData> for HttpBody {
-
     /// Creates a HTTP body from form data.
     fn from(form: HttpFormData) -> HttpBody {
         let (mime_type, body) = http_form_into_body_parts(form);
@@ -119,7 +131,7 @@ pub fn validate_http_request_body<T: HttpLike>(
     }
 
     // Parse and compare different body types
-    let body = parse_http_body(result.headers(), &body);
+    let body = parse_http_body(&body);
     errors.push(match body {
 
         Ok(actual) => match actual {
@@ -167,8 +179,15 @@ pub fn validate_http_request_body<T: HttpLike>(
                 }
 
             },
-            // TODO handle deep compare of forms when validating requests to
-            // external resources
+            ParsedHttpBody::Form(form) => {
+                // TODO IW: implement form field diffing
+                format!(
+                    "{} {}\n\n        {}",
+                    context.yellow(),
+                    "body contains form data:".yellow(),
+                    "Form data diffing is not yet implemented.".red().bold()
+                )
+            },
             ParsedHttpBody::Raw(data) => {
                 format!(
                     "{} {}\n\n       [{}]\n\n    {}\n\n       [{}]",
@@ -222,39 +241,51 @@ pub fn validate_http_request_body<T: HttpLike>(
 pub enum ParsedHttpBody<'a> {
     Text(&'a str),
     Json(json::JsonValue),
+    Form(HttpFormData),
     Raw(&'a [u8])
 }
 
-pub fn parse_http_body<'a>(headers: &Headers, body: &'a HttpBody) -> Result<ParsedHttpBody<'a>, String> {
+pub fn parse_http_body<'a>(body: &'a HttpBody) -> Result<ParsedHttpBody<'a>, String> {
 
-    let content_type = headers.get::<ContentType>().and_then(|content_type| {
-        Some(content_type.clone())
+    if let Some(mime) = body.mime.as_ref() {
+        match mime.clone() {
+            Mime(TopLevel::Text, _, _) => {
+                match str::from_utf8(body.data.as_slice()) {
+                    Ok(text) => Ok(ParsedHttpBody::Text(text)),
+                    Err(err) => Err(format!(
+                        "{}\n\n        {}",
+                        "text body contains invalid UTF-8:".yellow(),
+                        format!("{:?}", err).red().bold()
+                    ))
+                }
+            },
+            Mime(TopLevel::Application, SubLevel::Json, _) => {
+                match parse_json(body.data.as_slice()) {
+                    Ok(json) => Ok(ParsedHttpBody::Json(json)),
+                    Err(err) => Err(err)
+                }
+            },
+            Mime(TopLevel::Application, SubLevel::FormData, attrs) |
+            Mime(TopLevel::Application, SubLevel::WwwFormUrlEncoded, attrs) => {
 
-    }).unwrap_or_else(|| {
-        ContentType(Mime(TopLevel::Application, SubLevel::OctetStream, vec![]))
-    });
+                // Get form-data boundary, if present
+                let boundary = attrs.get(0).map(|b| {
+                    b.1.as_str().to_string()
+                });
 
-    match content_type.0 {
-        Mime(TopLevel::Text, _, _) => {
-            match str::from_utf8(body.data.as_slice()) {
-                Ok(text) => Ok(ParsedHttpBody::Text(text)),
-                Err(err) => Err(format!(
-                    "{}\n\n        {}",
-                    "text body contains invalid UTF-8:".yellow(),
-                    format!("{:?}", err).red().bold()
-                ))
+                match parse_form_data(body.data.as_slice(), boundary) {
+                    Ok(data) => Ok(ParsedHttpBody::Form(data)),
+                    Err(err) => Err(err)
+                }
+
+            },
+            _ => {
+                Ok(ParsedHttpBody::Raw(&body.data[..]))
             }
-        },
-        Mime(TopLevel::Application, SubLevel::Json, _) => {
-            match parse_json(body.data.as_slice()) {
-                Ok(json) => Ok(ParsedHttpBody::Json(json)),
-                Err(err) => Err(err)
-            }
-        },
-        _ => {
-            Ok(ParsedHttpBody::Raw(&body.data[..]))
         }
-    }
 
+    } else {
+        Ok(ParsedHttpBody::Raw(&body.data[..]))
+    }
 }
 

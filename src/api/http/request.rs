@@ -522,7 +522,10 @@ impl<A: HttpApi> Drop for HttpRequest<A> {
 
 
 // Helper ---------------------------------------------------------------------
-fn format_response_errors(header: String, offset: usize, errors: Vec<String>) -> String {
+fn format_response_errors(
+    header: String, offset: usize, errors: Vec<String>
+
+) -> String {
 
     let mut formatted = format!(
         "{} {}",

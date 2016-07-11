@@ -36,11 +36,11 @@ fn test_body_with_expected() {
 }
 
 #[test]
-fn test_body_text_mismatch_diff_addded() {
+fn test_body_text_mismatch_diff_added() {
 
     let actual = {
         API::get("/get/hello")
-            .expected_body("Hello")
+            .expected_body("Hello     \n")
             .collect()
     };
 
@@ -49,7 +49,7 @@ fn test_body_text_mismatch_diff_addded() {
 
 <br> 1) <by>Response body text <by>does not match, expected:
 
-        <bg>\"Hello\"
+        <bg>\"Hello     \\n\"
 
     <by>but got:
 
@@ -57,7 +57,7 @@ fn test_body_text_mismatch_diff_addded() {
 
     <by>difference:
 
-        \"Hello <gbg>World\"
+        \"Hello <gbg>World <gbr>\\n\"
 
 
 "#, actual);
@@ -69,7 +69,7 @@ fn test_body_text_mismatch_diff_removed() {
 
     let actual = {
         API::get("/get/hello")
-            .expected_body("Hello World Message")
+            .expected_body("Hello World Message\n")
             .collect()
     };
 
@@ -78,7 +78,7 @@ fn test_body_text_mismatch_diff_removed() {
 
 <br> 1) <by>Response body text <by>does not match, expected:
 
-        <bg>\"Hello World Message\"
+        <bg>\"Hello World Message\\n\"
 
     <by>but got:
 
@@ -86,7 +86,7 @@ fn test_body_text_mismatch_diff_removed() {
 
     <by>difference:
 
-        \"Hello World <gbr>Message\"
+        \"Hello World <gbr>Message\\n\"
 
 
 "#, actual);

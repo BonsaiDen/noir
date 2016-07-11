@@ -14,7 +14,7 @@ use std::net::ToSocketAddrs;
 use hyper::method::Method;
 use hyper::status::StatusCode;
 use hyper::header::{Accept, Connection, ContentType, Server, qitem};
-use hyper::mime::{Mime, TopLevel, SubLevel};
+use hyper::mime::{Mime, TopLevel, SubLevel, Attr, Value};
 use hyper::server::{Request, Response};
 use hyper::uri::RequestUri;
 
@@ -75,6 +75,25 @@ fn handle(mut req: Request, mut res: Response) {
 
                 let mut body = Vec::new();
                 req.read_to_end(&mut body).unwrap();
+
+                // Handle form-data requests
+                if let Some(&mut ContentType(Mime(_, _, ref mut attrs))) = req.headers.get_mut::<ContentType>() {
+
+                    // Replace any form boundary value with a static string so we
+                    // can test it
+                    if let Some(&mut (Attr::Boundary, Value::Ext(ref mut b))) = attrs.get_mut(0) {
+
+                        // TODO IW: Replace boundary without string conversion
+                        let mut str_body = String::from_utf8(body).unwrap();
+                        str_body = str_body.replace(b.as_str(), "boundary12345");
+
+                        *b = "boundary12345".to_string();
+
+                        body = str_body.into();
+
+                    }
+
+                }
 
                 let _ext = hyper_client!().post(
                     format!("https://example.com/forward").as_str()

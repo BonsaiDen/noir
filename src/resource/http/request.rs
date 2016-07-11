@@ -18,8 +18,9 @@ use hyper::header::Headers;
 
 
 // Internal Dependencies ------------------------------------------------------
-use super::{HttpLike, HttpBody};
 use mock::MockRequest;
+use super::{HttpLike, HttpBody};
+use super::body::http_body_from_parts;
 
 
 // Noir Internal --------------------------------------------------------------
@@ -38,17 +39,22 @@ impl HttpRequest  {
         hostname: String,
         port: u16,
         req: Request,
-        body: HttpBody
+        data: Vec<u8>
 
     ) -> HttpRequest {
+
+        let headers = Headers::from_raw(req.headers).unwrap();
+        let body = http_body_from_parts(data, &headers);
+
         HttpRequest {
             hostname: hostname,
             port: port,
             method: req.method.unwrap().parse().unwrap(),
             path: req.path.unwrap().to_string(),
-            headers: Headers::from_raw(req.headers).unwrap(),
+            headers: headers,
             body: Some(body)
         }
+
     }
 
     fn host(&self) -> String {

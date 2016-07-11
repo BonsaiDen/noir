@@ -14,13 +14,19 @@ use std::str;
 use json;
 use colored::*;
 use difference;
-use hyper::header::Headers;
+use hyper::header::{Headers, ContentType};
 use hyper::status::StatusCode;
 
 
 // Internal Dependencies ------------------------------------------------------
 use super::{HttpBody, HttpLike, HttpQueryString};
-use super::body::{ParsedHttpBody, parse_http_body, validate_http_request_body};
+use super::form::{HttpFormDataField, http_form_into_fields};
+use super::body::{
+    ParsedHttpBody,
+    parse_http_body,
+    http_body_from_parts,
+    validate_http_request_body
+};
 use super::header::validate_http_request_headers;
 
 
@@ -66,7 +72,14 @@ pub fn parse_json(data: &[u8]) -> Result<json::JsonValue, String> {
     }
 }
 
-pub fn diff_text(context:&str, expected: &str, actual: &str) -> String {
+pub fn diff_text(context: &str, expected: &str, actual: &str) -> String {
+
+    // Escape newlines etc.
+    let expected = format!("{:?}", expected);
+    let expected = &expected[1..expected.len() - 1];
+
+    let actual = format!("{:?}", actual);
+    let actual = &actual[1..actual.len() - 1];
 
     let diff = difference::diff(expected, actual, " ").1.into_iter().map(|diff| {
         match diff {
@@ -75,9 +88,8 @@ pub fn diff_text(context:&str, expected: &str, actual: &str) -> String {
             difference::Difference::Add(s) => s.white().on_green().bold().to_string()
         }
 
-    }).collect::<Vec<String>>().join(" ");
+    }).filter(|s| s.len() > 0).collect::<Vec<String>>().join(" ");
 
-    // TODO escape new lines and other characters?
     format!(
         "{} {}\n\n        {}\n\n    {}\n\n        {}\n\n    {}\n\n        {}",
         context.yellow(),
@@ -88,6 +100,7 @@ pub fn diff_text(context:&str, expected: &str, actual: &str) -> String {
         "difference:".yellow(),
         format!("\"{}\"", diff)
     )
+
 }
 
 pub fn validate_http_request<T: HttpLike>(
@@ -139,7 +152,24 @@ pub fn dump_http_like<T: HttpLike>(
     context: &str
 ) {
 
-    // Format Headers
+    let headers = format_headers(result);
+    let body = result.into_http_body();
+
+    errors.push(
+        format!(
+            "{} {}\n\n        {}\n\n    {} {}",
+            context.yellow(),
+            "headers dump:".yellow(),
+            headers,
+            context.yellow(),
+            format_body(parse_http_body(&body))
+        )
+    )
+
+}
+
+fn format_headers<T: HttpLike>(result: &mut T) -> String {
+
     let mut headers = result.headers().iter().map(|header| {
         (header.name().to_string(), header.value_string().clone())
 
@@ -148,24 +178,21 @@ pub fn dump_http_like<T: HttpLike>(
     headers.sort();
 
     let max_name_length = headers.iter().map(|h| h.0.len()).max().unwrap_or(0);
-    let headers = headers.into_iter().map(|(name, value)| {
+
+    headers.into_iter().map(|(name, value)| {
         format!("{: >2$}: {}", name.cyan(), value.purple().bold(), max_name_length)
 
-    }).collect::<Vec<String>>().join("\n        ");
+    }).collect::<Vec<String>>().join("\n        ")
 
-    // Format Body
-    let body = result.into_http_body();
-    let body = parse_http_body(result.headers(), &body);
-    errors.push(match body {
+}
+
+fn format_body(body: Result<ParsedHttpBody, String>) -> String {
+    match body {
         Ok(actual) => match actual {
             ParsedHttpBody::Text(text) => {
                 let text = format!("{:?}", text);
                 format!(
-                    "{} {}\n\n        {}\n\n    {} {}\n\n        \"{}\"",
-                    context.yellow(),
-                    "headers dump:".yellow(),
-                    headers,
-                    context.yellow(),
+                    "{}\n\n        \"{}\"",
                     "body dump:".yellow(),
                     &text[1..text.len() - 1].purple().bold()
                 )
@@ -173,13 +200,9 @@ pub fn dump_http_like<T: HttpLike>(
 
             ParsedHttpBody::Json(json) => {
                 format!(
-                    "{} {}\n\n        {}\n\n    {} {}\n\n        {}",
-                    context.yellow(),
-                    "headers dump:".yellow(),
-                    headers,
-                    context.yellow(),
+                    "{}\n\n        {}",
                     "body dump:".yellow(),
-                    // TODO highlighting
+                    // TODO IW: Support JSON highlighting
                     json::stringify_pretty(json, 4)
                         .lines()
                         .collect::<Vec<&str>>()
@@ -187,14 +210,87 @@ pub fn dump_http_like<T: HttpLike>(
                 )
             },
 
-            // Format as 16 columns rows of hexadecimal numbers
+            ParsedHttpBody::Form(form) => {
+
+                let fields = http_form_into_fields(form);
+                let field_count = fields.len();
+
+                let fields = fields.into_iter().enumerate().map(|(i, field)| {
+                    match field {
+                        HttpFormDataField::Value(name, value) => {
+                            let value = format!("{:?}", value);
+                            format!(
+                                "{} {} \"{}\" {}\n\n              \"{}\"\n",
+                                format!("{:2})", i + 1).cyan().bold(),
+                                "Field".yellow(),
+                                name.cyan(),
+                                "dump:".yellow(),
+                                &value[1..value.len() - 1].purple().bold()
+                            )
+                        },
+                        HttpFormDataField::Array(name, values) => {
+                            format!(
+                                "{} {} \"{}\" ({}) {}\n\n              {}\n",
+                                format!("{:2})", i + 1).cyan().bold(),
+                                "Array".yellow(),
+                                name.cyan(),
+                                format!("{} items", values.len()).purple().bold(),
+                                "dump:".yellow(),
+                                values.into_iter().map(|value| {
+                                    let value = format!("{:?}", value);
+                                    format!("\"{}\"", &value[1..value.len() - 1].purple().bold())
+
+                                }).collect::<Vec<String>>().join(", ")
+                            )
+                        },
+                        HttpFormDataField::FileVec(name, filename, mime, data) => {
+
+                            // Parse file data into a HttpBody
+                            let mut headers = Headers::new();
+                            headers.set(ContentType(mime.clone()));
+                            let body = http_body_from_parts(data, &headers);
+
+                            // Format the body
+                            let body = format_body(
+                                parse_http_body(&body)
+
+                            ).split("\n").map(|line| {
+                                format!("      {}", line)
+
+                            }).collect::<Vec<String>>().join("\n");
+
+                            format!(
+                                "{} {} \"{}\" (\"{}\", {}) {}\n",
+                                format!("{:2})", i + 1).cyan().bold(),
+                                "File".yellow(),
+                                name.cyan(),
+                                filename.purple().bold(),
+                                format!("{}", mime).purple().bold(),
+                                body.trim_left()
+                            )
+                        },
+                        _ => unreachable!()
+                    }
+
+                }).collect::<Vec<String>>().join("\n        ");
+
+                format!(
+                    "{}\n\n        {}",
+                    format!(
+                        "{} {}{}",
+                        "form dump with".yellow(),
+                        format!("{} fields", field_count).cyan(),
+                        ":".yellow()
+                    ),
+                    fields
+                )
+
+            },
+
+            // Format as 16 column wide rows of hexadecimal numbers
             ParsedHttpBody::Raw(data) => {
                 format!(
-                    "{} {}\n\n        {}\n\n    {} {}\n\n       [{}]",
-                    context.yellow(),
-                    "headers dump:".yellow(),
-                    headers,
-                    context.yellow(),
+                    "{}\n\n       [{}]",
                     format!(
                         "{} {}{}",
                         "raw body dump of".yellow(),
@@ -213,16 +309,7 @@ pub fn dump_http_like<T: HttpLike>(
                 )
             }
         },
-        Err(err) => {
-            format!(
-                "{} {}\n\n        {}\n\n    {} {}",
-                context.yellow(),
-                "headers dump:".yellow(),
-                headers,
-                context.yellow(),
-                err
-            )
-        }
-    })
+        Err(err) => err
+    }
 }
 

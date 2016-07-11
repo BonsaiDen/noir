@@ -7,6 +7,7 @@
 // except according to those terms.
 
 // STD Dependencies -----------------------------------------------------------
+use rand::Rng;
 use std::fs::File;
 use std::io::Read;
 
@@ -14,9 +15,10 @@ use std::io::Read;
 // External Dependencies ------------------------------------------------------
 use json;
 use rand;
-use rand::Rng;
-use url::form_urlencoded::Serializer;
+use httparse;
+use url::form_urlencoded;
 use hyper::mime::{Mime, TopLevel, SubLevel, Attr, Value};
+use hyper::header::{Headers, ContentType, ContentDisposition, DispositionParam};
 
 
 /// An abstraction over HTTP form data.
@@ -63,6 +65,14 @@ pub struct HttpFormData {
     fields: Vec<HttpFormDataField>
 }
 
+pub fn http_form_into_fields(form: HttpFormData) -> Vec<HttpFormDataField> {
+    form.fields
+}
+
+pub fn http_form_into_body_parts(form: HttpFormData) -> (Mime, Vec<u8>) {
+    form.into_body_parts()
+}
+
 
 // Internal -------------------------------------------------------------------
 #[doc(hidden)]
@@ -99,61 +109,7 @@ impl HttpFormData {
 
             let mut body = Vec::new();
             let mut rng = rand::thread_rng();
-            let mut parts: Vec<(Vec<u8>, Vec<u8>)> = Vec::new();
-
-            // Convert form fields into multiparts
-            for field in self.fields {
-                match field {
-                    HttpFormDataField::Value(name, value) => {
-                        parts.push((
-                            format!(
-                                "\r\nContent-Disposition: form-data; name=\"{}\"\r\n\r\n",
-                                name
-
-                            ).as_bytes().to_vec(),
-                            value.as_bytes().to_vec()
-                        ));
-                    },
-                    HttpFormDataField::Array(name, values) => {
-                        for value in values {
-                            parts.push((
-                                format!(
-                                    "\r\nContent-Disposition: form-data; name=\"{}\"\r\n\r\n",
-                                    name
-
-                                ).as_bytes().to_vec(),
-                                value.as_bytes().to_vec()
-                            ));
-                        }
-                    },
-                    HttpFormDataField::FileVec(name, filename, mime, data) => {
-                        parts.push((
-                            format!(
-                                "\r\nContent-Disposition: form-data; name=\"{}\"; filename=\"{}\"\r\nContent-Type: {}\r\n\r\n",
-                                name,
-                                filename,
-                                mime
-
-                            ).as_bytes().to_vec(),
-                            data
-                        ));
-                    },
-                    HttpFormDataField::FileFs(name, filename, mime, mut file) => {
-                        let mut data = Vec::new();
-                        file.read_to_end(&mut data).expect("Failed to read file.");
-                        parts.push((
-                            format!(
-                                "\r\nContent-Disposition: form-data; name=\"{}\"; filename=\"{}\"\r\nContent-Type: {}\r\n\r\n",
-                                name,
-                                filename,
-                                mime
-
-                            ).as_bytes().to_vec(),
-                            data
-                        ));
-                    }
-                }
-            };
+            let parts = form_fields_into_parts(self.fields);
 
             // Generate form boundary
             // TODO IW: Check for collisions in the data
@@ -178,7 +134,7 @@ impl HttpFormData {
             )
 
         } else {
-            let mut serializer = Serializer::new(String::new());
+            let mut serializer = form_urlencoded::Serializer::new(String::new());
             for field in self.fields {
                 match field {
                     HttpFormDataField::Value(name, value) => {
@@ -202,9 +158,229 @@ impl HttpFormData {
 
 }
 
+pub fn parse_form_data(body: &[u8], boundary: Option<String>) -> Result<HttpFormData, String> {
 
-pub fn http_form_into_body_parts(form: HttpFormData) -> (Mime, Vec<u8>) {
-    form.into_body_parts()
+    let mut fields = Vec::new();
+
+    // FormData
+    if let Some(boundary) = boundary {
+
+        // Boundary
+        let mut b = String::from("--");
+        b.push_str(boundary.as_str());
+        let boundary = b.as_bytes();
+
+        // Split the body along the form boundaries
+        let mut previous_index = 0;
+        for (i, w) in body.windows(boundary.len()).enumerate() {
+            if w == boundary {
+
+                // Skip the split before the first actual field
+                if previous_index != 0 {
+
+                    // We'll use httparse so we need to pretend to be a http request
+                    let mut part = b"POST / HTTP/1.1\r\n".to_vec();
+
+                    part.extend_from_slice(
+                        // Strip out boundary and padding
+                        &body[previous_index + boundary.len() + 2..i - 2]
+                    );
+
+                    parse_form_data_part(&mut fields, part);
+
+                }
+
+                previous_index = i;
+
+            }
+        }
+
+    // WwwFormUrlEncoded
+    } else {
+        for (name, value) in form_urlencoded::parse(body) {
+            parse_form_field(&mut fields, name.to_string(), value.to_string());
+        }
+    };
+
+    // Convert Array fields with a single value back to Value fields
+    let fields = fields.into_iter().map(|field| {
+        if let HttpFormDataField::Array(name, mut values) = field {
+            if values.len() == 1 {
+                HttpFormDataField::Value(name, values.remove(0))
+
+            } else {
+                HttpFormDataField::Array(name, values)
+            }
+
+        } else {
+            field
+        }
+
+    }).collect::<Vec<HttpFormDataField>>();
+
+    Ok(HttpFormData::new(fields))
+
+}
+
+fn form_fields_into_parts(fields: Vec<HttpFormDataField>) -> Vec<(Vec<u8>, Vec<u8>)> {
+
+    // Convert form fields into multiparts
+    let mut parts = Vec::new();
+    for field in fields {
+        match field {
+            HttpFormDataField::Value(name, value) => {
+                parts.push((
+                    format!(
+                        "\r\nContent-Disposition: form-data; name=\"{}\"\r\n\r\n",
+                        name
+
+                    ).as_bytes().to_vec(),
+                    value.as_bytes().to_vec()
+                ));
+            },
+            HttpFormDataField::Array(name, values) => {
+                for value in values {
+                    parts.push((
+                        format!(
+                            "\r\nContent-Disposition: form-data; name=\"{}\"\r\n\r\n",
+                            name
+
+                        ).as_bytes().to_vec(),
+                        value.as_bytes().to_vec()
+                    ));
+                }
+            },
+            HttpFormDataField::FileVec(name, filename, mime, data) => {
+                parts.push((
+                    format!(
+                        "\r\nContent-Disposition: form-data; name=\"{}\"; filename=\"{}\"\r\nContent-Type: {}\r\n\r\n",
+                        name,
+                        filename,
+                        mime
+
+                    ).as_bytes().to_vec(),
+                    data
+                ));
+            },
+            HttpFormDataField::FileFs(name, filename, mime, mut file) => {
+                let mut data = Vec::new();
+                file.read_to_end(&mut data).expect("Failed to read file.");
+                parts.push((
+                    format!(
+                        "\r\nContent-Disposition: form-data; name=\"{}\"; filename=\"{}\"\r\nContent-Type: {}\r\n\r\n",
+                        name,
+                        filename,
+                        mime
+
+                    ).as_bytes().to_vec(),
+                    data
+                ));
+            }
+        }
+    };
+
+    parts
+
+}
+
+fn parse_form_field(fields: &mut Vec<HttpFormDataField>, name: String, value: String) {
+
+    // If the field name matches the previous field, push the
+    // value into the array instead of adding a new field
+    if let Some(&mut HttpFormDataField::Array(ref field_name, ref mut values)) = fields.last_mut() {
+        if field_name == &name {
+            values.push(value);
+            return;
+        }
+    }
+
+    // Add a new field if the field names did not match
+    fields.push(HttpFormDataField::Array(name, vec![value]));
+
+}
+
+fn parse_form_data_part(fields: &mut Vec<HttpFormDataField>, data: Vec<u8>) {
+
+    // We let httparse do the gruntwork for us
+    let mut headers = [httparse::EMPTY_HEADER; 16];
+    let mut req = httparse::Request::new(&mut headers);
+
+    match req.parse(&data[..]) {
+        Ok(httparse::Status::Complete(size)) => {
+
+            // Parse field metadata
+            let mut part = ParsedFormDataField::from_headers(
+                // TODO IW: Return error if headers are not parseable
+                Headers::from_raw(req.headers).unwrap()
+            );
+
+            // File fields
+            if part.filename.is_some() {
+                fields.push(HttpFormDataField::FileVec(
+                    part.name,
+                    part.filename.take().unwrap(),
+                    part.mime.take().unwrap(),
+                    (&data[size..]).to_vec()
+                ));
+
+            // Text fields
+            } else {
+                parse_form_field(
+                    fields,
+                    part.name,
+                    // TODO return utf-8 errors
+                    String::from_utf8((&data[size..]).to_vec()).unwrap()
+                )
+            }
+
+        },
+        _ => unreachable!()
+    }
+
+}
+
+#[derive(Debug)]
+struct ParsedFormDataField {
+    name: String,
+    mime: Option<Mime>,
+    filename: Option<String>
+}
+
+impl ParsedFormDataField {
+
+    fn from_headers(headers: Headers) -> ParsedFormDataField {
+
+        let mut name = String::new();
+        let mut mime = None;
+        let mut filename = None;
+
+        if let Some(&ContentType(ref m)) = headers.get::<ContentType>() {
+            mime = Some(m.clone());
+        }
+
+        // TODO IW: Return error if header is missing
+        let disposition = headers.get::<ContentDisposition>().unwrap();
+        for p in &disposition.parameters {
+            match p {
+                &DispositionParam::Ext(ref key, ref value) => {
+                    if key == "name" {
+                        name = value.clone();
+                    }
+                },
+                &DispositionParam::Filename(_, _, ref buf) => {
+                    filename = Some(String::from_utf8(buf.clone()).unwrap());
+                }
+            }
+        }
+
+        ParsedFormDataField {
+            name: name,
+            mime: mime,
+            filename: filename,
+        }
+
+    }
+
 }
 
 #[doc(hidden)]
