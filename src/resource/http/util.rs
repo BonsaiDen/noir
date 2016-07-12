@@ -217,7 +217,7 @@ fn format_body(body: Result<ParsedHttpBody, String>) -> String {
 
                 let fields = fields.into_iter().enumerate().map(|(i, field)| {
                     match field {
-                        HttpFormDataField::Value(name, value) => {
+                        HttpFormDataField::Field(name, value) => {
                             let value = format!("{:?}", value);
                             format!(
                                 "{} {} \"{}\" {}\n\n              \"{}\"\n",
@@ -268,6 +268,7 @@ fn format_body(body: Result<ParsedHttpBody, String>) -> String {
                                 format!("{}", mime).purple().bold(),
                                 body.trim_left()
                             )
+
                         },
                         _ => unreachable!()
                     }

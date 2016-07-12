@@ -137,7 +137,7 @@ impl HttpFormData {
             let mut serializer = form_urlencoded::Serializer::new(String::new());
             for field in self.fields {
                 match field {
-                    HttpFormDataField::Value(name, value) => {
+                    HttpFormDataField::Field(name, value) => {
                         serializer.append_pair(name.as_str(), value.as_str());
                     },
                     HttpFormDataField::Array(name, values) => {
@@ -206,7 +206,7 @@ pub fn parse_form_data(body: &[u8], boundary: Option<String>) -> Result<HttpForm
     let fields = fields.into_iter().map(|field| {
         if let HttpFormDataField::Array(name, mut values) = field {
             if values.len() == 1 {
-                HttpFormDataField::Value(name, values.remove(0))
+                HttpFormDataField::Field(name, values.remove(0))
 
             } else {
                 HttpFormDataField::Array(name, values)
@@ -228,7 +228,7 @@ fn form_fields_into_parts(fields: Vec<HttpFormDataField>) -> Vec<(Vec<u8>, Vec<u
     let mut parts = Vec::new();
     for field in fields {
         match field {
-            HttpFormDataField::Value(name, value) => {
+            HttpFormDataField::Field(name, value) => {
                 parts.push((
                     format!(
                         "\r\nContent-Disposition: form-data; name=\"{}\"\r\n\r\n",
@@ -385,7 +385,7 @@ impl ParsedFormDataField {
 
 #[doc(hidden)]
 pub enum HttpFormDataField {
-    Value(String, String),
+    Field(String, String),
     Array(String, Vec<String>),
     FileVec(String, String, Mime, Vec<u8>),
     FileFs(String, String, Mime, File)
@@ -396,7 +396,7 @@ macro_rules! impl_form_data_field_type {
 
         impl From<(&'static str, $T)> for HttpFormDataField {
             fn from(item: (&'static str, $T)) -> HttpFormDataField {
-                HttpFormDataField::Value(
+                HttpFormDataField::Field(
                     item.0.to_string(),
                     item.1.to_string()
                 )

@@ -245,6 +245,8 @@ fn compare_type(
                 vec![(
                     path,
                     format!(
+                        // TODO escape \n etc.
+                        // TODO use text diff?
                         "{} (\"{}\") {} (\"{}\")",
                         "String".green().bold(),
                         value_b.red().bold(),
