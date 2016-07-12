@@ -1,4 +1,4 @@
-# noir [![Build Status](https://img.shields.io/travis/BonsaiDen/noir/master.svg?style=flat-square)](https://travis-ci.org/BonsaiDen/noir) [![Build status](https://img.shields.io/appveyor/ci/BonsaiDen/noir/master.svg?style=flat-square)](https://ci.appveyor.com/project/BonsaiDen/noir) [![Crates.io](https://img.shields.io/crates/v/noir.svg?style=flat-square)](https://crates.io/crates/noir) [![License](https://img.shields.io/crates/l/noir.svg?style=flat-square)]() 
+# noir [![Build Status](https://img.shields.io/travis/BonsaiDen/noir/master.svg?style=flat-square)](https://travis-ci.org/BonsaiDen/noir) [![Build status](https://img.shields.io/appveyor/ci/BonsaiDen/noir/master.svg?style=flat-square)](https://ci.appveyor.com/project/BonsaiDen/noir) [![Dependency Status](https://dependencyci.com/github/BonsaiDen/noir/badge)](https://dependencyci.com/github/BonsaiDen/noir)  [![Crates.io](https://img.shields.io/crates/v/noir.svg?style=flat-square)](https://crates.io/crates/noir) [![License](https://img.shields.io/crates/l/noir.svg?style=flat-square)]() 
 
 A [rust](https://rust-lang.org/) based, DSL alike and request driven, black box testing library 
 for HTTP APIs. 
