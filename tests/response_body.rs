@@ -97,13 +97,13 @@ fn test_provided_response_with_expected_body_text_mismatch_diff_added() {
 
 <br> 1) <br>Request Failure: <bc>POST <by>response provided for \"<bc>https://example.com<bc>/forward\" <by>returned <br>1 <by>error(s)
 
-    <br> 1.1) <by>Request body text <by>does not match, expected:
+    <br> 1.1) <by>Request <by>does not match, expected:
 
-              <bg>\"Response\"
+              \"<bg>Response\"
 
           <by>but got:
 
-              <br>\"Response Body\"
+              \"<br>Response Body\"
 
           <by>difference:
 
@@ -132,13 +132,13 @@ fn test_provided_response_with_expected_body_text_mismatch_diff_removed() {
 
 <br> 1) <br>Request Failure: <bc>POST <by>response provided for \"<bc>https://example.com<bc>/forward\" <by>returned <br>1 <by>error(s)
 
-    <br> 1.1) <by>Request body text <by>does not match, expected:
+    <br> 1.1) <by>Request <by>does not match, expected:
 
-              <bg>\"Response Body\"
+              \"<bg>Response Body\"
 
           <by>but got:
 
-              <br>\"Response\"
+              \"<br>Response\"
 
           <by>difference:
 
@@ -322,7 +322,17 @@ fn test_provided_response_with_expected_body_json_mismatch() {
 
     <br> 1.1) <by>Request <by>body json does not match, expected:
 
-              - <bb>json.<bb>key: <bg>String (\"<br>different value\") <by>does not match expected value (\"<bg>value\")
+              - <bb>json.<bb>key: <bg>String <by>does not match, expected:
+
+                    \"<bg>different value\"
+
+                <by>but got:
+
+                    \"<br>value\"
+
+                <by>difference:
+
+                    \"<gbr>different value\"
 
               - <bb>json.<bb>list: <bg>Array <by>with <br>2 <by>item(s) does not match expected length of <bg>3
 
@@ -385,7 +395,17 @@ fn test_provided_response_with_expected_body_json_mismatch_exact() {
 
     <br> 1.1) <by>Request <by>body json does not match, expected:
 
-              - <bb>json.<bb>key: <bg>String (\"<br>different value\") <by>does not match expected value (\"<bg>value\")
+              - <bb>json.<bb>key: <bg>String <by>does not match, expected:
+
+                    \"<bg>different value\"
+
+                <by>but got:
+
+                    \"<br>value\"
+
+                <by>difference:
+
+                    \"<gbr>different value\"
 
               - <bb>json.<bb>list: <bg>Array <by>with <br>2 <by>item(s) does not match expected length of <bg>3
 

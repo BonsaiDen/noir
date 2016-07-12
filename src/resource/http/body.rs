@@ -135,11 +135,23 @@ pub fn validate_http_request_body<T: HttpLike>(
 
         Ok(actual) => match actual {
             ParsedHttpBody::Text(text) => {
-                util::diff::text(
-                    format!("{} body text", context).as_str(),
+
+                let (expected, actual, diff) = util::diff::text(
                     str::from_utf8(expected_body.data.as_slice()).unwrap(),
                     text
+                );
+
+                format!(
+                    "{} {}\n\n        \"{}\"\n\n    {}\n\n        \"{}\"\n\n    {}\n\n        \"{}\"",
+                    context.yellow(),
+                    "does not match, expected:".yellow(),
+                    expected.green().bold(),
+                    "but got:".yellow(),
+                    actual.red().bold(),
+                    "difference:".yellow(),
+                    diff
                 )
+
             },
             ParsedHttpBody::Json(actual) => {
                 let expected_json = util::json::parse(expected_body.data.as_slice());

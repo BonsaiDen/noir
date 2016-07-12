@@ -17,6 +17,10 @@ use json::JsonValue;
 use colored::*;
 
 
+// Internal Dependencies ------------------------------------------------------
+use util;
+
+
 // Parsing Utilities ----------------------------------------------------------
 pub fn parse(data: &[u8]) -> Result<JsonValue, String> {
     match str::from_utf8(data) {
@@ -267,16 +271,21 @@ fn compare_type(
                 vec![]
 
             } else {
+                let (expected, actual, diff) = util::diff::text(
+                    value_b,
+                    value_a
+                );
                 vec![(
                     path,
                     format!(
-                        // TODO escape \n etc.
-                        // TODO use text diff?
-                        "{} (\"{}\") {} (\"{}\")",
+                        "{} {}\n\n              \"{}\"\n\n          {}\n\n              \"{}\"\n\n          {}\n\n              \"{}\"",
                         "String".green().bold(),
-                        value_b.red().bold(),
-                        "does not match expected value".yellow(),
-                        value_a.green().bold()
+                        "does not match, expected:".yellow(),
+                        expected.green().bold(),
+                        "but got:".yellow(),
+                        actual.red().bold(),
+                        "difference:".yellow(),
+                        diff
                     )
                 )]
             }
@@ -470,6 +479,8 @@ mod tests {
         text = text.replace("[1;35m", "<bp>");
         text = text.replace("[36m", "<bn>");
         text = text.replace("[1;36m", "<bc>");
+        text = text.replace("[1;42;37m", "<gbg>");
+        text = text.replace("[1;41;37m", "<gbr>");
         text.replace("[0m", "")
     }
 
@@ -509,7 +520,7 @@ mod tests {
     fn test_compare_string() {
         cmp(JsonValue::String("Foo".to_string()), JsonValue::String("Foo".to_string()), vec![]);
         cmp(JsonValue::String("Foo".to_string()), JsonValue::String("Bar".to_string()), vec![
-            (vec![], "<bg>String (\"<br>Bar\") <by>does not match expected value (\"<bg>Foo\")")
+            (vec![], "<bg>String <by>does not match, expected:\n\n              \"<bg>Bar\"\n\n          <by>but got:\n\n              \"<br>Foo\"\n\n          <by>difference:\n\n              \"<gbr>Bar <gbg>Foo\"")
         ]);
         cmp(JsonValue::String("Foo".to_string()), JsonValue::Number(2.0), vec![
             (vec![], "<by>Expected a <bg>String <by>but found a <br>Number (<br>2)")
@@ -689,7 +700,7 @@ mod tests {
             "additional" => "key"
 
         }, vec![
-            (vec![".<bb>key"], "<bg>String (\"<br>\") <by>does not match expected value (\"<bg>value\")"),
+            (vec![".<bb>key"], "<bg>String <by>does not match, expected:\n\n              \"<bg>\"\n\n          <by>but got:\n\n              \"<br>value\"\n\n          <by>difference:\n\n              \"<gbg>value\""),
             (vec![".<bb>number"], "<bg>Number (<br>4) <by>does not match expected value (<bg>2)"),
             (vec![], "<bg>Object <by>is missing <br>1 <by>key(s) (<br>missing)")
 
@@ -709,7 +720,7 @@ mod tests {
             "additional" => "key"
 
         }, vec![
-            (vec![".<bb>key"], "<bg>String (\"<br>\") <by>does not match expected value (\"<bg>value\")"),
+            (vec![".<bb>key"], "<bg>String <by>does not match, expected:\n\n              \"<bg>\"\n\n          <by>but got:\n\n              \"<br>value\"\n\n          <by>difference:\n\n              \"<gbg>value\""),
             (vec![".<bb>number"], "<bg>Number (<br>4) <by>does not match expected value (<bg>2)"),
             (vec![], "<bg>Object <by>is missing <br>1 <by>key(s) (<br>missing)"),
             (vec![], "<bg>Object <by>has <br>1 <by>additional unexpected key(s) (<br>additional)")
@@ -730,7 +741,7 @@ mod tests {
 
         ], vec![
             (vec![], "<bg>Array <by>with <br>2 <by>item(s) does not match expected length of <bg>3"),
-            (vec!["<bp>[0]"], "<bg>String (\"<br>foo\") <by>does not match expected value (\"<bg>key\")"),
+            (vec!["<bp>[0]"], "<bg>String <by>does not match, expected:\n\n              \"<bg>foo\"\n\n          <by>but got:\n\n              \"<br>key\"\n\n          <by>difference:\n\n              \"<gbr>foo <gbg>key\""),
             (vec!["<bp>[1]"], "<by>Expected a <bg>Number <by>but found a <br>Boolean (<br>true)")
 
         ], 2, false);

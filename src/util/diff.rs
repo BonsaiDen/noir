@@ -12,7 +12,7 @@ use difference;
 
 
 // Diffing Utilities ----------------------------------------------------------
-pub fn text(context: &str, expected: &str, actual: &str) -> String {
+pub fn text(expected: &str, actual: &str) -> (String, String, String) {
 
     // Escape newlines etc.
     let expected = format!("{:?}", expected);
@@ -30,16 +30,7 @@ pub fn text(context: &str, expected: &str, actual: &str) -> String {
 
     }).filter(|s| s.len() > 0).collect::<Vec<String>>().join(" ");
 
-    format!(
-        "{} {}\n\n        {}\n\n    {}\n\n        {}\n\n    {}\n\n        {}",
-        context.yellow(),
-        "does not match, expected:".yellow(),
-        format!("\"{}\"", expected).green().bold(),
-        "but got:".yellow(),
-        format!("\"{}\"", actual).red().bold(),
-        "difference:".yellow(),
-        format!("\"{}\"", diff)
-    )
+    (expected.to_string(), actual.to_string(), diff)
 
 }
 
