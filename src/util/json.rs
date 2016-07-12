@@ -7,9 +7,34 @@
 // except according to those terms.
 
 
+// STD Dependencies -----------------------------------------------------------
+use std::str;
+
+
 // External Dependencies ------------------------------------------------------
-use colored::*;
+use json;
 use json::JsonValue;
+use colored::*;
+
+
+// Parsing Utilities ----------------------------------------------------------
+pub fn parse(data: &[u8]) -> Result<JsonValue, String> {
+    match str::from_utf8(data) {
+        Ok(text) => match json::parse(text) {
+            Ok(value) => Ok(value),
+            Err(err) => Err(format!(
+                "{}\n\n        {}",
+                "body contains invalid json:".yellow(),
+                format!("{:?}", err).red().bold()
+            ))
+        },
+        Err(err) => Err(format!(
+            "{}\n\n        {}",
+            "json body contains invalid UTF-8:".yellow(),
+            format!("{:?}", err).red().bold()
+        ))
+    }
+}
 
 
 // Deep JSON Compare ----------------------------------------------------------

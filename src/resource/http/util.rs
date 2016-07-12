@@ -13,7 +13,6 @@ use std::str;
 // External Dependencies ------------------------------------------------------
 use json;
 use colored::*;
-use difference;
 use hyper::header::{Headers, ContentType};
 use hyper::status::StatusCode;
 
@@ -51,55 +50,6 @@ pub fn path_with_query(path: &str, query: HttpQueryString) -> String {
     } else {
         format!("{}?{}", path, new_query)
     }
-
-}
-
-pub fn parse_json(data: &[u8]) -> Result<json::JsonValue, String> {
-    match str::from_utf8(data) {
-        Ok(text) => match json::parse(text) {
-            Ok(value) => Ok(value),
-            Err(err) => Err(format!(
-                "{}\n\n        {}",
-                "body contains invalid json:".yellow(),
-                format!("{:?}", err).red().bold()
-            ))
-        },
-        Err(err) => Err(format!(
-            "{}\n\n        {}",
-            "json body contains invalid UTF-8:".yellow(),
-            format!("{:?}", err).red().bold()
-        ))
-    }
-}
-
-pub fn diff_text(context: &str, expected: &str, actual: &str) -> String {
-
-    // Escape newlines etc.
-    let expected = format!("{:?}", expected);
-    let expected = &expected[1..expected.len() - 1];
-
-    let actual = format!("{:?}", actual);
-    let actual = &actual[1..actual.len() - 1];
-
-    let diff = difference::diff(expected, actual, " ").1.into_iter().map(|diff| {
-        match diff {
-            difference::Difference::Same(s) => s,
-            difference::Difference::Rem(s) => s.white().on_red().bold().to_string(),
-            difference::Difference::Add(s) => s.white().on_green().bold().to_string()
-        }
-
-    }).filter(|s| s.len() > 0).collect::<Vec<String>>().join(" ");
-
-    format!(
-        "{} {}\n\n        {}\n\n    {}\n\n        {}\n\n    {}\n\n        {}",
-        context.yellow(),
-        "does not match, expected:".yellow(),
-        format!("\"{}\"", expected).green().bold(),
-        "but got:".yellow(),
-        format!("\"{}\"", actual).red().bold(),
-        "difference:".yellow(),
-        format!("\"{}\"", diff)
-    )
 
 }
 

@@ -1,0 +1,45 @@
+// Copyright (c) 2016 Ivo Wetzel
+
+// Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
+// http://www.apache.org/licenses/LICENSE-2.0> or the MIT license
+// <LICENSE-MIT or http://opensource.org/licenses/MIT>, at your
+// option. This file may not be copied, modified, or distributed
+// except according to those terms.
+
+// External Dependencies ------------------------------------------------------
+use colored::*;
+use difference;
+
+
+// Diffing Utilities ----------------------------------------------------------
+pub fn text(context: &str, expected: &str, actual: &str) -> String {
+
+    // Escape newlines etc.
+    let expected = format!("{:?}", expected);
+    let expected = &expected[1..expected.len() - 1];
+
+    let actual = format!("{:?}", actual);
+    let actual = &actual[1..actual.len() - 1];
+
+    let diff = difference::diff(expected, actual, " ").1.into_iter().map(|diff| {
+        match diff {
+            difference::Difference::Same(s) => s,
+            difference::Difference::Rem(s) => s.white().on_red().bold().to_string(),
+            difference::Difference::Add(s) => s.white().on_green().bold().to_string()
+        }
+
+    }).filter(|s| s.len() > 0).collect::<Vec<String>>().join(" ");
+
+    format!(
+        "{} {}\n\n        {}\n\n    {}\n\n        {}\n\n    {}\n\n        {}",
+        context.yellow(),
+        "does not match, expected:".yellow(),
+        format!("\"{}\"", expected).green().bold(),
+        "but got:".yellow(),
+        format!("\"{}\"", actual).red().bold(),
+        "difference:".yellow(),
+        format!("\"{}\"", diff)
+    )
+
+}
+

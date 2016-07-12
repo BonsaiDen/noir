@@ -23,7 +23,6 @@ use hyper::mime::{Mime, TopLevel, SubLevel};
 use util;
 use super::{HttpLike, HttpFormData};
 use super::form::{http_form_into_body_parts, parse_form_data};
-use super::util::{parse_json, diff_text};
 
 
 /// An abstraction over different data types used for HTTP request bodies.
@@ -136,14 +135,14 @@ pub fn validate_http_request_body<T: HttpLike>(
 
         Ok(actual) => match actual {
             ParsedHttpBody::Text(text) => {
-                diff_text(
+                util::diff::text(
                     format!("{} body text", context).as_str(),
                     str::from_utf8(expected_body.data.as_slice()).unwrap(),
                     text
                 )
             },
             ParsedHttpBody::Json(actual) => {
-                let expected_json = parse_json(expected_body.data.as_slice());
+                let expected_json = util::json::parse(expected_body.data.as_slice());
                 match expected_json {
                     Ok(expected) => {
 
@@ -260,7 +259,7 @@ pub fn parse_http_body<'a>(body: &'a HttpBody) -> Result<ParsedHttpBody<'a>, Str
                 }
             },
             Mime(TopLevel::Application, SubLevel::Json, _) => {
-                match parse_json(body.data.as_slice()) {
+                match util::json::parse(body.data.as_slice()) {
                     Ok(json) => Ok(ParsedHttpBody::Json(json)),
                     Err(err) => Err(err)
                 }
