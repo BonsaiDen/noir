@@ -191,9 +191,24 @@ fn external_request(res: &mut Response, path: &'static str) -> String {
 
     match req {
         Ok(mut r) => {
+
+            // TODO IW: Support binary responses
             let mut body = String::new();
             r.read_to_string(&mut body).unwrap();
             *res.status_mut() = r.status;
+
+            // Handle form-data responses
+            if let Some(&mut ContentType(Mime(_, _, ref mut attrs))) = r.headers.get_mut::<ContentType>() {
+
+                // Replace any form boundary value with a static string so we
+                // can test it
+                if let Some(&mut (Attr::Boundary, Value::Ext(ref mut b))) = attrs.get_mut(0) {
+                    body = body.replace(b.as_str(), "boundary12345");
+                    *b = "boundary12345".to_string();
+                }
+
+            }
+
             *res.headers_mut() = r.headers.clone();
             body
         },

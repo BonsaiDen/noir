@@ -175,6 +175,8 @@ fn test_provided_response_with_expected_body_text_invalid_utf8() {
 "#, actual);
 }
 
+
+// Raw Body -------------------------------------------------------------------
 #[test]
 fn test_provided_response_with_expected_body_raw() {
 
@@ -233,12 +235,13 @@ fn test_provided_response_with_expected_body_raw_mismatch() {
 
 }
 
+
+// JSON Body ------------------------------------------------------------------
 #[test]
 fn test_provided_response_with_expected_body_json() {
 
     let actual = {
         API::post("/response/forward")
-            .with_header(ContentType(Mime(TopLevel::Application, SubLevel::Json, vec![])))
             .provide(responses![
                 EXAMPLE.post("/forward").expected_body(object! {
                     "key" => "value",
@@ -281,7 +284,6 @@ fn test_provided_response_with_expected_body_json_mismatch() {
 
     let actual = {
         API::post("/response/forward")
-            .with_header(ContentType(Mime(TopLevel::Application, SubLevel::Json, vec![])))
             .provide(responses![
                 EXAMPLE.post("/forward").expected_body(object! {
                     "key" => "value",
@@ -354,7 +356,6 @@ fn test_provided_response_with_expected_body_json_mismatch_exact() {
 
     let actual = {
         API::post("/response/forward")
-            .with_header(ContentType(Mime(TopLevel::Application, SubLevel::Json, vec![])))
             .provide(responses![
                 EXAMPLE.post("/forward").expected_exact_body(object! {
                     "key" => "value",
@@ -480,6 +481,261 @@ fn test_provided_response_with_expected_body_json_invalid_utf8() {
 "#, actual);
 }
 
+
+// Form Body ------------------------------------------------------------------
+#[test]
+fn test_provided_response_with_expected_body_form() {
+
+    use std::fs::File;
+    let actual = {
+        API::post("/response/forward")
+            .provide(responses![
+                EXAMPLE.post("/forward").expected_body(form! {
+                    "field" => "someValue\n",
+                    "array[]" => vec!["1", "2", "3", "4", "5\n"],
+                    "vec_file" => (
+                        "file.bin",
+                        Mime(TopLevel::Application, SubLevel::OctetStream, vec![]),
+                        vec![1, 2, 3, 4, 5, 6, 7, 8]
+                    ),
+                    "str_file" => (
+                        "readme.md",
+                        Mime(TopLevel::Text, SubLevel::Plain, vec![]),
+                        "Hello World"
+                    ),
+                    "fs_file" => (
+                        "form_test.md",
+                        Mime(TopLevel::Text, SubLevel::Plain, vec![]),
+                        File::open("./tests/form_test.md").unwrap()
+                    )
+                })
+            ])
+            .with_body(form! {
+                "field" => "someValue\n",
+                "array[]" => vec!["1", "2", "3", "4", "5\n"],
+                "vec_file" => (
+                    "file.bin",
+                    Mime(TopLevel::Application, SubLevel::OctetStream, vec![]),
+                    vec![1, 2, 3, 4, 5, 6, 7, 8]
+                ),
+                "str_file" => (
+                    "readme.md",
+                    Mime(TopLevel::Text, SubLevel::Plain, vec![]),
+                    "Hello World"
+                ),
+                "fs_file" => (
+                    "form_test.md",
+                    Mime(TopLevel::Text, SubLevel::Plain, vec![]),
+                    File::open("./tests/form_test.md").unwrap()
+                )
+            })
+            .collect()
+    };
+
+    assert_pass!(actual);
+
+}
+
+#[test]
+fn test_provided_response_with_expected_body_form_mismatch() {
+
+    let actual = {
+        API::post("/response/forward")
+            .provide(responses![
+                EXAMPLE.post("/forward").expected_body(form! {
+                    "field" => "someValue\n",
+                    "missingField" => "value",
+                    "mismatchedType" => "plain",
+                    "array[]" => vec!["1", "2", "3", "4", "5\n"],
+                    "vec_file" => (
+                        "file.bin",
+                        Mime(TopLevel::Application, SubLevel::OctetStream, vec![]),
+                        vec![1, 2, 3, 4, 5, 6, 7, 8]
+                    ),
+                    "str_file" => (
+                        "readme.md",
+                        Mime(TopLevel::Text, SubLevel::Plain, vec![]),
+                        "Hello World"
+                    )
+                })
+            ])
+            .with_body(form! {
+                "field" => "different someValue\n",
+                "additionalField" => "value",
+                "mismatchedType" => vec!["array"],
+                "array[]" => vec!["1", "2", "3", "5\n"],
+                "vec_file" => (
+                    "other.bin",
+                    Mime(TopLevel::Application, SubLevel::OctetStream, vec![]),
+                    vec![1, 2, 3, 4, 5, 6, 7, 8]
+                ),
+                "str_file" => (
+                    "readme.md",
+                    Mime(TopLevel::Text, SubLevel::Html, vec![]),
+                    "Hello World"
+                )
+            })
+            .collect()
+    };
+
+    assert_fail!(r#"
+<br>Response Failure: <bc>POST <by>request to \"<bc>http://localhost:4000<bc>/response/forward\" <by>returned <br>1 <by>error(s)
+
+<br> 1) <br>Request Failure: <bc>POST <by>response provided for \"<bc>https://example.com<bc>/forward\" <by>returned <br>1 <by>error(s)
+
+    <br> 1.1) <by>Request <by>body form data does not match, expected:
+
+              - <bb>form.<bb>array[]: <bg>Array <by>with <br>4 <by>item(s) does not match expected length of <bg>5
+
+              - <bb>form.<bb>array[]<bp>[3]: <bg>ArrayItem <by>value does not match, expected:
+
+                    \"<bg>5\\n\"
+
+                <by>but got:
+
+                    \"<br>4\"
+
+                <by>difference:
+
+                    \"<gbr>5\\n <gbg>4\"
+
+              - <bb>form.<bb>field: <bg>Field <by>value does not match, expected:
+
+                    \"<bg>different someValue\\n\"
+
+                <by>but got:
+
+                    \"<br>someValue\\n\"
+
+                <by>difference:
+
+                    \"<gbr>different someValue\\n\"
+
+              - <bb>form.<bb>mismatchedType: <bg>Field <by>value does not match, expected:
+
+                    \"<bg>array\"
+
+                <by>but got:
+
+                    \"<br>plain\"
+
+                <by>difference:
+
+                    \"<gbr>array <gbg>plain\"
+
+              - <bb>form.<bb>str_file: <bg>Mimetype (<br>text/html) <by>does not match expected value (<bg>text/plain)
+
+              - <bb>form.<bb>vec_file: <bg>Filename (\"<br>other.bin\") <by>does not match expected value (\"<bg>file.bin\")
+
+              - <bb>form: <by>Is missing <br>1 <by>plain field(s) (<br>missingField)
+
+
+"#, actual);
+
+}
+
+#[test]
+fn test_provided_response_with_expected_body_form_mismatch_exact() {
+
+    let actual = {
+        API::post("/response/forward")
+            .provide(responses![
+                EXAMPLE.post("/forward").expected_exact_body(form! {
+                    "field" => "someValue\n",
+                    "missingField" => "value",
+                    "mismatchedType" => "plain",
+                    "array[]" => vec!["1", "2", "3", "4", "5\n"],
+                    "vec_file" => (
+                        "file.bin",
+                        Mime(TopLevel::Application, SubLevel::OctetStream, vec![]),
+                        vec![1, 2, 3, 4, 5, 6, 7, 8]
+                    ),
+                    "str_file" => (
+                        "readme.md",
+                        Mime(TopLevel::Text, SubLevel::Plain, vec![]),
+                        "Hello World"
+                    )
+                })
+            ])
+            .with_body(form! {
+                "field" => "different someValue\n",
+                "additionalField" => "value",
+                "mismatchedType" => vec!["array"],
+                "array[]" => vec!["1", "2", "3", "5\n"],
+                "vec_file" => (
+                    "other.bin",
+                    Mime(TopLevel::Application, SubLevel::OctetStream, vec![]),
+                    vec![1, 2, 3, 4, 5, 6, 7, 8]
+                ),
+                "str_file" => (
+                    "readme.md",
+                    Mime(TopLevel::Text, SubLevel::Html, vec![]),
+                    "Hello World"
+                )
+            })
+            .collect()
+    };
+
+    assert_fail!(r#"
+<br>Response Failure: <bc>POST <by>request to \"<bc>http://localhost:4000<bc>/response/forward\" <by>returned <br>1 <by>error(s)
+
+<br> 1) <br>Request Failure: <bc>POST <by>response provided for \"<bc>https://example.com<bc>/forward\" <by>returned <br>1 <by>error(s)
+
+    <br> 1.1) <by>Request <by>body form data does not match, expected:
+
+              - <bb>form.<bb>array[]: <bg>Array <by>with <br>4 <by>item(s) does not match expected length of <bg>5
+
+              - <bb>form.<bb>array[]<bp>[3]: <bg>ArrayItem <by>value does not match, expected:
+
+                    \"<bg>5\\n\"
+
+                <by>but got:
+
+                    \"<br>4\"
+
+                <by>difference:
+
+                    \"<gbr>5\\n <gbg>4\"
+
+              - <bb>form.<bb>field: <bg>Field <by>value does not match, expected:
+
+                    \"<bg>different someValue\\n\"
+
+                <by>but got:
+
+                    \"<br>someValue\\n\"
+
+                <by>difference:
+
+                    \"<gbr>different someValue\\n\"
+
+              - <bb>form.<bb>mismatchedType: <bg>Field <by>value does not match, expected:
+
+                    \"<bg>array\"
+
+                <by>but got:
+
+                    \"<br>plain\"
+
+                <by>difference:
+
+                    \"<gbr>array <gbg>plain\"
+
+              - <bb>form.<bb>str_file: <bg>Mimetype (<br>text/html) <by>does not match expected value (<bg>text/plain)
+
+              - <bb>form.<bb>vec_file: <bg>Filename (\"<br>other.bin\") <by>does not match expected value (\"<bg>file.bin\")
+
+              - <bb>form: <by>Is missing <br>1 <by>plain field(s) (<br>missingField)
+
+              - <bb>form: <by>Has <br>1 <by>additional unexpected plain field(s) (<br>additionalField)
+
+
+"#, actual);
+
+}
+
+
+// Headers from Body Type -----------------------------------------------------
 #[test]
 fn test_provided_response_set_header_from_body_raw() {
 
@@ -542,6 +798,56 @@ fn test_provided_response_set_header_from_body_json() {
 }
 
 #[test]
+fn test_provided_response_set_header_from_body_form() {
+
+    let actual = {
+        API::get("/responses/one")
+            .provide(responses![
+                EXAMPLE.get("/one").with_body(form! {
+                    "field" => "value"
+                })
+            ])
+            .expected_header(ContentType(
+                Mime(TopLevel::Application, SubLevel::WwwFormUrlEncoded, vec![])
+            ))
+            .collect()
+    };
+
+    assert_pass!(actual);
+
+}
+
+#[test]
+fn test_provided_response_set_header_from_body_form_with_file() {
+
+    use hyper::mime::{Attr, Value};
+
+    let actual = {
+        API::get("/responses/one")
+            .provide(responses![
+                EXAMPLE.get("/one").with_body(form! {
+                    "file" => (
+                        "filename",
+                        Mime(TopLevel::Text, SubLevel::Plain, vec![]),
+                        "Data"
+                    )
+                })
+            ])
+            .expected_header(ContentType(
+                Mime(TopLevel::Application, SubLevel::FormData, vec![
+                    (Attr::Boundary, Value::Ext("boundary12345".to_string()))
+                ])
+            ))
+            .collect()
+    };
+
+    assert_pass!(actual);
+
+}
+
+
+// Body Type Header Override --------------------------------------------------
+#[test]
 fn test_provided_response_override_header_from_body() {
 
     let actual = {
@@ -559,6 +865,58 @@ fn test_provided_response_override_header_from_body() {
                 Mime(TopLevel::Text, SubLevel::Plain, vec![])
             ))
             .expected_body("{\"key\":\"value\"}")
+            .collect()
+    };
+
+    assert_pass!(actual);
+
+}
+
+#[test]
+fn test_provided_response_override_header_from_form() {
+
+    let actual = {
+        API::get("/responses/one")
+            .provide(responses![
+                EXAMPLE.get("/one")
+                    .with_header(ContentType(
+                        Mime(TopLevel::Text, SubLevel::Plain, vec![])
+                    ))
+                    .with_body(form! {
+                        "field" => "value"
+                    })
+            ])
+            .expected_header(ContentType(
+                Mime(TopLevel::Text, SubLevel::Plain, vec![])
+            ))
+            .collect()
+    };
+
+    assert_pass!(actual);
+
+}
+
+#[test]
+fn test_provided_response_override_header_from_form_with_file() {
+
+    let actual = {
+        API::get("/responses/one")
+            .provide(responses![
+                EXAMPLE.get("/one")
+                    .with_header(ContentType(
+                        Mime(TopLevel::Text, SubLevel::Plain, vec![])
+                    ))
+                    .with_body(form! {
+                        "file" => (
+                            "filename",
+                            Mime(TopLevel::Text, SubLevel::Plain, vec![]),
+                            "Data"
+                        )
+                    })
+            ])
+            .expected_header(ContentType(
+                Mime(TopLevel::Text, SubLevel::Plain, vec![])
+            ))
             .collect()
     };
 

@@ -22,7 +22,11 @@ use hyper::mime::{Mime, TopLevel, SubLevel};
 // Internal Dependencies ------------------------------------------------------
 use util;
 use super::{HttpLike, HttpFormData};
-use super::form::{http_form_into_body_parts, parse_form_data};
+use super::form::{
+    http_form_into_body_parts,
+    http_form_into_fields,
+    parse_form_data
+};
 
 
 /// An abstraction over different data types used for HTTP request bodies.
@@ -134,11 +138,12 @@ pub fn validate_http_request_body<T: HttpLike>(
     errors.push(match body {
 
         Ok(actual) => match actual {
-            ParsedHttpBody::Text(text) => {
+            ParsedHttpBody::Text(actual) => {
 
                 let (expected, actual, diff) = util::diff::text(
+                    // TODO IW: handle errors in expected body data?
                     str::from_utf8(expected_body.data.as_slice()).unwrap(),
-                    text
+                    actual
                 );
 
                 format!(
@@ -179,10 +184,11 @@ pub fn validate_http_request_body<T: HttpLike>(
 
                     },
                     Err(err) => {
+                        // TODO: IW test with broken expected body
                         format!(
                             "{} {}\n\n        {}",
                             context.yellow(),
-                            "body contains invalid json data:".yellow(),
+                            "expected body contains invalid json data:".yellow(),
                             err
                         )
                     }
@@ -190,16 +196,37 @@ pub fn validate_http_request_body<T: HttpLike>(
                 }
 
             },
-            ParsedHttpBody::Form(form) => {
-                // TODO IW: implement form field diffing
-                format!(
-                    "{} {}\n\n        {}",
-                    context.yellow(),
-                    "body contains form data:".yellow(),
-                    "Form data diffing is not yet implemented.".red().bold()
-                )
+            ParsedHttpBody::Form(actual) => {
+
+                if let Ok(ParsedHttpBody::Form(expected)) = parse_http_body(expected_body) {
+
+                    let expected = http_form_into_fields(expected);
+                    let actual = http_form_into_fields(actual);
+                    let errors = util::form::compare(
+                        &expected,
+                        &actual,
+                        expected_exact_body
+                    );
+
+                    // Exit early when there are no errors
+                    if errors.is_ok() {
+                        return;
+                    }
+
+                    format!(
+                        "{} {}\n\n        {}",
+                        context.yellow(),
+                        "body form data does not match, expected:".yellow(),
+                        util::form::format(errors.unwrap_err())
+                    )
+
+                } else {
+                    // TODO: IW test with broken expected body
+                    format!("{} {}{}", context.yellow(), "Failed to parse expected form body.", ".".to_string())
+                }
+
             },
-            ParsedHttpBody::Raw(data) => {
+            ParsedHttpBody::Raw(actual) => {
                 format!(
                     "{} {}\n\n       [{}]\n\n    {}\n\n       [{}]",
 
@@ -224,12 +251,12 @@ pub fn validate_http_request_body<T: HttpLike>(
                     format!(
                         "{} {} {}",
                         "but got the following".yellow(),
-                        format!("{} bytes", data.len()).red().bold(),
+                        format!("{} bytes", actual.len()).red().bold(),
                         "instead:".yellow()
                     ),
 
                     // TODO dry or better diff
-                    data.chunks(16).map(|c| {
+                    actual.chunks(16).map(|c| {
                         c.iter().map(|d| {
                             format!("{}", format!("0x{:0>2X}", d).red().bold())
 
