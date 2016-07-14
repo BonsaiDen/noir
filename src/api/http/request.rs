@@ -7,13 +7,14 @@
 // except according to those terms.
 
 // STD Dependencies -----------------------------------------------------------
+use std::io::ErrorKind;
 use std::time::Duration;
 use std::sync::{Arc, Mutex};
 
 
 // External Dependencies ------------------------------------------------------
 use colored::*;
-use hyper::Client;
+use hyper::{Client, Error};
 use hyper::method::Method;
 use hyper::client::Response;
 use hyper::status::StatusCode;
@@ -420,18 +421,14 @@ impl<A: HttpApi> HttpRequest<A> {
 
         // Send response and validate
         let errors = match request.send() {
-            Ok(response) => {
-                self.validate(response)
-            },
-            Err(err) => {
-                // TODO IW: Explictly handle timeouts?
-                (vec![format!(
-                    "{} {}",
-                    "Internal Noir Error:".red().bold(),
-                    err.to_string().yellow()
-
-                )], 1)
-            }
+            Ok(response) => self.validate(response),
+            Err(err) => (vec![format!(
+                "{} {} {}{}",
+                "Noir Api Failure:".red().bold(),
+                "No response within".yellow(),
+                "1000ms".cyan(),
+                ".".yellow()
+            )], 1)
         };
 
         for mock in &mut self.provided_mocks {

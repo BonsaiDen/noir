@@ -48,3 +48,21 @@ fn test_api_start_multiple() {
 
 }
 
+
+#[test]
+fn test_api_request_timeout() {
+
+    let actual = {
+        API::get("/timeout").collect()
+    };
+
+    assert_fail!(r#"
+<br>Response Failure: <bc>GET <by>request to \"<bc>http://localhost:4000<bc>/timeout\" <by>returned <br>1 <by>error(s)
+
+<br> 1) <br>Noir Api Failure: <by>No response within <bn>1000ms<by>.
+
+
+"#, actual);
+
+}
+

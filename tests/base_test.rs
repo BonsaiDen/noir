@@ -6,7 +6,9 @@ extern crate hyper;
 
 
 // STD Dependencies -----------------------------------------------------------
+use std::thread;
 use std::io::Read;
+use std::time::Duration;
 use std::net::ToSocketAddrs;
 
 
@@ -39,6 +41,11 @@ fn handle(mut req: Request, mut res: Response) {
 
             (m, "/echo/method") => {
                 format!("{}", m)
+            },
+
+            (Method::Get, "/timeout") => {
+                thread::sleep(Duration::from_millis(2000));
+                "".to_string()
             },
 
             (Method::Get, "/status/404") => {
