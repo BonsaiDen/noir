@@ -139,34 +139,46 @@ pub fn validate_http_request_body<T: HttpLike>(
 
         Ok(actual) => match actual {
             ParsedHttpBody::Text(actual) => {
+                match str::from_utf8(expected_body.data.as_slice()) {
+                    Ok(expected) => {
 
-                let (expected, actual, diff) = util::diff::text(
-                    // TODO IW: handle errors in expected body data?
-                    str::from_utf8(expected_body.data.as_slice()).unwrap(),
-                    actual
-                );
+                        let (expected, actual, diff) = util::diff::text(
+                            expected,
+                            actual
+                        );
 
-                format!(
-                    "{} {}\n\n        \"{}\"\n\n    {}\n\n        \"{}\"\n\n    {}\n\n        \"{}\"",
-                    context.yellow(),
-                    "does not match, expected:".yellow(),
-                    expected.green().bold(),
-                    "but got:".yellow(),
-                    actual.red().bold(),
-                    "difference:".yellow(),
-                    diff
-                )
+                        format!(
+                            "{} {}\n\n        \"{}\"\n\n    {}\n\n        \"{}\"\n\n    {}\n\n        \"{}\"",
+                            context.yellow(),
+                            "does not match, expected:".yellow(),
+                            expected.green().bold(),
+                            "but got:".yellow(),
+                            actual.red().bold(),
+                            "difference:".yellow(),
+                            diff
+                        )
 
+                    },
+                    Err(err) => format!(
+                        "{} {}\n\n        {}",
+                        context.yellow(),
+                        "body, expected text provided by test contains invalid UTF-8:".yellow(),
+                        format!("{:?}", err).red().bold()
+                    )
+                }
             },
             ParsedHttpBody::Json(actual) => {
-                let expected_json = util::json::parse(expected_body.data.as_slice());
+                let expected_json = util::json::parse(
+                    expected_body.data.as_slice(),
+                    "body json provided by test"
+                );
                 match expected_json {
                     Ok(expected) => {
 
                         let errors = util::json::compare(
                             &expected,
                             &actual,
-                            4096, // TODO configure max depth
+                            4096, // TODO IW: Configure max depth?
                             expected_exact_body
                         );
 
@@ -184,47 +196,54 @@ pub fn validate_http_request_body<T: HttpLike>(
 
                     },
                     Err(err) => {
-                        // TODO: IW test with broken expected body
                         format!(
-                            "{} {}\n\n        {}",
+                            "{} {} {}",
                             context.yellow(),
-                            "expected body contains invalid json data:".yellow(),
+                            "body, expected".yellow(),
                             err
                         )
                     }
-
                 }
-
             },
             ParsedHttpBody::Form(actual) => {
+                match parse_http_body(expected_body) {
+                    Ok(ParsedHttpBody::Form(expected)) => {
 
-                if let Ok(ParsedHttpBody::Form(expected)) = parse_http_body(expected_body) {
+                        let expected = http_form_into_fields(expected);
+                        let actual = http_form_into_fields(actual);
+                        let errors = util::form::compare(
+                            &expected,
+                            &actual,
+                            expected_exact_body
+                        );
 
-                    let expected = http_form_into_fields(expected);
-                    let actual = http_form_into_fields(actual);
-                    let errors = util::form::compare(
-                        &expected,
-                        &actual,
-                        expected_exact_body
-                    );
+                        // Exit early when there are no errors
+                        if errors.is_ok() {
+                            return;
+                        }
 
-                    // Exit early when there are no errors
-                    if errors.is_ok() {
-                        return;
-                    }
+                        format!(
+                            "{} {}\n\n        {}",
+                            context.yellow(),
+                            "body form data does not match, expected:".yellow(),
+                            util::form::format(errors.unwrap_err())
+                        )
 
-                    format!(
-                        "{} {}\n\n        {}",
+                    },
+                    // TODO IW: Test, we need to override the body type header for this
+                    Ok(_) => format!(
+                        "{} {}",
                         context.yellow(),
-                        "body form data does not match, expected:".yellow(),
-                        util::form::format(errors.unwrap_err())
+                        "body, expected body provided by test is no form data.".yellow(),
+                    ),
+                    // TODO IW: Test, supply custom (broken) form data
+                    Err(err) => format!(
+                        "{} {} {}",
+                        context.yellow(),
+                        "body, expected form data provided by test is invalid:".yellow(),
+                        err
                     )
-
-                } else {
-                    // TODO: IW test with broken expected body
-                    format!("{} {}{}", context.yellow(), "Failed to parse expected form body.", ".".to_string())
                 }
-
             },
             ParsedHttpBody::Raw(actual) => {
                 format!(
@@ -238,32 +257,14 @@ pub fn validate_http_request_body<T: HttpLike>(
                         format!("{} bytes", expected_body.data.len()).green().bold(),
                         ":".yellow()
                     ),
-
-                    // TODO dry or better diff
-                    expected_body.data.chunks(16).map(|c| {
-                        c.iter().map(|d| {
-                            format!("{}", format!("0x{:0>2X}", d).green().bold())
-
-                        }).collect::<Vec<String>>().join(", ")
-
-                    }).collect::<Vec<String>>().join(",\n        "),
-
+                    util::raw::format_green(expected_body.data.as_slice()),
                     format!(
                         "{} {} {}",
                         "but got the following".yellow(),
                         format!("{} bytes", actual.len()).red().bold(),
                         "instead:".yellow()
                     ),
-
-                    // TODO dry or better diff
-                    actual.chunks(16).map(|c| {
-                        c.iter().map(|d| {
-                            format!("{}", format!("0x{:0>2X}", d).red().bold())
-
-                        }).collect::<Vec<String>>().join(", ")
-
-                    }).collect::<Vec<String>>().join(",\n        ")
-
+                    util::raw::format_red(actual),
                 )
             }
         },
@@ -298,7 +299,7 @@ pub fn parse_http_body<'a>(body: &'a HttpBody) -> Result<ParsedHttpBody<'a>, Str
                 }
             },
             Mime(TopLevel::Application, SubLevel::Json, _) => {
-                match util::json::parse(body.data.as_slice()) {
+                match util::json::parse(body.data.as_slice(), "body json") {
                     Ok(json) => Ok(ParsedHttpBody::Json(json)),
                     Err(err) => Err(err)
                 }

@@ -104,7 +104,6 @@ impl HttpFormData {
 
     fn into_body_parts(self) -> (Mime, Vec<u8>) {
 
-        // TODO IW: Support nested form-data (multipart/mixed)
         if self.mime == SubLevel::FormData {
 
             let mut body = Vec::new();
@@ -186,7 +185,7 @@ pub fn parse_form_data(body: &[u8], boundary: Option<String>) -> Result<HttpForm
                         &body[previous_index + boundary.len() + 2..i - 2]
                     );
 
-                    parse_form_data_part(&mut fields, part);
+                    try!(parse_form_data_part(&mut fields, part));
 
                 }
 
@@ -299,7 +298,7 @@ fn parse_form_field(fields: &mut Vec<HttpFormDataField>, name: String, value: St
 
 }
 
-fn parse_form_data_part(fields: &mut Vec<HttpFormDataField>, data: Vec<u8>) {
+fn parse_form_data_part(fields: &mut Vec<HttpFormDataField>, data: Vec<u8>) -> Result<(), String> {
 
     // We let httparse do the gruntwork for us
     let mut headers = [httparse::EMPTY_HEADER; 16];
@@ -309,10 +308,13 @@ fn parse_form_data_part(fields: &mut Vec<HttpFormDataField>, data: Vec<u8>) {
         Ok(httparse::Status::Complete(size)) => {
 
             // Parse field metadata
-            let mut part = ParsedFormDataField::from_headers(
-                // TODO IW: Return error if headers are not parseable
-                Headers::from_raw(req.headers).unwrap()
-            );
+            let headers = match Headers::from_raw(req.headers) {
+                Ok(headers) => headers,
+                // TODO: IW test
+                Err(_) => return Err("Failed to form field headers.".to_string())
+            };
+
+            let mut part = try!(ParsedFormDataField::from_headers(headers));
 
             // File fields
             if part.filename.is_some() {
@@ -328,7 +330,7 @@ fn parse_form_data_part(fields: &mut Vec<HttpFormDataField>, data: Vec<u8>) {
                 parse_form_field(
                     fields,
                     part.name,
-                    // TODO return utf-8 errors
+                    // TODO IW: return utf-8 errors
                     String::from_utf8((&data[size..]).to_vec()).unwrap()
                 )
             }
@@ -336,6 +338,8 @@ fn parse_form_data_part(fields: &mut Vec<HttpFormDataField>, data: Vec<u8>) {
         },
         _ => unreachable!()
     }
+
+    Ok(())
 
 }
 
@@ -348,7 +352,7 @@ struct ParsedFormDataField {
 
 impl ParsedFormDataField {
 
-    fn from_headers(headers: Headers) -> ParsedFormDataField {
+    fn from_headers(headers: Headers) -> Result<ParsedFormDataField, String> {
 
         let mut name = String::new();
         let mut mime = None;
@@ -358,8 +362,14 @@ impl ParsedFormDataField {
             mime = Some(m.clone());
         }
 
-        // TODO IW: Return error if header is missing
-        let disposition = headers.get::<ContentDisposition>().unwrap();
+        let disposition = match headers.get::<ContentDisposition>() {
+            Some(disposition) => disposition,
+            None => return Err(
+                // TODO: IW test
+                "Content-Disposition header is missing on form field.".to_string()
+            )
+        };
+
         for p in &disposition.parameters {
             match p {
                 &DispositionParam::Ext(ref key, ref value) => {
@@ -368,16 +378,17 @@ impl ParsedFormDataField {
                     }
                 },
                 &DispositionParam::Filename(_, _, ref buf) => {
+                    // TODO IW: return utf-8 errors
                     filename = Some(String::from_utf8(buf.clone()).unwrap());
                 }
             }
         }
 
-        ParsedFormDataField {
+        Ok(ParsedFormDataField {
             name: name,
             mime: mime,
             filename: filename,
-        }
+        })
 
     }
 

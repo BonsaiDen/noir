@@ -445,7 +445,7 @@ fn test_provided_response_with_expected_body_json_invalid() {
 
 <br> 1) <br>Request Failure: <bc>POST <by>response provided for \"<bc>https://example.com<bc>/forward\" <by>returned <br>1 <by>error(s)
 
-    <br> 1.1) <by>Request <by>body contains invalid json:
+    <br> 1.1) <by>Request <by>body json is invalid:
 
               <br>UnexpectedCharacter { ch: \'}\', line: 1, column: 9 }.
 
@@ -473,7 +473,7 @@ fn test_provided_response_with_expected_body_json_invalid_utf8() {
 
 <br> 1) <br>Request Failure: <bc>POST <by>response provided for \"<bc>https://example.com<bc>/forward\" <by>returned <br>1 <by>error(s)
 
-    <br> 1.1) <by>Request <by>json body contains invalid UTF-8:
+    <br> 1.1) <by>Request <by>body json contains invalid UTF-8:
 
               <br>Utf8Error { valid_up_to: 0 }.
 

@@ -18,6 +18,7 @@ use hyper::status::StatusCode;
 
 
 // Internal Dependencies ------------------------------------------------------
+use util;
 use super::{HttpBody, HttpLike, HttpQueryString};
 use super::form::{HttpFormDataField, http_form_into_fields};
 use super::body::{
@@ -248,15 +249,7 @@ fn format_body(body: Result<ParsedHttpBody, String>) -> String {
                         format!("{} bytes", data.len()).cyan(),
                         ":".yellow()
                     ),
-                    // TODO move out and use when comparing raw bodies
-                    //  color must be made configurable (how?)
-                    data.chunks(16).map(|c| {
-                        c.iter().map(|d| {
-                            format!("{}", format!("0x{:0>2X}", d).purple().bold())
-
-                        }).collect::<Vec<String>>().join(", ")
-
-                    }).collect::<Vec<String>>().join(",\n        ")
+                    util::raw::format_purple(data)
                 )
             }
         },

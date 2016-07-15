@@ -189,7 +189,7 @@ fn test_dump_response_with_json_body_invalid() {
         <bn>          Date: <bp>
         <bn>          Host: <bp>localhost:4000
 
-    <by>Response <by>body contains invalid json:
+    <by>Response <by>body json is invalid:
 
         <br>UnexpectedCharacter { ch: \'}\', line: 1, column: 9 }
 

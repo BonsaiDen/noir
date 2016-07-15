@@ -22,19 +22,19 @@ use util;
 
 
 // Parsing Utilities ----------------------------------------------------------
-pub fn parse(data: &[u8]) -> Result<JsonValue, String> {
+pub fn parse(data: &[u8], err_prefix: &'static str) -> Result<JsonValue, String> {
     match str::from_utf8(data) {
         Ok(text) => match json::parse(text) {
             Ok(value) => Ok(value),
             Err(err) => Err(format!(
                 "{}\n\n        {}",
-                "body contains invalid json:".yellow(),
+                format!("{} is invalid:", err_prefix).yellow(),
                 format!("{:?}", err).red().bold()
             ))
         },
         Err(err) => Err(format!(
             "{}\n\n        {}",
-            "json body contains invalid UTF-8:".yellow(),
+            format!("{} contains invalid UTF-8:", err_prefix).yellow(),
             format!("{:?}", err).red().bold()
         ))
     }
