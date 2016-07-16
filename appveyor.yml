@@ -1,7 +1,9 @@
 environment:
   RUST_TEST_THREADS: 1
-  OPENSSL_LIB_DIR: "C:/OpenSSL/lib"
-  OPENSSL_INCLUDE_DIR: "C:/OpenSSL/include"
+  DEP_OPENSSL_INCLUDE: "C:\OpenSSL\include"
+  OPENSSL_INCLUDE_DIR: "C:\OpenSSL\include"
+  OPENSSL_LIB_DIR: "C:\OpenSSL\lib\VC"
+  OPENSSL_LIBS: "ssleay32MT:libeay32MT"
   matrix:
   - TARGET: x86_64-pc-windows-msvc
     VERSION: 1.10.0
@@ -9,16 +11,10 @@ environment:
   - TARGET: i686-pc-windows-msvc
     VERSION: 1.10.0
     BITS: 32
-  - TARGET: i686-pc-windows-gnu
-    VERSION: 1.10.0
-    BITS: 32
 
 install:
   - ps: Start-FileDownload "http://slproweb.com/download/Win${env:BITS}OpenSSL-1_0_2h.exe"
   - Win%BITS%OpenSSL-1_0_2h.exe /SILENT /VERYSILENT /SP- /DIR="C:\OpenSSL"
-  - ren C:\OpenSSL\lib\libeay%BITS%.lib eay%BITS%.lib
-  - ren C:\OpenSSL\lib\ssleay%BITS%.lib ssl%BITS%.lib
-  - dir C:\OpenSSL\lib
   - ps: Start-FileDownload "https://static.rust-lang.org/dist/rust-${env:VERSION}-${env:TARGET}.exe"
   - rust-%VERSION%-%TARGET%.exe /VERYSILENT /NORESTART /DIR="C:\rust"
   - SET PATH=%PATH%;C:\rust\bin
