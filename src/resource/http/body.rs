@@ -21,6 +21,7 @@ use hyper::mime::{Mime, TopLevel, SubLevel};
 
 // Internal Dependencies ------------------------------------------------------
 use util;
+use Options;
 use super::{HttpLike, HttpFormData};
 use super::form::{
     http_form_into_body_parts,
@@ -119,6 +120,7 @@ impl From<HttpFormData> for HttpBody {
 
 pub fn validate_http_request_body<T: HttpLike>(
     errors: &mut Vec<String>,
+    options: &Options,
     result: &mut T,
     context: &str,
     expected_body: &&HttpBody,
@@ -178,7 +180,7 @@ pub fn validate_http_request_body<T: HttpLike>(
                         let errors = util::json::compare(
                             &expected,
                             &actual,
-                            4096, // TODO IW: Configure max depth?
+                            options.json_compare_depth,
                             expected_exact_body
                         );
 

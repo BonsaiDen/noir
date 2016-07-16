@@ -51,7 +51,7 @@ pub fn compare(
 ) -> Result<(), Vec<(Vec<String>, String)>> {
 
     let errors = compare_json(
-        1,
+        0,
         max_depth,
         check_additional_keys,
         vec![],
@@ -704,7 +704,7 @@ mod tests {
             (vec![".<bb>number"], "<bg>Number (<br>4) <by>does not match expected value (<bg>2)"),
             (vec![], "<bg>Object <by>is missing <br>1 <by>key(s) (<br>missing)")
 
-        ], 2, false);
+        ], 1, false);
     }
 
     #[test]
@@ -725,7 +725,7 @@ mod tests {
             (vec![], "<bg>Object <by>is missing <br>1 <by>key(s) (<br>missing)"),
             (vec![], "<bg>Object <by>has <br>1 <by>additional unexpected key(s) (<br>additional)")
 
-        ], 2, true);
+        ], 1, true);
     }
 
     #[test]
@@ -744,7 +744,7 @@ mod tests {
             (vec!["<bp>[0]"], "<bg>String <by>does not match, expected:\n\n              \"<bg>foo\"\n\n          <by>but got:\n\n              \"<br>key\"\n\n          <by>difference:\n\n              \"<gbr>foo <gbg>key\""),
             (vec!["<bp>[1]"], "<by>Expected a <bg>Number <by>but found a <br>Boolean (<br>true)")
 
-        ], 2, false);
+        ], 1, false);
 
     }
 
@@ -764,7 +764,7 @@ mod tests {
                 }
             }
 
-        }, vec![], 4, false);
+        }, vec![], 3, false);
 
         cmp_base(object!{
             "top" => object!{
@@ -783,7 +783,7 @@ mod tests {
         }, vec![
             (vec![".<bb>top", ".<bb>sub", ".<bb>level", "<bp>[0]"], "<bg>Number (<br>3) <by>does not match expected value (<bg>2)")
 
-        ], 5, false);
+        ], 4, false);
     }
 
 }

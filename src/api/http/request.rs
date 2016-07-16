@@ -22,6 +22,7 @@ use hyper::header::{Header, Headers, HeaderFormat, ContentType};
 
 // Internal Dependencies ------------------------------------------------------
 use HttpApi;
+use Options;
 use mock::{MockResponse, MockProvider, ResponseProvider};
 use resource::http::util;
 use resource::http::{HttpHeader, HttpBody, HttpQueryString};
@@ -95,6 +96,7 @@ pub struct HttpRequest<A: HttpApi> {
     api: A,
     method: Method,
     path: String,
+    options: Options,
 
     api_timed_out: bool,
     dump_response: bool,
@@ -152,6 +154,14 @@ impl<A: HttpApi> HttpRequest<A> {
     /// The set `Content-Type` can be overriden via `HttpRequest::with_header`.
     pub fn with_body<S: Into<HttpBody>>(mut self, body: S) -> Self {
         self.request_body = Some(body.into());
+        self
+    }
+
+    /// Sets the request's configuration options.
+    ///
+    /// This allows to change or override the default request behaviour.
+    pub fn with_options(mut self, options: Options) -> Self {
+        self.options = options;
         self
     }
 
@@ -452,6 +462,7 @@ impl<A: HttpApi> HttpRequest<A> {
         let status = response.status;
         errors.append(&mut util::validate_http_request(
             &mut response,
+            &self.options,
             "Response",
             Some(status),
             self.expected_status,
@@ -572,6 +583,7 @@ pub fn http_request<A: HttpApi>(
         api: api,
         method: method,
         path: path.to_string(),
+        options: Default::default(),
 
         api_timed_out: api_timed_out,
         dump_response: false,

@@ -19,6 +19,7 @@ use hyper::header::{Header, Headers, HeaderFormat, ContentType};
 
 
 // Internal Dependencies ------------------------------------------------------
+use Options;
 use super::request::HttpRequest;
 use super::endpoint::HttpEndpoint;
 use mock::{MockRequest, MockResponse};
@@ -32,6 +33,7 @@ pub struct HttpResponse<E: HttpEndpoint> {
 
     method: Method,
     path: String,
+    options: Options,
 
     dump_request: bool,
 
@@ -97,6 +99,14 @@ impl<E: HttpEndpoint> HttpResponse<E> {
     /// Sets a low level io error to be returned once the response is read.
     pub fn with_error(mut self, error: Error) -> Self {
         self.response_error = Some(error);
+        self
+    }
+
+    /// Sets the response's configuration options.
+    ///
+    /// This allows to change or override the default response behaviour.
+    pub fn with_options(mut self, options: Options) -> Self {
+        self.options = options;
         self
     }
 
@@ -313,6 +323,7 @@ impl<E: HttpEndpoint> MockResponse for HttpResponse<E> {
 
             errors.append(&mut util::validate_http_request(
                 request,
+                &self.options,
                 "Request",
                 None,
                 None,
@@ -369,6 +380,7 @@ pub fn http_response<E: HttpEndpoint>(
 
         method: method,
         path: path.to_string(),
+        options: Default::default(),
 
         dump_request: false,
 

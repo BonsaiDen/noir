@@ -481,6 +481,84 @@ fn test_body_with_expected_json_expected_invalid_utf8() {
 
 }
 
+#[test]
+fn test_body_with_expected_json_compare_depth_one() {
+
+    use noir::Options;
+    let actual = {
+        API::post("/echo")
+            .with_options(Options {
+                // This will only enter the first level after the top level
+                json_compare_depth: 1,
+                .. Default::default()
+            })
+            .with_body(object! {
+                "key" => "value",
+                "deep" => object! {
+                    "compare" => "foo"
+                }
+            })
+            .expected_body(object! {
+                "key" => "otherValue",
+                "deep" => object! {
+                    "compare" => "bar"
+                }
+            })
+            .collect()
+    };
+
+    assert_fail!(r#"
+<br>Response Failure: <bc>POST <by>request to \"<bc>http://localhost:4000<bc>/echo\" <by>returned <br>1 <by>error(s)
+
+<br> 1) <by>Response <by>body json does not match, expected:
+
+        - <bb>json.<bb>key: <bg>String <by>does not match, expected:
+
+              \"<bg>value\"
+
+          <by>but got:
+
+              \"<br>otherValue\"
+
+          <by>difference:
+
+              \"<gbr>value <gbg>otherValue\"
+
+
+"#, actual);
+
+}
+
+#[test]
+fn test_body_with_expected_json_compare_depth_zero() {
+
+    use noir::Options;
+    let actual = {
+        API::post("/echo")
+            .with_options(Options {
+                // This will perform no comparisons at all
+                json_compare_depth: 0,
+                .. Default::default()
+            })
+            .with_body(object! {
+                "key" => "value",
+                "deep" => object! {
+                    "compare" => "foo"
+                }
+            })
+            .expected_body(object! {
+                "key" => "otherValue",
+                "deep" => object! {
+                    "compare" => "bar"
+                }
+            })
+            .collect()
+    };
+
+    assert_pass!(actual);
+
+}
+
 
 // Set Headers from Body ------------------------------------------------------
 #[test]

@@ -39,6 +39,7 @@ mod util;
 
 
 // Exports --------------------------------------------------------------------
+pub use api::options::Options;
 pub use api::http::{HttpApi, HttpRequest};
 pub use mock::{
     MockResponse, MockRequest, MockProvider,

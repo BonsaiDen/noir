@@ -149,8 +149,9 @@ pub trait MockProvider: Send {
 /// If the response was configured to return a custom `std::io::Error`.
 pub type MockRequestResponse = Result<Vec<u8>, Error>;
 
-/// An interface for `MockRequest` trait implementations for consuming
-/// matching `MockResponse` objects that were provided during the active test.
+/// An interface for `MockRequest` trait implementations allowing them to
+/// consume matching `MockResponse` objects that were provided for the current
+/// test.
 pub struct MockResponseProvider;
 impl MockResponseProvider {
 

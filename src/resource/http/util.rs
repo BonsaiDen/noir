@@ -19,6 +19,7 @@ use hyper::status::StatusCode;
 
 // Internal Dependencies ------------------------------------------------------
 use util;
+use Options;
 use super::{HttpBody, HttpLike, HttpQueryString};
 use super::form::{HttpFormDataField, http_form_into_fields};
 use super::body::{
@@ -56,6 +57,7 @@ pub fn path_with_query(path: &str, query: HttpQueryString) -> String {
 
 pub fn validate_http_request<T: HttpLike>(
     result: &mut T,
+    options: &Options,
     context: &str,
     response_status: Option<StatusCode>,
     expected_status: Option<StatusCode>,
@@ -89,7 +91,12 @@ pub fn validate_http_request<T: HttpLike>(
 
     if let Some(ref expected_body) = expected_body.as_ref() {
         validate_http_request_body(
-            &mut errors, result, context, expected_body, expected_exact_body
+            &mut errors,
+            options,
+            result,
+            context,
+            expected_body,
+            expected_exact_body
         );
     }
 

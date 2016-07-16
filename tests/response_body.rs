@@ -481,6 +481,92 @@ fn test_provided_response_with_expected_body_json_invalid_utf8() {
 "#, actual);
 }
 
+#[test]
+fn test_provided_response_with_expected_body_json_compare_depth_one() {
+
+    use noir::Options;
+    let actual = {
+        API::post("/response/forward")
+            .provide(responses![
+                EXAMPLE.post("/forward")
+                    .with_options(Options {
+                        // This will only enter the first level after the top level
+                        json_compare_depth: 1,
+                        .. Default::default()
+                    })
+                    .expected_body(object! {
+                        "key" => "otherValue",
+                        "deep" => object! {
+                            "compare" => "bar"
+                        }
+                    })
+            ])
+            .with_body(object! {
+                "key" => "value",
+                "deep" => object! {
+                    "compare" => "foo"
+                }
+            })
+            .collect()
+    };
+
+    assert_fail!(r#"
+<br>Response Failure: <bc>POST <by>request to \"<bc>http://localhost:4000<bc>/response/forward\" <by>returned <br>1 <by>error(s)
+
+<br> 1) <br>Request Failure: <bc>POST <by>response provided for \"<bc>https://example.com<bc>/forward\" <by>returned <br>1 <by>error(s)
+
+    <br> 1.1) <by>Request <by>body json does not match, expected:
+
+              - <bb>json.<bb>key: <bg>String <by>does not match, expected:
+
+                    \"<bg>value\"
+
+                <by>but got:
+
+                    \"<br>otherValue\"
+
+                <by>difference:
+
+                    \"<gbr>value <gbg>otherValue\"
+
+
+"#, actual);
+
+}
+
+#[test]
+fn test_provided_response_with_expected_body_json_compare_depth_zero() {
+
+    use noir::Options;
+    let actual = {
+        API::post("/response/forward")
+            .provide(responses![
+                EXAMPLE.post("/forward")
+                    .with_options(Options {
+                        // This will perform no comparisons at all
+                        json_compare_depth: 0,
+                        .. Default::default()
+                    })
+                    .expected_body(object! {
+                        "key" => "otherValue",
+                        "deep" => object! {
+                            "compare" => "bar"
+                        }
+                    })
+            ])
+            .with_body(object! {
+                "key" => "value",
+                "deep" => object! {
+                    "compare" => "foo"
+                }
+            })
+            .collect()
+    };
+
+    assert_pass!(actual);
+
+}
+
 
 // Form Body ------------------------------------------------------------------
 #[test]
