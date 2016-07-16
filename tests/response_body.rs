@@ -169,7 +169,7 @@ fn test_provided_response_with_expected_body_text_invalid_utf8() {
 
     <br> 1.1) <by>Request <by>text body contains invalid UTF-8:
 
-              <br>Utf8Error { valid_up_to: 0 }.
+              <br>Utf8Error { valid_up_to: 0 }
 
 
 "#, actual);
@@ -447,7 +447,7 @@ fn test_provided_response_with_expected_body_json_invalid() {
 
     <br> 1.1) <by>Request <by>body json is invalid:
 
-              <br>UnexpectedCharacter { ch: \'}\', line: 1, column: 9 }.
+              <br>UnexpectedCharacter { ch: \'}\', line: 1, column: 9 }
 
 
 "#, actual);
@@ -475,7 +475,7 @@ fn test_provided_response_with_expected_body_json_invalid_utf8() {
 
     <br> 1.1) <by>Request <by>body json contains invalid UTF-8:
 
-              <br>Utf8Error { valid_up_to: 0 }.
+              <br>Utf8Error { valid_up_to: 0 }
 
 
 "#, actual);

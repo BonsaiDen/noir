@@ -272,7 +272,7 @@ pub fn validate_http_request_body<T: HttpLike>(
         },
 
         Err(err) => {
-            format!("{} {}{}", context.yellow(), err, ".".to_string())
+            format!("{} {}", context.yellow(), err)
         }
 
     });
@@ -316,7 +316,11 @@ pub fn parse_http_body<'a>(body: &'a HttpBody) -> Result<ParsedHttpBody<'a>, Str
 
                 match parse_form_data(body.data.as_slice(), boundary) {
                     Ok(data) => Ok(ParsedHttpBody::Form(data)),
-                    Err(err) => Err(err)
+                    Err(err) => Err(format!(
+                        "{}\n\n        {}",
+                        "form body could not be parsed:".yellow(),
+                         err.red().bold()
+                    ))
                 }
 
             },

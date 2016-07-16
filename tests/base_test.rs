@@ -90,13 +90,16 @@ fn handle(mut req: Request, mut res: Response) {
                     // can test it
                     if let Some(&mut (Attr::Boundary, Value::Ext(ref mut b))) = attrs.get_mut(0) {
 
-                        // TODO IW: Replace boundary without string conversion
-                        let mut str_body = String::from_utf8(body).unwrap();
-                        str_body = str_body.replace(b.as_str(), "boundary12345");
+                        // Ignore plain boundaries from some of the tests
+                        if b != "boundary" {
+                            // TODO IW: Replace boundary without string conversion
+                            let mut str_body = String::from_utf8(body).unwrap();
+                            str_body = str_body.replace(b.as_str(), "boundary12345");
 
-                        *b = "boundary12345".to_string();
+                            *b = "boundary12345".to_string();
 
-                        body = str_body.into();
+                            body = str_body.into();
+                        }
 
                     }
 

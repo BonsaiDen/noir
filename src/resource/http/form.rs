@@ -301,18 +301,14 @@ fn parse_form_field(fields: &mut Vec<HttpFormDataField>, name: String, value: St
 fn parse_form_data_part(fields: &mut Vec<HttpFormDataField>, data: Vec<u8>) -> Result<(), String> {
 
     // We let httparse do the gruntwork for us
-    let mut headers = [httparse::EMPTY_HEADER; 16];
+    let mut headers = [httparse::EMPTY_HEADER; 2];
     let mut req = httparse::Request::new(&mut headers);
 
     match req.parse(&data[..]) {
         Ok(httparse::Status::Complete(size)) => {
 
             // Parse field metadata
-            let headers = match Headers::from_raw(req.headers) {
-                Ok(headers) => headers,
-                // TODO: IW test
-                Err(_) => return Err("Failed to form field headers.".to_string())
-            };
+            let headers = Headers::from_raw(req.headers).unwrap();
 
             let mut part = try!(ParsedFormDataField::from_headers(headers));
 
@@ -330,12 +326,17 @@ fn parse_form_data_part(fields: &mut Vec<HttpFormDataField>, data: Vec<u8>) -> R
                 parse_form_field(
                     fields,
                     part.name,
-                    // TODO IW: return utf-8 errors
                     String::from_utf8((&data[size..]).to_vec()).unwrap()
                 )
             }
 
         },
+        Err(err) => return Err(match err {
+            httparse::Error::HeaderName => "Invalid byte in header name of multi part field.".to_string(),
+            httparse::Error::HeaderValue => "Invalid byte in header value of multi part field.".to_string(),
+            httparse::Error::TooManyHeaders => "Unexpected headers in multi part field.".to_string(),
+            _ => unreachable!()
+        }),
         _ => unreachable!()
     }
 
@@ -365,8 +366,7 @@ impl ParsedFormDataField {
         let disposition = match headers.get::<ContentDisposition>() {
             Some(disposition) => disposition,
             None => return Err(
-                // TODO: IW test
-                "Content-Disposition header is missing on form field.".to_string()
+                "Content-Disposition header is missing from multi part field.".to_string()
             )
         };
 
@@ -378,7 +378,6 @@ impl ParsedFormDataField {
                     }
                 },
                 &DispositionParam::Filename(_, _, ref buf) => {
-                    // TODO IW: return utf-8 errors
                     filename = Some(String::from_utf8(buf.clone()).unwrap());
                 }
             }
