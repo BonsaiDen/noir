@@ -215,6 +215,7 @@
 <span id="171">171</span>
 <span id="172">172</span>
 <span id="173">173</span>
+<span id="174">174</span>
 </pre><pre class='rust '>
 <span class='comment'>// Copyright (c) 2016 Ivo Wetzel</span>
 
@@ -367,8 +368,9 @@
 <span class='doccomment'>/// If the response was configured to return a custom `std::io::Error`.</span>
 <span class='kw'>pub</span> <span class='kw'>type</span> <span class='ident'>MockRequestResponse</span> <span class='op'>=</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>, <span class='ident'>Error</span><span class='op'>&gt;</span>;
 
-<span class='doccomment'>/// An interface for `MockRequest` trait implementations for consuming</span>
-<span class='doccomment'>/// matching `MockResponse` objects that were provided during the active test.</span>
+<span class='doccomment'>/// An interface for `MockRequest` trait implementations allowing them to</span>
+<span class='doccomment'>/// consume matching `MockResponse` objects that were provided for the current</span>
+<span class='doccomment'>/// test.</span>
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>MockResponseProvider</span>;
 <span class='kw'>impl</span> <span class='ident'>MockResponseProvider</span> {
 

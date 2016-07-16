@@ -47,7 +47,7 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-114' class='srclink' href='../src/noir/src/api/http/request.rs.html#94-116' title='goto source code'>[src]</a></span></h1>
+               </span><a id='src-115' class='srclink' href='../src/noir/src/api/http/request.rs.html#95-118' title='goto source code'>[src]</a></span></h1>
 <pre class='rust struct'>pub struct HttpRequest&lt;A: <a class='trait' href='../noir/trait.HttpApi.html' title='noir::HttpApi'>HttpApi</a>&gt; {
     // some fields omitted
 }</pre><div class='docblock'><p>A HTTP request for API testing.</p>
@@ -78,7 +78,7 @@ failure.</p>
 
 <h1 id='panics' class='section-header'><a href='#panics'>Panics</a></h1>
 <p>If any of the set up expectations fail.</p>
-</div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl&lt;A: <a class='trait' href='../noir/trait.HttpApi.html' title='noir::HttpApi'>HttpApi</a>&gt; <a class='struct' href='../noir/struct.HttpRequest.html' title='noir::HttpRequest'>HttpRequest</a>&lt;A&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a id='src-131' class='srclink' href='../src/noir/src/api/http/request.rs.html#118-504' title='goto source code'>[src]</a></span></h3>
+</div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl&lt;A: <a class='trait' href='../noir/trait.HttpApi.html' title='noir::HttpApi'>HttpApi</a>&gt; <a class='struct' href='../noir/struct.HttpRequest.html' title='noir::HttpRequest'>HttpRequest</a>&lt;A&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a id='src-133' class='srclink' href='../src/noir/src/api/http/request.rs.html#120-511' title='goto source code'>[src]</a></span></h3>
 <div class='impl-items'><h4 id='method.with_headers' class='method'><code>fn <a href='#method.with_headers' class='fnname'>with_headers</a>(self, headers: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='struct' href='../noir/struct.HttpHeader.html' title='noir::HttpHeader'>HttpHeader</a>&gt;) -&gt; Self</code></h4>
 <div class='docblock'><p>Sets additional headers to be send with the request.</p>
 
@@ -98,6 +98,10 @@ from the request&#39;s path.</p>
 of the <code>body</code> argument.</p>
 
 <p>The set <code>Content-Type</code> can be overriden via <code>HttpRequest::with_header</code>.</p>
+</div><h4 id='method.with_options' class='method'><code>fn <a href='#method.with_options' class='fnname'>with_options</a>(self, options: <a class='struct' href='../noir/struct.Options.html' title='noir::Options'>Options</a>) -&gt; Self</code></h4>
+<div class='docblock'><p>Sets the request&#39;s configuration options.</p>
+
+<p>This allows to change or override the default request behaviour.</p>
 </div><h4 id='method.expected_status' class='method'><code>fn <a href='#method.expected_status' class='fnname'>expected_status</a>(self, status_code: <a class='enum' href='https://hyperium.github.io/hyper/hyper/status/enum.StatusCode.html' title='hyper::status::StatusCode'>StatusCode</a>) -&gt; Self</code></h4>
 <div class='docblock'><p>Sets the expected response status for the request.</p>
 
@@ -183,7 +187,7 @@ currently executing request.</p>
 concrete types of the <code>MockProvider</code> trait for use with this method.</p>
 </div><h4 id='method.collect' class='method'><code>fn <a href='#method.collect' class='fnname'>collect</a>(self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>, <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>&gt;</code></h4>
 <div class='docblock'><p>Directly execute the test request and collect any error message output.</p>
-</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl&lt;A: <a class='trait' href='../noir/trait.HttpApi.html' title='noir::HttpApi'>HttpApi</a>&gt; <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html' title='core::ops::Drop'>Drop</a> for <a class='struct' href='../noir/struct.HttpRequest.html' title='noir::HttpRequest'>HttpRequest</a>&lt;A&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a id='src-253' class='srclink' href='../src/noir/src/api/http/request.rs.html#512-521' title='goto source code'>[src]</a></span></h3>
+</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl&lt;A: <a class='trait' href='../noir/trait.HttpApi.html' title='noir::HttpApi'>HttpApi</a>&gt; <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html' title='core::ops::Drop'>Drop</a> for <a class='struct' href='../noir/struct.HttpRequest.html' title='noir::HttpRequest'>HttpRequest</a>&lt;A&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a id='src-259' class='srclink' href='../src/noir/src/api/http/request.rs.html#519-528' title='goto source code'>[src]</a></span></h3>
 <div class='docblock'><p>Automatically starts the request and logs any errors from set up expectations
 to <code>stdout</code>.</p>
 

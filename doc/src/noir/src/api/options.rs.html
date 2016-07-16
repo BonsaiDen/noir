@@ -4,10 +4,10 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="Source to the Rust file `src/util/mod.rs`.">
+    <meta name="description" content="Source to the Rust file `src/api/options.rs`.">
     <meta name="keywords" content="rust, rustlang, rust-lang">
 
-    <title>mod.rs.html -- source</title>
+    <title>options.rs.html -- source</title>
 
     <link rel="stylesheet" type="text/css" href="../../../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../../../main.css">
@@ -57,6 +57,21 @@
 <span id="13">13</span>
 <span id="14">14</span>
 <span id="15">15</span>
+<span id="16">16</span>
+<span id="17">17</span>
+<span id="18">18</span>
+<span id="19">19</span>
+<span id="20">20</span>
+<span id="21">21</span>
+<span id="22">22</span>
+<span id="23">23</span>
+<span id="24">24</span>
+<span id="25">25</span>
+<span id="26">26</span>
+<span id="27">27</span>
+<span id="28">28</span>
+<span id="29">29</span>
+<span id="30">30</span>
 </pre><pre class='rust '>
 <span class='comment'>// Copyright (c) 2016 Ivo Wetzel</span>
 
@@ -66,12 +81,27 @@
 <span class='comment'>// option. This file may not be copied, modified, or distributed</span>
 <span class='comment'>// except according to those terms.</span>
 
+<span class='doccomment'>/// Additional configuration options for api requests and responses.</span>
+<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Options</span> {
 
-<span class='comment'>// Modules --------------------------------------------------------------------</span>
-<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>diff</span>;
-<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>form</span>;
-<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>json</span>;
-<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>raw</span>;
+    <span class='doccomment'>/// Maximum depth for recursive json comparison. Defaults to `4096`.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// For top level json objects their own keys and the types of their values</span>
+    <span class='doccomment'>/// will be at depth `0`, the actual values will then be at depth `1`.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// For top level json arrays, their length will be at depth `0` and their</span>
+    <span class='doccomment'>/// items and their types and values will be at level `1`.</span>
+    <span class='kw'>pub</span> <span class='ident'>json_compare_depth</span>: <span class='ident'>usize</span>
+
+}
+
+<span class='kw'>impl</span> <span class='ident'>Default</span> <span class='kw'>for</span> <span class='ident'>Options</span> {
+    <span class='kw'>fn</span> <span class='ident'>default</span>() <span class='op'>-&gt;</span> <span class='ident'>Options</span> {
+        <span class='ident'>Options</span> {
+            <span class='ident'>json_compare_depth</span>: <span class='number'>4096</span>
+        }
+    }
+}
 
 </pre>
 </section>

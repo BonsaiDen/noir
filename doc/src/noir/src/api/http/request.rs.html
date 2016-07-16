@@ -647,6 +647,14 @@
 <span id="603">603</span>
 <span id="604">604</span>
 <span id="605">605</span>
+<span id="606">606</span>
+<span id="607">607</span>
+<span id="608">608</span>
+<span id="609">609</span>
+<span id="610">610</span>
+<span id="611">611</span>
+<span id="612">612</span>
+<span id="613">613</span>
 </pre><pre class='rust '>
 <span class='comment'>// Copyright (c) 2016 Ivo Wetzel</span>
 
@@ -672,6 +680,7 @@
 
 <span class='comment'>// Internal Dependencies ------------------------------------------------------</span>
 <span class='kw'>use</span> <span class='ident'>HttpApi</span>;
+<span class='kw'>use</span> <span class='ident'>Options</span>;
 <span class='kw'>use</span> <span class='ident'>mock</span>::{<span class='ident'>MockResponse</span>, <span class='ident'>MockProvider</span>, <span class='ident'>ResponseProvider</span>};
 <span class='kw'>use</span> <span class='ident'>resource</span>::<span class='ident'>http</span>::<span class='ident'>util</span>;
 <span class='kw'>use</span> <span class='ident'>resource</span>::<span class='ident'>http</span>::{<span class='ident'>HttpHeader</span>, <span class='ident'>HttpBody</span>, <span class='ident'>HttpQueryString</span>};
@@ -745,6 +754,7 @@
     <span class='ident'>api</span>: <span class='ident'>A</span>,
     <span class='ident'>method</span>: <span class='ident'>Method</span>,
     <span class='ident'>path</span>: <span class='ident'>String</span>,
+    <span class='ident'>options</span>: <span class='ident'>Options</span>,
 
     <span class='ident'>api_timed_out</span>: <span class='ident'>bool</span>,
     <span class='ident'>dump_response</span>: <span class='ident'>bool</span>,
@@ -802,6 +812,14 @@
     <span class='doccomment'>/// The set `Content-Type` can be overriden via `HttpRequest::with_header`.</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>with_body</span><span class='op'>&lt;</span><span class='ident'>S</span>: <span class='ident'>Into</span><span class='op'>&lt;</span><span class='ident'>HttpBody</span><span class='op'>&gt;&gt;</span>(<span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>body</span>: <span class='ident'>S</span>) <span class='op'>-&gt;</span> <span class='self'>Self</span> {
         <span class='self'>self</span>.<span class='ident'>request_body</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>body</span>.<span class='ident'>into</span>());
+        <span class='self'>self</span>
+    }
+
+    <span class='doccomment'>/// Sets the request&#39;s configuration options.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// This allows to change or override the default request behaviour.</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>with_options</span>(<span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>options</span>: <span class='ident'>Options</span>) <span class='op'>-&gt;</span> <span class='self'>Self</span> {
+        <span class='self'>self</span>.<span class='ident'>options</span> <span class='op'>=</span> <span class='ident'>options</span>;
         <span class='self'>self</span>
     }
 
@@ -1070,18 +1088,14 @@
 
         <span class='comment'>// Send response and validate</span>
         <span class='kw'>let</span> <span class='ident'>errors</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='ident'>request</span>.<span class='ident'>send</span>() {
-            <span class='prelude-val'>Ok</span>(<span class='ident'>response</span>) <span class='op'>=&gt;</span> {
-                <span class='self'>self</span>.<span class='ident'>validate</span>(<span class='ident'>response</span>)
-            },
-            <span class='prelude-val'>Err</span>(<span class='ident'>err</span>) <span class='op'>=&gt;</span> {
-                <span class='comment'>// TODO IW: Explictly handle timeouts?</span>
-                (<span class='macro'>vec</span><span class='macro'>!</span>[<span class='macro'>format</span><span class='macro'>!</span>(
-                    <span class='string'>&quot;{} {}&quot;</span>,
-                    <span class='string'>&quot;Internal Noir Error:&quot;</span>.<span class='ident'>red</span>().<span class='ident'>bold</span>(),
-                    <span class='ident'>err</span>.<span class='ident'>to_string</span>().<span class='ident'>yellow</span>()
-
-                )], <span class='number'>1</span>)
-            }
+            <span class='prelude-val'>Ok</span>(<span class='ident'>response</span>) <span class='op'>=&gt;</span> <span class='self'>self</span>.<span class='ident'>validate</span>(<span class='ident'>response</span>),
+            <span class='prelude-val'>Err</span>(_) <span class='op'>=&gt;</span> (<span class='macro'>vec</span><span class='macro'>!</span>[<span class='macro'>format</span><span class='macro'>!</span>(
+                <span class='string'>&quot;{} {} {}{}&quot;</span>,
+                <span class='string'>&quot;Noir Api Failure:&quot;</span>.<span class='ident'>red</span>().<span class='ident'>bold</span>(),
+                <span class='string'>&quot;No response within&quot;</span>.<span class='ident'>yellow</span>(),
+                <span class='string'>&quot;1000ms&quot;</span>.<span class='ident'>cyan</span>(),
+                <span class='string'>&quot;.&quot;</span>.<span class='ident'>yellow</span>()
+            )], <span class='number'>1</span>)
         };
 
         <span class='kw'>for</span> <span class='ident'>mock</span> <span class='kw'>in</span> <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>.<span class='ident'>provided_mocks</span> {
@@ -1106,6 +1120,7 @@
         <span class='kw'>let</span> <span class='ident'>status</span> <span class='op'>=</span> <span class='ident'>response</span>.<span class='ident'>status</span>;
         <span class='ident'>errors</span>.<span class='ident'>append</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>util</span>::<span class='ident'>validate_http_request</span>(
             <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>response</span>,
+            <span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>options</span>,
             <span class='string'>&quot;Response&quot;</span>,
             <span class='prelude-val'>Some</span>(<span class='ident'>status</span>),
             <span class='self'>self</span>.<span class='ident'>expected_status</span>,
@@ -1226,6 +1241,7 @@
         <span class='ident'>api</span>: <span class='ident'>api</span>,
         <span class='ident'>method</span>: <span class='ident'>method</span>,
         <span class='ident'>path</span>: <span class='ident'>path</span>.<span class='ident'>to_string</span>(),
+        <span class='ident'>options</span>: <span class='ident'>Default</span>::<span class='ident'>default</span>(),
 
         <span class='ident'>api_timed_out</span>: <span class='ident'>api_timed_out</span>,
         <span class='ident'>dump_response</span>: <span class='boolvalue'>false</span>,

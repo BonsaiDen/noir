@@ -333,6 +333,47 @@
 <span id="289">289</span>
 <span id="290">290</span>
 <span id="291">291</span>
+<span id="292">292</span>
+<span id="293">293</span>
+<span id="294">294</span>
+<span id="295">295</span>
+<span id="296">296</span>
+<span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
+<span id="303">303</span>
+<span id="304">304</span>
+<span id="305">305</span>
+<span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
+<span id="316">316</span>
+<span id="317">317</span>
+<span id="318">318</span>
+<span id="319">319</span>
+<span id="320">320</span>
+<span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
+<span id="324">324</span>
+<span id="325">325</span>
+<span id="326">326</span>
+<span id="327">327</span>
+<span id="328">328</span>
+<span id="329">329</span>
+<span id="330">330</span>
+<span id="331">331</span>
+<span id="332">332</span>
 </pre><pre class='rust '>
 <span class='comment'>// Copyright (c) 2016 Ivo Wetzel</span>
 
@@ -357,9 +398,13 @@
 
 <span class='comment'>// Internal Dependencies ------------------------------------------------------</span>
 <span class='kw'>use</span> <span class='ident'>util</span>;
+<span class='kw'>use</span> <span class='ident'>Options</span>;
 <span class='kw'>use</span> <span class='kw'>super</span>::{<span class='ident'>HttpLike</span>, <span class='ident'>HttpFormData</span>};
-<span class='kw'>use</span> <span class='kw'>super</span>::<span class='ident'>form</span>::{<span class='ident'>http_form_into_body_parts</span>, <span class='ident'>parse_form_data</span>};
-<span class='kw'>use</span> <span class='kw'>super</span>::<span class='ident'>util</span>::{<span class='ident'>parse_json</span>, <span class='ident'>diff_text</span>};
+<span class='kw'>use</span> <span class='kw'>super</span>::<span class='ident'>form</span>::{
+    <span class='ident'>http_form_into_body_parts</span>,
+    <span class='ident'>http_form_into_fields</span>,
+    <span class='ident'>parse_form_data</span>
+};
 
 
 <span class='doccomment'>/// An abstraction over different data types used for HTTP request bodies.</span>
@@ -452,6 +497,7 @@
 
 <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>validate_http_request_body</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>HttpLike</span><span class='op'>&gt;</span>(
     <span class='ident'>errors</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;</span>,
+    <span class='ident'>options</span>: <span class='kw-2'>&amp;</span><span class='ident'>Options</span>,
     <span class='ident'>result</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>T</span>,
     <span class='ident'>context</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>,
     <span class='ident'>expected_body</span>: <span class='op'>&amp;&amp;</span><span class='ident'>HttpBody</span>,
@@ -471,22 +517,47 @@
     <span class='ident'>errors</span>.<span class='ident'>push</span>(<span class='kw'>match</span> <span class='ident'>body</span> {
 
         <span class='prelude-val'>Ok</span>(<span class='ident'>actual</span>) <span class='op'>=&gt;</span> <span class='kw'>match</span> <span class='ident'>actual</span> {
-            <span class='ident'>ParsedHttpBody</span>::<span class='ident'>Text</span>(<span class='ident'>text</span>) <span class='op'>=&gt;</span> {
-                <span class='ident'>diff_text</span>(
-                    <span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;{} body text&quot;</span>, <span class='ident'>context</span>).<span class='ident'>as_str</span>(),
-                    <span class='ident'>str</span>::<span class='ident'>from_utf8</span>(<span class='ident'>expected_body</span>.<span class='ident'>data</span>.<span class='ident'>as_slice</span>()).<span class='ident'>unwrap</span>(),
-                    <span class='ident'>text</span>
-                )
+            <span class='ident'>ParsedHttpBody</span>::<span class='ident'>Text</span>(<span class='ident'>actual</span>) <span class='op'>=&gt;</span> {
+                <span class='kw'>match</span> <span class='ident'>str</span>::<span class='ident'>from_utf8</span>(<span class='ident'>expected_body</span>.<span class='ident'>data</span>.<span class='ident'>as_slice</span>()) {
+                    <span class='prelude-val'>Ok</span>(<span class='ident'>expected</span>) <span class='op'>=&gt;</span> {
+
+                        <span class='kw'>let</span> (<span class='ident'>expected</span>, <span class='ident'>actual</span>, <span class='ident'>diff</span>) <span class='op'>=</span> <span class='ident'>util</span>::<span class='ident'>diff</span>::<span class='ident'>text</span>(
+                            <span class='ident'>expected</span>,
+                            <span class='ident'>actual</span>
+                        );
+
+                        <span class='macro'>format</span><span class='macro'>!</span>(
+                            <span class='string'>&quot;{} {}\n\n        \&quot;{}\&quot;\n\n    {}\n\n        \&quot;{}\&quot;\n\n    {}\n\n        \&quot;{}\&quot;&quot;</span>,
+                            <span class='ident'>context</span>.<span class='ident'>yellow</span>(),
+                            <span class='string'>&quot;does not match, expected:&quot;</span>.<span class='ident'>yellow</span>(),
+                            <span class='ident'>expected</span>.<span class='ident'>green</span>().<span class='ident'>bold</span>(),
+                            <span class='string'>&quot;but got:&quot;</span>.<span class='ident'>yellow</span>(),
+                            <span class='ident'>actual</span>.<span class='ident'>red</span>().<span class='ident'>bold</span>(),
+                            <span class='string'>&quot;difference:&quot;</span>.<span class='ident'>yellow</span>(),
+                            <span class='ident'>diff</span>
+                        )
+
+                    },
+                    <span class='prelude-val'>Err</span>(<span class='ident'>err</span>) <span class='op'>=&gt;</span> <span class='macro'>format</span><span class='macro'>!</span>(
+                        <span class='string'>&quot;{} {}\n\n        {}&quot;</span>,
+                        <span class='ident'>context</span>.<span class='ident'>yellow</span>(),
+                        <span class='string'>&quot;body, expected text provided by test contains invalid UTF-8:&quot;</span>.<span class='ident'>yellow</span>(),
+                        <span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;{:?}&quot;</span>, <span class='ident'>err</span>).<span class='ident'>red</span>().<span class='ident'>bold</span>()
+                    )
+                }
             },
             <span class='ident'>ParsedHttpBody</span>::<span class='ident'>Json</span>(<span class='ident'>actual</span>) <span class='op'>=&gt;</span> {
-                <span class='kw'>let</span> <span class='ident'>expected_json</span> <span class='op'>=</span> <span class='ident'>parse_json</span>(<span class='ident'>expected_body</span>.<span class='ident'>data</span>.<span class='ident'>as_slice</span>());
+                <span class='kw'>let</span> <span class='ident'>expected_json</span> <span class='op'>=</span> <span class='ident'>util</span>::<span class='ident'>json</span>::<span class='ident'>parse</span>(
+                    <span class='ident'>expected_body</span>.<span class='ident'>data</span>.<span class='ident'>as_slice</span>(),
+                    <span class='string'>&quot;body json provided by test&quot;</span>
+                );
                 <span class='kw'>match</span> <span class='ident'>expected_json</span> {
                     <span class='prelude-val'>Ok</span>(<span class='ident'>expected</span>) <span class='op'>=&gt;</span> {
 
                         <span class='kw'>let</span> <span class='ident'>errors</span> <span class='op'>=</span> <span class='ident'>util</span>::<span class='ident'>json</span>::<span class='ident'>compare</span>(
                             <span class='kw-2'>&amp;</span><span class='ident'>expected</span>,
                             <span class='kw-2'>&amp;</span><span class='ident'>actual</span>,
-                            <span class='number'>4096</span>, <span class='comment'>// TODO configure max depth</span>
+                            <span class='ident'>options</span>.<span class='ident'>json_compare_depth</span>,
                             <span class='ident'>expected_exact_body</span>
                         );
 
@@ -505,26 +576,55 @@
                     },
                     <span class='prelude-val'>Err</span>(<span class='ident'>err</span>) <span class='op'>=&gt;</span> {
                         <span class='macro'>format</span><span class='macro'>!</span>(
-                            <span class='string'>&quot;{} {}\n\n        {}&quot;</span>,
+                            <span class='string'>&quot;{} {} {}&quot;</span>,
                             <span class='ident'>context</span>.<span class='ident'>yellow</span>(),
-                            <span class='string'>&quot;body contains invalid json data:&quot;</span>.<span class='ident'>yellow</span>(),
+                            <span class='string'>&quot;body, expected&quot;</span>.<span class='ident'>yellow</span>(),
                             <span class='ident'>err</span>
                         )
                     }
-
                 }
+            },
+            <span class='ident'>ParsedHttpBody</span>::<span class='ident'>Form</span>(<span class='ident'>actual</span>) <span class='op'>=&gt;</span> {
+                <span class='kw'>match</span> <span class='ident'>parse_http_body</span>(<span class='ident'>expected_body</span>) {
+                    <span class='prelude-val'>Ok</span>(<span class='ident'>ParsedHttpBody</span>::<span class='ident'>Form</span>(<span class='ident'>expected</span>)) <span class='op'>=&gt;</span> {
 
+                        <span class='kw'>let</span> <span class='ident'>expected</span> <span class='op'>=</span> <span class='ident'>http_form_into_fields</span>(<span class='ident'>expected</span>);
+                        <span class='kw'>let</span> <span class='ident'>actual</span> <span class='op'>=</span> <span class='ident'>http_form_into_fields</span>(<span class='ident'>actual</span>);
+                        <span class='kw'>let</span> <span class='ident'>errors</span> <span class='op'>=</span> <span class='ident'>util</span>::<span class='ident'>form</span>::<span class='ident'>compare</span>(
+                            <span class='kw-2'>&amp;</span><span class='ident'>expected</span>,
+                            <span class='kw-2'>&amp;</span><span class='ident'>actual</span>,
+                            <span class='ident'>expected_exact_body</span>
+                        );
+
+                        <span class='comment'>// Exit early when there are no errors</span>
+                        <span class='kw'>if</span> <span class='ident'>errors</span>.<span class='ident'>is_ok</span>() {
+                            <span class='kw'>return</span>;
+                        }
+
+                        <span class='macro'>format</span><span class='macro'>!</span>(
+                            <span class='string'>&quot;{} {}\n\n        {}&quot;</span>,
+                            <span class='ident'>context</span>.<span class='ident'>yellow</span>(),
+                            <span class='string'>&quot;body form data does not match, expected:&quot;</span>.<span class='ident'>yellow</span>(),
+                            <span class='ident'>util</span>::<span class='ident'>form</span>::<span class='ident'>format</span>(<span class='ident'>errors</span>.<span class='ident'>unwrap_err</span>())
+                        )
+
+                    },
+                    <span class='comment'>// TODO IW: Test, we need to override the body type header for this</span>
+                    <span class='prelude-val'>Ok</span>(_) <span class='op'>=&gt;</span> <span class='macro'>format</span><span class='macro'>!</span>(
+                        <span class='string'>&quot;{} {}&quot;</span>,
+                        <span class='ident'>context</span>.<span class='ident'>yellow</span>(),
+                        <span class='string'>&quot;body, expected body provided by test is no form data.&quot;</span>.<span class='ident'>yellow</span>(),
+                    ),
+                    <span class='comment'>// TODO IW: Test, supply custom (broken) form data</span>
+                    <span class='prelude-val'>Err</span>(<span class='ident'>err</span>) <span class='op'>=&gt;</span> <span class='macro'>format</span><span class='macro'>!</span>(
+                        <span class='string'>&quot;{} {} {}&quot;</span>,
+                        <span class='ident'>context</span>.<span class='ident'>yellow</span>(),
+                        <span class='string'>&quot;body, expected form data provided by test is invalid:&quot;</span>.<span class='ident'>yellow</span>(),
+                        <span class='ident'>err</span>
+                    )
+                }
             },
-            <span class='ident'>ParsedHttpBody</span>::<span class='ident'>Form</span>(<span class='ident'>form</span>) <span class='op'>=&gt;</span> {
-                <span class='comment'>// TODO IW: implement form field diffing</span>
-                <span class='macro'>format</span><span class='macro'>!</span>(
-                    <span class='string'>&quot;{} {}\n\n        {}&quot;</span>,
-                    <span class='ident'>context</span>.<span class='ident'>yellow</span>(),
-                    <span class='string'>&quot;body contains form data:&quot;</span>.<span class='ident'>yellow</span>(),
-                    <span class='string'>&quot;Form data diffing is not yet implemented.&quot;</span>.<span class='ident'>red</span>().<span class='ident'>bold</span>()
-                )
-            },
-            <span class='ident'>ParsedHttpBody</span>::<span class='ident'>Raw</span>(<span class='ident'>data</span>) <span class='op'>=&gt;</span> {
+            <span class='ident'>ParsedHttpBody</span>::<span class='ident'>Raw</span>(<span class='ident'>actual</span>) <span class='op'>=&gt;</span> {
                 <span class='macro'>format</span><span class='macro'>!</span>(
                     <span class='string'>&quot;{} {}\n\n       [{}]\n\n    {}\n\n       [{}]&quot;</span>,
 
@@ -536,32 +636,14 @@
                         <span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;{} bytes&quot;</span>, <span class='ident'>expected_body</span>.<span class='ident'>data</span>.<span class='ident'>len</span>()).<span class='ident'>green</span>().<span class='ident'>bold</span>(),
                         <span class='string'>&quot;:&quot;</span>.<span class='ident'>yellow</span>()
                     ),
-
-                    <span class='comment'>// TODO dry or better diff</span>
-                    <span class='ident'>expected_body</span>.<span class='ident'>data</span>.<span class='ident'>chunks</span>(<span class='number'>16</span>).<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>c</span><span class='op'>|</span> {
-                        <span class='ident'>c</span>.<span class='ident'>iter</span>().<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>d</span><span class='op'>|</span> {
-                            <span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;{}&quot;</span>, <span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;0x{:0&gt;2X}&quot;</span>, <span class='ident'>d</span>).<span class='ident'>green</span>().<span class='ident'>bold</span>())
-
-                        }).<span class='ident'>collect</span>::<span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;&gt;</span>().<span class='ident'>join</span>(<span class='string'>&quot;, &quot;</span>)
-
-                    }).<span class='ident'>collect</span>::<span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;&gt;</span>().<span class='ident'>join</span>(<span class='string'>&quot;,\n        &quot;</span>),
-
+                    <span class='ident'>util</span>::<span class='ident'>raw</span>::<span class='ident'>format_green</span>(<span class='ident'>expected_body</span>.<span class='ident'>data</span>.<span class='ident'>as_slice</span>()),
                     <span class='macro'>format</span><span class='macro'>!</span>(
                         <span class='string'>&quot;{} {} {}&quot;</span>,
                         <span class='string'>&quot;but got the following&quot;</span>.<span class='ident'>yellow</span>(),
-                        <span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;{} bytes&quot;</span>, <span class='ident'>data</span>.<span class='ident'>len</span>()).<span class='ident'>red</span>().<span class='ident'>bold</span>(),
+                        <span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;{} bytes&quot;</span>, <span class='ident'>actual</span>.<span class='ident'>len</span>()).<span class='ident'>red</span>().<span class='ident'>bold</span>(),
                         <span class='string'>&quot;instead:&quot;</span>.<span class='ident'>yellow</span>()
                     ),
-
-                    <span class='comment'>// TODO dry or better diff</span>
-                    <span class='ident'>data</span>.<span class='ident'>chunks</span>(<span class='number'>16</span>).<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>c</span><span class='op'>|</span> {
-                        <span class='ident'>c</span>.<span class='ident'>iter</span>().<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>d</span><span class='op'>|</span> {
-                            <span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;{}&quot;</span>, <span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;0x{:0&gt;2X}&quot;</span>, <span class='ident'>d</span>).<span class='ident'>red</span>().<span class='ident'>bold</span>())
-
-                        }).<span class='ident'>collect</span>::<span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;&gt;</span>().<span class='ident'>join</span>(<span class='string'>&quot;, &quot;</span>)
-
-                    }).<span class='ident'>collect</span>::<span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;&gt;</span>().<span class='ident'>join</span>(<span class='string'>&quot;,\n        &quot;</span>)
-
+                    <span class='ident'>util</span>::<span class='ident'>raw</span>::<span class='ident'>format_red</span>(<span class='ident'>actual</span>),
                 )
             }
         },
@@ -596,7 +678,7 @@
                 }
             },
             <span class='ident'>Mime</span>(<span class='ident'>TopLevel</span>::<span class='ident'>Application</span>, <span class='ident'>SubLevel</span>::<span class='ident'>Json</span>, _) <span class='op'>=&gt;</span> {
-                <span class='kw'>match</span> <span class='ident'>parse_json</span>(<span class='ident'>body</span>.<span class='ident'>data</span>.<span class='ident'>as_slice</span>()) {
+                <span class='kw'>match</span> <span class='ident'>util</span>::<span class='ident'>json</span>::<span class='ident'>parse</span>(<span class='ident'>body</span>.<span class='ident'>data</span>.<span class='ident'>as_slice</span>(), <span class='string'>&quot;body json&quot;</span>) {
                     <span class='prelude-val'>Ok</span>(<span class='ident'>json</span>) <span class='op'>=&gt;</span> <span class='prelude-val'>Ok</span>(<span class='ident'>ParsedHttpBody</span>::<span class='ident'>Json</span>(<span class='ident'>json</span>)),
                     <span class='prelude-val'>Err</span>(<span class='ident'>err</span>) <span class='op'>=&gt;</span> <span class='prelude-val'>Err</span>(<span class='ident'>err</span>)
                 }

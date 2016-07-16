@@ -47,14 +47,14 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-625' class='srclink' href='../src/noir/src/resource/http/header.rs.html#26-29' title='goto source code'>[src]</a></span></h1>
+               </span><a id='src-649' class='srclink' href='../src/noir/src/resource/http/header.rs.html#26-29' title='goto source code'>[src]</a></span></h1>
 <pre class='rust struct'>pub struct HttpHeader {
     // some fields omitted
 }</pre><div class='docblock'><p>An abstraction over different <code>hyper::Header</code> implementations.</p>
 
 <p>Used by the <code>headers![...]</code> macro to easily create a vector containing
 different types that implement the <code>hyper::Header</code> trait.</p>
-</div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl&lt;H: <a class='trait' href='https://hyperium.github.io/hyper/hyper/header/trait.Header.html' title='hyper::header::Header'>Header</a> + <a class='trait' href='https://hyperium.github.io/hyper/hyper/header/trait.HeaderFormat.html' title='hyper::header::HeaderFormat'>HeaderFormat</a>&gt; <a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.From.html' title='core::convert::From'>From</a>&lt;H&gt; for <a class='struct' href='../noir/struct.HttpHeader.html' title='noir::HttpHeader'>HttpHeader</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-628' class='srclink' href='../src/noir/src/resource/http/header.rs.html#31-50' title='goto source code'>[src]</a></span></h3>
+</div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl&lt;H: <a class='trait' href='https://hyperium.github.io/hyper/hyper/header/trait.Header.html' title='hyper::header::Header'>Header</a> + <a class='trait' href='https://hyperium.github.io/hyper/hyper/header/trait.HeaderFormat.html' title='hyper::header::HeaderFormat'>HeaderFormat</a>&gt; <a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.From.html' title='core::convert::From'>From</a>&lt;H&gt; for <a class='struct' href='../noir/struct.HttpHeader.html' title='noir::HttpHeader'>HttpHeader</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-652' class='srclink' href='../src/noir/src/resource/http/header.rs.html#31-50' title='goto source code'>[src]</a></span></h3>
 <div class='impl-items'><h4 id='method.from' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/convert/trait.From.html#tymethod.from' class='fnname'>from</a>(header: H) -&gt; <a class='struct' href='../noir/struct.HttpHeader.html' title='noir::HttpHeader'>HttpHeader</a></code></h4>
 <div class='docblock'><p>Converts a implementation of the <code>hyper::Header</code> trait into a abstract
 representation suitable for use within a <code>Vec</code>.</p>

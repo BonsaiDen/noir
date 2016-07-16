@@ -1,1 +1,1 @@
-initSidebarItems({"mod":[["http",""]]});
+initSidebarItems({"mod":[["http",""],["options",""]]});
