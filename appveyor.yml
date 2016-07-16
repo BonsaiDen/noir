@@ -1,8 +1,8 @@
 environment:
   RUST_TEST_THREADS: 1
-  DEP_OPENSSL_INCLUDE: "C:\OpenSSL\include"
-  OPENSSL_INCLUDE_DIR: "C:\OpenSSL\include"
-  OPENSSL_LIB_DIR: "C:\OpenSSL\lib\VC"
+  DEP_OPENSSL_INCLUDE: "C:/OpenSSL/include"
+  OPENSSL_INCLUDE_DIR: "C:/OpenSSL/include"
+  OPENSSL_LIB_DIR: "C:/OpenSSL/lib/VC"
   OPENSSL_LIBS: "ssleay32MT:libeay32MT"
   matrix:
   - TARGET: x86_64-pc-windows-msvc
