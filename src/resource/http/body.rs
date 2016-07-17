@@ -232,19 +232,7 @@ pub fn validate_http_request_body<T: HttpLike>(
                         )
 
                     },
-                    // TODO IW: Test, we need to override the body type header for this
-                    Ok(_) => format!(
-                        "{} {}",
-                        context.yellow(),
-                        "body, expected body provided by test is no form data.".yellow(),
-                    ),
-                    // TODO IW: Test, supply custom (broken) form data
-                    Err(err) => format!(
-                        "{} {} {}",
-                        context.yellow(),
-                        "body, expected form data provided by test is invalid:".yellow(),
-                        err
-                    )
+                    _ => unreachable!()
                 }
             },
             ParsedHttpBody::Raw(actual) => {
