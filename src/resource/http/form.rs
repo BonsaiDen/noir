@@ -85,11 +85,11 @@ impl HttpFormData {
         // Check if any of the fields are files and switch to the corresponding
         // mime type if necessary.
         for field in &fields {
-            if let &HttpFormDataField::FileVec(_, _, _, _) = field {
+            if let HttpFormDataField::FileVec(_, _, _, _) = *field {
                 mime = SubLevel::FormData;
                 break;
 
-            } else if let &HttpFormDataField::FileFs(_, _, _, _) = field {
+            } else if let HttpFormDataField::FileFs(_, _, _, _) = *field {
                 mime = SubLevel::FormData;
                 break;
             }
@@ -371,13 +371,13 @@ impl ParsedFormDataField {
         };
 
         for p in &disposition.parameters {
-            match p {
-                &DispositionParam::Ext(ref key, ref value) => {
+            match *p {
+                DispositionParam::Ext(ref key, ref value) => {
                     if key == "name" {
                         name = value.clone();
                     }
                 },
-                &DispositionParam::Filename(_, _, ref buf) => {
+                DispositionParam::Filename(_, _, ref buf) => {
                     filename = Some(String::from_utf8(buf.clone()).unwrap());
                 }
             }

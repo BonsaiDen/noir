@@ -22,8 +22,8 @@ use resource::http::HttpFormDataField;
 
 // Deep Form Compare ----------------------------------------------------------
 pub fn compare(
-    expected: &Vec<HttpFormDataField>,
-    actual: &Vec<HttpFormDataField>,
+    expected: &[HttpFormDataField],
+    actual: &[HttpFormDataField],
     check_additional_keys: bool
 
 ) -> Result<(), Vec<(Vec<String>, String)>> {
@@ -54,8 +54,8 @@ pub fn format(errors: Vec<(Vec<String>, String)>) -> String {
 
 // Recursive Compare Function -------------------------------------------------
 fn compare_form(
-    a: &Vec<HttpFormDataField>,
-    b: &Vec<HttpFormDataField>,
+    a: &[HttpFormDataField],
+    b: &[HttpFormDataField],
     check_additional_keys: bool,
     path: Vec<String>
 
@@ -65,8 +65,8 @@ fn compare_form(
         return vec![];
     }
 
-    let mut a_fields = map_form_fields(&a);
-    let mut b_fields = map_form_fields(&b);
+    let mut a_fields = map_form_fields(a);
+    let mut b_fields = map_form_fields(b);
 
     a_fields.sort_by(|a, b| a.0.cmp(b.0));
     b_fields.sort_by(|a, b| a.0.cmp(b.0));
@@ -77,14 +77,14 @@ fn compare_form(
     for (a_name, a_type, a_field) in a_fields {
 
         let mut found = false;
-        b_fields.retain(|&(ref b_name, ref b_type, ref b_field)| {
+        b_fields.retain(|&(ref b_name, b_type, ref b_field)| {
             if a_name == *b_name {
 
                 let mut field_path = path.clone();
                 field_path.push(format!(".{}", a_name.blue().bold()));
                 errors.append(&mut compare_form_fields(
                     a_type,
-                    b_type.clone(),
+                    b_type,
                     a_field,
                     b_field,
                     field_path,
@@ -134,10 +134,10 @@ fn compare_form_fields(
     if type_a == type_b {
 
         let mut errors = vec![];
-        match a {
+        match *a {
 
-            &HttpFormDataField::Field(_, ref value_a) => {
-                if let &HttpFormDataField::Field(_, ref value_b) = b {
+            HttpFormDataField::Field(_, ref value_a) => {
+                if let HttpFormDataField::Field(_, ref value_b) = *b {
                     if value_a != value_b {
                         let (expected, actual, diff) = util::diff::text(value_b, value_a);
                         errors.push((
@@ -157,8 +157,8 @@ fn compare_form_fields(
                 }
             },
 
-            &HttpFormDataField::Array(_, ref value_a) => {
-                if let &HttpFormDataField::Array(_, ref value_b) = b {
+            HttpFormDataField::Array(_, ref value_a) => {
+                if let HttpFormDataField::Array(_, ref value_b) = *b {
 
                     let len_a = value_a.len();
                     let len_b = value_b.len();
@@ -199,8 +199,8 @@ fn compare_form_fields(
                 }
             },
 
-            &HttpFormDataField::FileVec(_, ref filename_a, ref mime_a, ref data_a) => {
-                if let &HttpFormDataField::FileVec(_, ref filename_b, ref mime_b, ref data_b) = b {
+            HttpFormDataField::FileVec(_, ref filename_a, ref mime_a, _) => {
+                if let HttpFormDataField::FileVec(_, ref filename_b, ref mime_b, _) = *b {
 
                     if filename_a != filename_b {
                         errors.push((
@@ -208,9 +208,9 @@ fn compare_form_fields(
                             format!(
                                 "{} (\"{}\") {} (\"{}\")",
                                 "Filename".green().bold(),
-                                format!("{}", filename_b).red().bold(),
+                                filename_b.red().bold(),
                                 "does not match expected value".yellow(),
-                                format!("{}", filename_a).green().bold()
+                                filename_a.green().bold()
                             )
                         ))
                     }
@@ -254,7 +254,11 @@ fn compare_form_fields(
 
 
 // Helpers --------------------------------------------------------------------
-fn missing_field_errors(typ: FormFieldType, errors: &mut Vec<(Vec<String>, String)>, fields: &Vec<(&String, FormFieldType, &HttpFormDataField)>) {
+fn missing_field_errors(
+    typ: FormFieldType,
+    errors: &mut Vec<(Vec<String>, String)>,
+    fields: &[(&String, FormFieldType, &HttpFormDataField)]
+) {
 
     let fields = fields.iter().filter(|v| v.1 == typ).collect::<Vec<&(&String, FormFieldType, &HttpFormDataField)>>();
     if !fields.is_empty() {
@@ -275,7 +279,11 @@ fn missing_field_errors(typ: FormFieldType, errors: &mut Vec<(Vec<String>, Strin
 
 }
 
-fn additional_field_errors(typ: FormFieldType, errors: &mut Vec<(Vec<String>, String)>, fields: &Vec<(&String, FormFieldType, &HttpFormDataField)>) {
+fn additional_field_errors(
+    typ: FormFieldType,
+    errors: &mut Vec<(Vec<String>, String)>,
+    fields: &[(&String, FormFieldType, &HttpFormDataField)]
+) {
 
     let fields = fields.iter().filter(|v| v.1 == typ).collect::<Vec<&(&String, FormFieldType, &HttpFormDataField)>>();
     if !fields.is_empty() {
@@ -296,16 +304,20 @@ fn additional_field_errors(typ: FormFieldType, errors: &mut Vec<(Vec<String>, St
 
 }
 
-fn map_form_fields(fields: &Vec<HttpFormDataField>) -> Vec<(&String, FormFieldType, &HttpFormDataField)> {
+fn map_form_fields(
+    fields: &[HttpFormDataField]
+
+) -> Vec<(&String, FormFieldType, &HttpFormDataField)> {
     fields.iter().map(|field| {
-        match field {
-            &HttpFormDataField::Field(ref name, _) => {
+        match *field {
+            HttpFormDataField::Field(ref name, _) => {
                 (name, FormFieldType::Field, field)
             },
-            &HttpFormDataField::Array(ref name, _) => {
+            HttpFormDataField::Array(ref name, _) => {
                 (name, FormFieldType::Array, field)
             },
-            &HttpFormDataField::FileVec(ref name, _, _, _) | &HttpFormDataField::FileFs(ref name, _, _, _) => {
+            HttpFormDataField::FileVec(ref name, _, _, _) |
+            HttpFormDataField::FileFs(ref name, _, _, _) => {
                 (name, FormFieldType::File, field)
             }
         }
@@ -368,11 +380,20 @@ mod tests {
         text.replace("[0m", "")
     }
 
-    fn cmp(expected: Vec<HttpFormDataField>, actual: Vec<HttpFormDataField>, errors: Vec<(Vec<&str>, &str)>) {
+    fn cmp(
+        expected: Vec<HttpFormDataField>,
+        actual: Vec<HttpFormDataField>,
+        errors: Vec<(Vec<&str>, &str)>
+    ) {
         cmp_base(expected, actual, errors, false);
     }
 
-    fn cmp_base(expected: Vec<HttpFormDataField>, actual: Vec<HttpFormDataField>, errors: Vec<(Vec<&str>, &str)>, add: bool) {
+    fn cmp_base(
+        expected: Vec<HttpFormDataField>,
+        actual: Vec<HttpFormDataField>,
+        errors: Vec<(Vec<&str>, &str)>,
+        add: bool
+    ) {
         match compare(&expected, &actual, add) {
             Ok(()) => {
                 assert!(errors.is_empty());

@@ -56,14 +56,14 @@ impl ToString for HttpQueryString {
         let mut query = Serializer::new(String::new());
 
         for item in &self.fields {
-            match item {
-                &HttpQueryStringItem::Value(ref key, ref value) => {
+            match *item {
+                HttpQueryStringItem::Value(ref key, ref value) => {
                     query.append_pair(
                         key.as_str(),
                         value.as_str()
                     );
                 },
-                &HttpQueryStringItem::Array(ref key, ref values) => {
+                HttpQueryStringItem::Array(ref key, ref values) => {
                     for value in values {
                         query.append_pair(
                             key.as_str(),

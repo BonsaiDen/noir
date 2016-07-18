@@ -274,7 +274,7 @@ pub enum ParsedHttpBody<'a> {
     Raw(&'a [u8])
 }
 
-pub fn parse_http_body<'a>(body: &'a HttpBody) -> Result<ParsedHttpBody<'a>, String> {
+pub fn parse_http_body(body: &HttpBody) -> Result<ParsedHttpBody, String> {
 
     if let Some(mime) = body.mime.as_ref() {
         match mime.clone() {

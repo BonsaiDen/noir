@@ -212,7 +212,7 @@ fn format_body(body: Result<ParsedHttpBody, String>) -> String {
                             let body = format_body(
                                 parse_http_body(&body)
 
-                            ).split("\n").map(|line| {
+                            ).split('\n').map(|line| {
                                 format!("      {}", line)
 
                             }).collect::<Vec<String>>().join("\n");

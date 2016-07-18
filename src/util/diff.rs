@@ -28,7 +28,7 @@ pub fn text(expected: &str, actual: &str) -> (String, String, String) {
             difference::Difference::Add(s) => s.white().on_green().bold().to_string()
         }
 
-    }).filter(|s| s.len() > 0).collect::<Vec<String>>().join(" ");
+    }).filter(|s| !s.is_empty()).collect::<Vec<String>>().join(" ");
 
     (expected.to_string(), actual.to_string(), diff)
 
