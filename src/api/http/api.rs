@@ -24,7 +24,7 @@ use hyper::method::Method;
 use super::request::HttpRequest;
 
 
-/// A trait for the description of a testable, HTTP based api.
+/// A trait for the description of a testable, HTTP based API.
 ///
 /// # Example Implementation
 ///
@@ -53,25 +53,25 @@ use super::request::HttpRequest;
 /// ```
 pub trait HttpApi: Send + Copy + Default {
 
-    /// A blocking callback for provision of the api.
+    /// A blocking callback for provision of the API.
     ///
     /// The callback is executed in a background thread and should serve the
-    /// api at the specified host.
+    /// API at the specified host.
     fn start(&self);
 
-    /// Returns the hostname of the api.
+    /// Returns the hostname of the API.
     fn hostname(&self) -> &'static str;
 
-    /// Returns the port of the api.
+    /// Returns the port of the API.
     fn port(&self) -> u16;
 
-    /// Returns the `hostname:port` combination of the api used for making
-    /// requests against the api.
+    /// Returns the `hostname:port` combination of the API used for making
+    /// requests against the API.
     fn host(&self) -> String {
         format!("{}:{}", self.hostname(), self.port())
     }
 
-    /// Returns the http protocol used by the api.
+    /// Returns the HTTP protocol used by the API.
     ///
     /// By default this is based on the port, returning `https` for port 443.
     fn protocol(&self) -> &'static str {
@@ -81,7 +81,7 @@ pub trait HttpApi: Send + Copy + Default {
         }
     }
 
-    /// Returns the fully qualified base url of the api.
+    /// Returns the fully qualified base URL of the API.
     fn url(&self) -> String {
         match self.port() {
             443 | 80 => format!("{}://{}", self.protocol(), self.hostname()),
@@ -89,59 +89,59 @@ pub trait HttpApi: Send + Copy + Default {
         }
     }
 
-    /// Returns the fully qualified url of the api with the specified `path`
+    /// Returns the fully qualified URL of the API with the specified `path`
     /// appended.
     fn url_with_path(&self, path: &str) -> String {
         format!("{}{}", self.url(), path)
     }
 
-    /// Returns a `OPTIONS` request that will be performed against the api.
+    /// Returns a `OPTIONS` request that will be performed against the API.
     fn options(path: &'static str) -> HttpRequest<Self> where Self: 'static {
         request(Self::default(), Method::Options, path)
     }
 
-    /// Returns a `GET` request that will be performed against the api.
+    /// Returns a `GET` request that will be performed against the API.
     fn get(path: &'static str) -> HttpRequest<Self> where Self: 'static {
         request(Self::default(), Method::Get, path)
     }
 
-    /// Returns a `POST` request that will be performed against the api.
+    /// Returns a `POST` request that will be performed against the API.
     fn post(path: &'static str) -> HttpRequest<Self> where Self: 'static {
         request(Self::default(), Method::Post, path)
     }
 
-    /// Returns a `PUT` request that will be performed against the api.
+    /// Returns a `PUT` request that will be performed against the API.
     fn put(path: &'static str) -> HttpRequest<Self> where Self: 'static {
         request(Self::default(), Method::Put, path)
     }
 
-    /// Returns a `DELETE` request that will be performed against the api.
+    /// Returns a `DELETE` request that will be performed against the API.
     fn delete(path: &'static str) -> HttpRequest<Self> where Self: 'static {
         request(Self::default(), Method::Delete, path)
     }
 
-    /// Returns a `HEAD` request that will be performed against the api.
+    /// Returns a `HEAD` request that will be performed against the API.
     fn head(path: &'static str) -> HttpRequest<Self> where Self: 'static {
         request(Self::default(), Method::Head, path)
     }
 
-    /// Returns a `TRACE` request that will be performed against the api.
+    /// Returns a `TRACE` request that will be performed against the API.
     fn trace(path: &'static str) -> HttpRequest<Self> where Self: 'static {
         request(Self::default(), Method::Trace, path)
     }
 
-    /// Returns a `CONNECT` request that will be performed against the api.
+    /// Returns a `CONNECT` request that will be performed against the API.
     fn connect(path: &'static str) -> HttpRequest<Self> where Self: 'static {
         request(Self::default(), Method::Connect, path)
     }
 
-    /// Returns a `PATCH` request that will be performed against the api.
+    /// Returns a `PATCH` request that will be performed against the API.
     fn patch(path: &'static str) -> HttpRequest<Self> where Self: 'static {
         request(Self::default(), Method::Patch, path)
     }
 
-    /// Returns a request for the specified http verb extension that will be
-    /// performed against the api.
+    /// Returns a request for the specified HTTP verb extension that will be
+    /// performed against the API.
     fn ext(http_verb: &'static str, path: &'static str) -> HttpRequest<Self> where Self: 'static {
         request(Self::default(), Method::Extension(http_verb.to_string()), path)
     }

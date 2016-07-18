@@ -173,7 +173,7 @@ impl Read for MockStream {
 impl NetworkStream for MockStream {
 
     fn peer_addr(&mut self) -> Result<SocketAddr, Error> {
-        Err(Error::new(ErrorKind::NotConnected, "Noir: Address not mocked."))
+        Err(Error::new(ErrorKind::NotConnected, "noir: Address not mocked."))
     }
 
     fn set_read_timeout(&self, _: Option<Duration>) -> Result<(), Error> {

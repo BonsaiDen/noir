@@ -172,7 +172,7 @@ pub fn validate_http_request_body<T: HttpLike>(
             ParsedHttpBody::Json(actual) => {
                 let expected_json = util::json::parse(
                     expected_body.data.as_slice(),
-                    "body json provided by test"
+                    "body JSON provided by test"
                 );
                 match expected_json {
                     Ok(expected) => {
@@ -192,7 +192,7 @@ pub fn validate_http_request_body<T: HttpLike>(
                         format!(
                             "{} {}\n\n        {}",
                             context.yellow(),
-                            "body json does not match, expected:".yellow(),
+                            "body JSON does not match, expected:".yellow(),
                             util::json::format(errors.unwrap_err())
                         )
 
@@ -289,7 +289,7 @@ pub fn parse_http_body(body: &HttpBody) -> Result<ParsedHttpBody, String> {
                 }
             },
             Mime(TopLevel::Application, SubLevel::Json, _) => {
-                match util::json::parse(body.data.as_slice(), "body json") {
+                match util::json::parse(body.data.as_slice(), "body JSON") {
                     Ok(json) => Ok(ParsedHttpBody::Json(json)),
                     Err(err) => Err(err)
                 }

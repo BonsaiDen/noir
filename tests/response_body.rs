@@ -322,7 +322,7 @@ fn test_provided_response_with_expected_body_json_mismatch() {
 
 <br> 1) <br>Request Failure: <bc>POST <by>response provided for \"<bc>https://example.com<bc>/forward\" <by>returned <br>1 <by>error(s)
 
-    <br> 1.1) <by>Request <by>body json does not match, expected:
+    <br> 1.1) <by>Request <by>body JSON does not match, expected:
 
               - <bb>json.<bb>key: <bg>String <by>does not match, expected:
 
@@ -394,7 +394,7 @@ fn test_provided_response_with_expected_body_json_mismatch_exact() {
 
 <br> 1) <br>Request Failure: <bc>POST <by>response provided for \"<bc>https://example.com<bc>/forward\" <by>returned <br>1 <by>error(s)
 
-    <br> 1.1) <by>Request <by>body json does not match, expected:
+    <br> 1.1) <by>Request <by>body JSON does not match, expected:
 
               - <bb>json.<bb>key: <bg>String <by>does not match, expected:
 
@@ -445,7 +445,7 @@ fn test_provided_response_with_expected_body_json_invalid() {
 
 <br> 1) <br>Request Failure: <bc>POST <by>response provided for \"<bc>https://example.com<bc>/forward\" <by>returned <br>1 <by>error(s)
 
-    <br> 1.1) <by>Request <by>body json is invalid:
+    <br> 1.1) <by>Request <by>body JSON is invalid:
 
               <br>UnexpectedCharacter { ch: \'}\', line: 1, column: 9 }
 
@@ -473,7 +473,7 @@ fn test_provided_response_with_expected_body_json_invalid_utf8() {
 
 <br> 1) <br>Request Failure: <bc>POST <by>response provided for \"<bc>https://example.com<bc>/forward\" <by>returned <br>1 <by>error(s)
 
-    <br> 1.1) <by>Request <by>body json contains invalid UTF-8:
+    <br> 1.1) <by>Request <by>body JSON contains invalid UTF-8:
 
               <br>Utf8Error { valid_up_to: 0 }
 
@@ -515,7 +515,7 @@ fn test_provided_response_with_expected_body_json_compare_depth_one() {
 
 <br> 1) <br>Request Failure: <bc>POST <by>response provided for \"<bc>https://example.com<bc>/forward\" <by>returned <br>1 <by>error(s)
 
-    <br> 1.1) <by>Request <by>body json does not match, expected:
+    <br> 1.1) <by>Request <by>body JSON does not match, expected:
 
               - <bb>json.<bb>key: <bg>String <by>does not match, expected:
 
@@ -709,7 +709,7 @@ fn test_provided_response_with_expected_body_form_mismatch() {
 
                     \"<gbr>array <gbg>plain\"
 
-              - <bb>form.<bb>str_file: <bg>Mimetype (<br>text/html) <by>does not match expected value (<bg>text/plain)
+              - <bb>form.<bb>str_file: <bg>MIME type (<br>text/html) <by>does not match expected value (<bg>text/plain)
 
               - <bb>form.<bb>vec_file: <bg>Filename (\"<br>other.bin\") <by>does not match expected value (\"<bg>file.bin\")
 
@@ -807,7 +807,7 @@ fn test_provided_response_with_expected_body_form_mismatch_exact() {
 
                     \"<gbr>array <gbg>plain\"
 
-              - <bb>form.<bb>str_file: <bg>Mimetype (<br>text/html) <by>does not match expected value (<bg>text/plain)
+              - <bb>form.<bb>str_file: <bg>MIME type (<br>text/html) <by>does not match expected value (<bg>text/plain)
 
               - <bb>form.<bb>vec_file: <bg>Filename (\"<br>other.bin\") <by>does not match expected value (\"<bg>file.bin\")
 

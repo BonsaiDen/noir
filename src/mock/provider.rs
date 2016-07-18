@@ -111,13 +111,13 @@ impl ResponseProvider {
 
                 Err(Error::new(
                     ErrorKind::ConnectionRefused,
-                    "Noir: No response provided in test."
+                    "noir: No response provided in test."
                 ))
 
             },
             _ => Err(Error::new(
                 ErrorKind::ConnectionReset,
-                "Noir: Handler lock failed."
+                "noir: Handler lock failed."
             ))
         };
 

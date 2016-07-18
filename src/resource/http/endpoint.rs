@@ -130,7 +130,7 @@ pub trait HttpEndpoint: Send + Copy {
     }
 
     /// Return a response to the next request made against the endpoint
-    /// which matches the specified path and http verb extension.
+    /// which matches the specified path and HTTP verb extension.
     fn ext(&self, http_verb: &'static str, path: &'static str) -> HttpResponse<Self> {
         http_response(*self, Method::Extension(http_verb.to_string()), path)
     }

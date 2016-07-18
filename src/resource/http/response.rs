@@ -90,13 +90,13 @@ impl<E: HttpEndpoint> HttpResponse<E> {
     /// Also sets the `Content-Type` header of the response based on the type
     /// of the `body` argument.
     ///
-    /// The set `Content-Type` can be overriden via `HttpResponse::with_header`.
+    /// The set `Content-Type` can be overridden via `HttpResponse::with_header`.
     pub fn with_body<S: Into<HttpBody>>(mut self, body: S) -> Self {
         self.response_body = Some(body.into());
         self
     }
 
-    /// Sets a low level io error to be returned once the response is read.
+    /// Sets a low level IO error to be returned once the response is read.
     pub fn with_error(mut self, error: Error) -> Self {
         self.response_error = Some(error);
         self
@@ -154,20 +154,20 @@ impl<E: HttpEndpoint> HttpResponse<E> {
     /// Sets the expected request body for the response.
     ///
     /// The expected and the actual body are compared based on the MIME type
-    /// of the reponse.
+    /// of the request.
     ///
     /// ##### text/*
     ///
-    /// These Compared as strings, if no other charset is set in the response
-    /// MIME type, UTF-8 will be used as the default encoding.
+    /// These Compared as strings, if no other character encoding is set in the
+    /// request's MIME type, UTF-8 will be used as the default.
     ///
     /// ##### application/json
     ///
-    /// JSON objects are deep compared, but __additional keys on response objects
+    /// JSON objects are deep compared, but __additional keys on request objects
     /// are ignored__.
     ///
     /// This allows for simpler and more fine grained assertions against JSON
-    /// responses.
+    /// requests.
     ///
     /// ##### All other mime types
     ///
@@ -175,7 +175,7 @@ impl<E: HttpEndpoint> HttpResponse<E> {
     ///
     /// ### Test Failure
     ///
-    /// If the actual response body does not match the expected one.
+    /// If the actual request body does not match the expected one.
     pub fn expected_body<S: Into<HttpBody>>(mut self, body: S) -> Self {
         self.expected_body = Some(body.into());
         self.expected_exact_body = false;
@@ -185,12 +185,12 @@ impl<E: HttpEndpoint> HttpResponse<E> {
     /// Sets the expected request body for the response, exact version.
     ///
     /// This method is based on `HttpRequest::expected_body()` but performs
-    /// additional comparison based on the mime type of the reponse:
+    /// additional comparison based on the mime type of the request:
     ///
     /// ##### application/json
     ///
     /// In contrast to `HttpResponse::expected_body()` __additional keys on
-    /// response objects are compared and will fail the test__.
+    /// request objects are compared and will fail the test__.
     ///
     /// ##### All other mime types
     ///
@@ -198,14 +198,14 @@ impl<E: HttpEndpoint> HttpResponse<E> {
     ///
     /// ### Test Failure
     ///
-    /// If the actual response body does not match the expected one.
+    /// If the actual request body does not match the expected one.
     pub fn expected_exact_body<S: Into<HttpBody>>(mut self, body: S) -> Self {
         self.expected_body = Some(body.into());
         self.expected_exact_body = true;
         self
     }
 
-    /// Dumps the response headers and body for this response.
+    /// Dumps the request headers and body for this response.
     ///
     /// ### Test Failure
     ///
@@ -257,7 +257,7 @@ impl<E: HttpEndpoint> MockResponse for HttpResponse<E> {
 
                 // Set Content-Type based on body data if:
                 // A. The body has a Mime
-                // B. No other ContentType has been set on the request
+                // B. No other Content-Type has been set on the request
                 if let Some(content_mime) = content_mime {
                     if !self.response_headers.has::<ContentType>() {
                         self.response_headers.set(ContentType(content_mime));

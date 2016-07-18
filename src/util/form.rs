@@ -220,7 +220,7 @@ fn compare_form_fields(
                             path.clone(),
                             format!(
                                 "{} ({}) {} ({})",
-                                "Mimetype".green().bold(),
+                                "MIME type".green().bold(),
                                 format!("{}", mime_b).red().bold(),
                                 "does not match expected value".yellow(),
                                 format!("{}", mime_a).green().bold()
@@ -557,7 +557,7 @@ mod tests {
             )
 
         }, vec![
-            (vec![".<bb>file"], "<bg>Mimetype (<br>text/html) <by>does not match expected value (<bg>text/plain)")
+            (vec![".<bb>file"], "<bg>MIME type (<br>text/html) <by>does not match expected value (<bg>text/plain)")
         ]);
 
     }

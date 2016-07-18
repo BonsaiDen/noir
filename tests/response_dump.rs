@@ -197,7 +197,7 @@ fn test_provided_response_dump_json_invalid() {
               <bn>  Content-Type: <bp>application/json
               <bn>          Host: <bp>example.com
 
-          <by>Request <by>body json is invalid:
+          <by>Request <by>body JSON is invalid:
 
               <br>UnexpectedCharacter { ch: \'}\', line: 1, column: 9 }
 
@@ -230,7 +230,7 @@ fn test_provided_response_dump_json_invalid_utf8() {
               <bn>  Content-Type: <bp>application/json
               <bn>          Host: <bp>example.com
 
-          <by>Request <by>body json contains invalid UTF-8:
+          <by>Request <by>body JSON contains invalid UTF-8:
 
               <br>Utf8Error { valid_up_to: 0 }
 

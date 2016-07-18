@@ -151,7 +151,7 @@ impl<A: HttpApi> HttpRequest<A> {
     /// Also sets the `Content-Type` header of the request based on the type
     /// of the `body` argument.
     ///
-    /// The set `Content-Type` can be overriden via `HttpRequest::with_header`.
+    /// The set `Content-Type` can be overridden via `HttpRequest::with_header`.
     pub fn with_body<S: Into<HttpBody>>(mut self, body: S) -> Self {
         self.request_body = Some(body.into());
         self
@@ -216,12 +216,12 @@ impl<A: HttpApi> HttpRequest<A> {
     /// Sets the expected response body for the request.
     ///
     /// The expected and the actual body are compared based on the MIME type
-    /// of the reponse.
+    /// of the response.
     ///
     /// ##### text/*
     ///
-    /// These Compared as strings, if no other charset is set in the response
-    /// MIME type, UTF-8 will be used as the default encoding.
+    /// These Compared as strings, if no other character encoding is set in the
+    /// response's MIME type, UTF-8 will be used as the default.
     ///
     /// ##### application/json
     ///
@@ -247,7 +247,7 @@ impl<A: HttpApi> HttpRequest<A> {
     /// Sets the expected response body for the request (exact version).
     ///
     /// This method is based on `HttpRequest::expected_body()` but performs
-    /// additional comparison based on the mime type of the reponse:
+    /// additional comparison based on the mime type of the response:
     ///
     /// ##### application/json
     ///
@@ -318,7 +318,7 @@ impl<A: HttpApi> HttpRequest<A> {
         if self.api_timed_out {
             return Err(format!(
                 "\n{} {} \"{}\" {} {}{}\n\n",
-                "Noir Api Failure:".red().bold(),
+                "API Failure:".red().bold(),
                 "Server for".yellow(),
                 self.api.url().as_str().cyan().bold(),
                 "did not respond within".yellow(),
@@ -335,7 +335,7 @@ impl<A: HttpApi> HttpRequest<A> {
         } else {
             (vec![format!(
                 "{} {}",
-                "Internal Noir Error:".red().bold(),
+                "Internal Error:".red().bold(),
                 "Request lock failed.".yellow()
 
             )], 1)
@@ -391,7 +391,7 @@ impl<A: HttpApi> HttpRequest<A> {
 
         // Set Content-Type based on body data if:
         // A. The body has a Mime
-        // B. No other ContentType has been set on the request
+        // B. No other Content-Type has been set on the request
         if let Some(content_mime) = content_mime {
             if !self.request_headers.has::<ContentType>() {
                 self.request_headers.set(ContentType(content_mime));
@@ -412,7 +412,7 @@ impl<A: HttpApi> HttpRequest<A> {
             self.request_headers.clone()
         );
 
-        // Set body, if presetn
+        // Set body, if present
         if let Some(body) = body.as_ref() {
             request = request.body(
                 &body[..]
@@ -433,7 +433,7 @@ impl<A: HttpApi> HttpRequest<A> {
             Ok(response) => self.validate(response),
             Err(_) => (vec![format!(
                 "{} {} {}{}",
-                "Noir Api Failure:".red().bold(),
+                "API Failure:".red().bold(),
                 "No response within".yellow(),
                 "1000ms".cyan(),
                 ".".yellow()

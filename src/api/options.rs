@@ -6,15 +6,16 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-/// Additional configuration options for api requests and responses.
+
+/// Additional configuration options for API requests and responses.
 pub struct Options {
 
-    /// Maximum depth for recursive json comparison. Defaults to `4096`.
+    /// Maximum depth for recursive JSON comparison. Defaults to `4096`.
     ///
-    /// For top level json objects their own keys and the types of their values
+    /// For top level JSON objects their own keys and the types of their values
     /// will be at depth `0`, the actual values will then be at depth `1`.
     ///
-    /// For top level json arrays, their length will be at depth `0` and their
+    /// For top level JSON arrays, their length will be at depth `0` and their
     /// items and their types and values will be at level `1`.
     pub json_compare_depth: usize
 
