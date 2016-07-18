@@ -6,8 +6,9 @@ for HTTP APIs.
 - [Documentation](https://bonsaiden.github.io/noir/doc/noir/) for the latest release on crates.io.
 
 
-> Please Note: **noir** is still work in progress , there will probably be a lot 
-> of types, quite a few bugs and probably a some API changes here and there.
+> Please Note: **noir** is still work in progress, there are lots of typos in 
+> its docs, quite a few bugs in the code and most likely also few API that won't 
+> be the same in the final release.
 
 
 ## Screenshots
@@ -20,15 +21,15 @@ for HTTP APIs.
 - [x] Describe your API and the external resources it accesses
 - [x] Setup and configure HTTP requests against your API
 
-  - [x] Perform requests with specific headers, querystrings and bodies
-  - [x] Set up expecations for response headers and bodies
+  - [x] Perform requests with specific headers, query strings and bodies
+  - [x] Set up expectations for response headers and bodies
 
 - [x] Setup and provide external, mocked HTTP responses to your API
 
   - [x] These are only available for one specific request
   - [x] Any unexpected external calls made by your API will be caught
   - [x] Request order of the provided responses is also verified
-  - [x] Set up expecations for headers and bodies of the requests your API perfomrs
+  - [x] Set up expectations for headers and bodies of the requests your API performs
 
 - [x] Detailed and colored test output to helps you quickly figuring out what exactly went wrong
 - [x] Great support for JSON featuring deep, detailed object and array diffing, showing you paths, types and values
@@ -120,7 +121,7 @@ impl HttpEndpoint for ExternalResource {
 
 Each **noir** test starts with a HTTP Method call on your defined `API` structure, all of these calls then return a `HttpRequest` instance.
 
-A `HttpRequest` instance allows you to set up both the data and expecations for your test request.
+A `HttpRequest` instance allows you to set up both the data and expectations for your test request.
 
 You can also provide external resource responses which will be available to your application for the time the request is running.
 
