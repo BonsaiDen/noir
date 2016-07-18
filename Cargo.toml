@@ -1,6 +1,6 @@
 [package]
 name = "noir"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["Ivo Wetzel <ivo.wetzel@googlemail.com>"]
 description="rust based, DSL alike and request driven, black box testing library for HTTP APIs."
 documentation = "https://bonsaiden.github.io/noir/doc/noir"
