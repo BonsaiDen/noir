@@ -361,7 +361,7 @@ impl<A: HttpApi> HttpRequest<A> {
             // Response and Request Errors
             for (index, e) in errors.iter().enumerate() {
                 report.push_str(format!(
-                    "\n{} {}\n", format!("{:2})", index + 1).red().bold(),
+                    "\n{} {}\n", format!("{:2})", index + 1).blue().bold(),
                     e
 
                 ).as_str());
@@ -584,7 +584,7 @@ fn format_response_errors(
                             offset,
                             index + 1
 
-                        ).red().bold(),
+                        ).blue().bold(),
                         line
                     )
 

@@ -26,7 +26,7 @@ fn test_provided_response_without_body() {
     assert_fail!(r#"
 <br>Response Failure: <bc>GET <by>request to \"<bc>http://localhost:4000<bc>/responses/one\" <by>returned <br>1 <by>error(s)
 
-<br> 1) <by>Response <by>raw body data does not match, expected the following <bg>13 bytes<by>:
+<bb> 1) <by>Response <by>raw body data does not match, expected the following <bg>13 bytes<by>:
 
        [<bg>0x52, <bg>0x65, <bg>0x73, <bg>0x70, <bg>0x6F, <bg>0x6E, <bg>0x73, <bg>0x65, <bg>0x20, <bg>0x42, <bg>0x6F, <bg>0x64, <bg>0x79]
 
@@ -146,9 +146,9 @@ fn test_provided_response_with_expected_body_text_mismatch_diff_added() {
     assert_fail!(r#"
 <br>Response Failure: <bc>POST <by>request to \"<bc>http://localhost:4000<bc>/response/forward\" <by>returned <br>1 <by>error(s)
 
-<br> 1) <br>Request Failure: <bc>POST <by>response provided for \"<bc>https://example.com<bc>/forward\" <by>returned <br>1 <by>error(s)
+<bb> 1) <br>Request Failure: <bc>POST <by>response provided for \"<bc>https://example.com<bc>/forward\" <by>returned <br>1 <by>error(s)
 
-    <br> 1.1) <by>Request <by>does not match, expected:
+    <bb> 1.1) <by>Request <by>does not match, expected:
 
               \"<bg>Response\"
 
@@ -181,9 +181,9 @@ fn test_provided_response_with_expected_body_text_mismatch_diff_removed() {
     assert_fail!(r#"
 <br>Response Failure: <bc>POST <by>request to \"<bc>http://localhost:4000<bc>/response/forward\" <by>returned <br>1 <by>error(s)
 
-<br> 1) <br>Request Failure: <bc>POST <by>response provided for \"<bc>https://example.com<bc>/forward\" <by>returned <br>1 <by>error(s)
+<bb> 1) <br>Request Failure: <bc>POST <by>response provided for \"<bc>https://example.com<bc>/forward\" <by>returned <br>1 <by>error(s)
 
-    <br> 1.1) <by>Request <by>does not match, expected:
+    <bb> 1.1) <by>Request <by>does not match, expected:
 
               \"<bg>Response Body\"
 
@@ -216,9 +216,9 @@ fn test_provided_response_with_expected_body_text_invalid_utf8() {
     assert_fail!(r#"
 <br>Response Failure: <bc>POST <by>request to \"<bc>http://localhost:4000<bc>/response/forward\" <by>returned <br>1 <by>error(s)
 
-<br> 1) <br>Request Failure: <bc>POST <by>response provided for \"<bc>https://example.com<bc>/forward\" <by>returned <br>1 <by>error(s)
+<bb> 1) <br>Request Failure: <bc>POST <by>response provided for \"<bc>https://example.com<bc>/forward\" <by>returned <br>1 <by>error(s)
 
-    <br> 1.1) <by>Request <by>text body contains invalid UTF-8:
+    <bb> 1.1) <by>Request <by>text body contains invalid UTF-8:
 
               <br>Utf8Error { valid_up_to: 0 }
 
@@ -271,9 +271,9 @@ fn test_provided_response_with_expected_body_raw_mismatch() {
     assert_fail!(r#"
 <br>Response Failure: <bc>POST <by>request to \"<bc>http://localhost:4000<bc>/response/forward\" <by>returned <br>1 <by>error(s)
 
-<br> 1) <br>Request Failure: <bc>POST <by>response provided for \"<bc>https://example.com<bc>/forward\" <by>returned <br>1 <by>error(s)
+<bb> 1) <br>Request Failure: <bc>POST <by>response provided for \"<bc>https://example.com<bc>/forward\" <by>returned <br>1 <by>error(s)
 
-    <br> 1.1) <by>Request <by>raw body data does not match, expected the following <bg>16 bytes<by>:
+    <bb> 1.1) <by>Request <by>raw body data does not match, expected the following <bg>16 bytes<by>:
 
              [<bg>0x00, <bg>0xA0, <bg>0xFF, <bg>0x80, <bg>0x45, <bg>0x13, <bg>0x21, <bg>0x78, <bg>0x67, <bg>0x08, <bg>0x90, <bg>0xCA, <bg>0xD4, <bg>0xE5, <bg>0xF4, <bg>0x89]
 
@@ -371,9 +371,9 @@ fn test_provided_response_with_expected_body_json_mismatch() {
     assert_fail!(r#"
 <br>Response Failure: <bc>POST <by>request to \"<bc>http://localhost:4000<bc>/response/forward\" <by>returned <br>1 <by>error(s)
 
-<br> 1) <br>Request Failure: <bc>POST <by>response provided for \"<bc>https://example.com<bc>/forward\" <by>returned <br>1 <by>error(s)
+<bb> 1) <br>Request Failure: <bc>POST <by>response provided for \"<bc>https://example.com<bc>/forward\" <by>returned <br>1 <by>error(s)
 
-    <br> 1.1) <by>Request <by>body JSON does not match, expected:
+    <bb> 1.1) <by>Request <by>body JSON does not match, expected:
 
               - <bb>json.<bb>key: <bg>String <by>does not match, expected:
 
@@ -443,9 +443,9 @@ fn test_provided_response_with_expected_body_json_mismatch_exact() {
     assert_fail!(r#"
 <br>Response Failure: <bc>POST <by>request to \"<bc>http://localhost:4000<bc>/response/forward\" <by>returned <br>1 <by>error(s)
 
-<br> 1) <br>Request Failure: <bc>POST <by>response provided for \"<bc>https://example.com<bc>/forward\" <by>returned <br>1 <by>error(s)
+<bb> 1) <br>Request Failure: <bc>POST <by>response provided for \"<bc>https://example.com<bc>/forward\" <by>returned <br>1 <by>error(s)
 
-    <br> 1.1) <by>Request <by>body JSON does not match, expected:
+    <bb> 1.1) <by>Request <by>body JSON does not match, expected:
 
               - <bb>json.<bb>key: <bg>String <by>does not match, expected:
 
@@ -494,9 +494,9 @@ fn test_provided_response_with_expected_body_json_invalid() {
     assert_fail!(r#"
 <br>Response Failure: <bc>POST <by>request to \"<bc>http://localhost:4000<bc>/response/forward\" <by>returned <br>1 <by>error(s)
 
-<br> 1) <br>Request Failure: <bc>POST <by>response provided for \"<bc>https://example.com<bc>/forward\" <by>returned <br>1 <by>error(s)
+<bb> 1) <br>Request Failure: <bc>POST <by>response provided for \"<bc>https://example.com<bc>/forward\" <by>returned <br>1 <by>error(s)
 
-    <br> 1.1) <by>Request <by>body JSON is invalid:
+    <bb> 1.1) <by>Request <by>body JSON is invalid:
 
               <br>UnexpectedCharacter { ch: \'}\', line: 1, column: 9 }
 
@@ -522,9 +522,9 @@ fn test_provided_response_with_expected_body_json_invalid_utf8() {
     assert_fail!(r#"
 <br>Response Failure: <bc>POST <by>request to \"<bc>http://localhost:4000<bc>/response/forward\" <by>returned <br>1 <by>error(s)
 
-<br> 1) <br>Request Failure: <bc>POST <by>response provided for \"<bc>https://example.com<bc>/forward\" <by>returned <br>1 <by>error(s)
+<bb> 1) <br>Request Failure: <bc>POST <by>response provided for \"<bc>https://example.com<bc>/forward\" <by>returned <br>1 <by>error(s)
 
-    <br> 1.1) <by>Request <by>body JSON contains invalid UTF-8:
+    <bb> 1.1) <by>Request <by>body JSON contains invalid UTF-8:
 
               <br>Utf8Error { valid_up_to: 0 }
 
@@ -564,9 +564,9 @@ fn test_provided_response_with_expected_body_json_compare_depth_one() {
     assert_fail!(r#"
 <br>Response Failure: <bc>POST <by>request to \"<bc>http://localhost:4000<bc>/response/forward\" <by>returned <br>1 <by>error(s)
 
-<br> 1) <br>Request Failure: <bc>POST <by>response provided for \"<bc>https://example.com<bc>/forward\" <by>returned <br>1 <by>error(s)
+<bb> 1) <br>Request Failure: <bc>POST <by>response provided for \"<bc>https://example.com<bc>/forward\" <by>returned <br>1 <by>error(s)
 
-    <br> 1.1) <by>Request <by>body JSON does not match, expected:
+    <bb> 1.1) <by>Request <by>body JSON does not match, expected:
 
               - <bb>json.<bb>key: <bg>String <by>does not match, expected:
 
@@ -718,9 +718,9 @@ fn test_provided_response_with_expected_body_form_mismatch() {
     assert_fail!(r#"
 <br>Response Failure: <bc>POST <by>request to \"<bc>http://localhost:4000<bc>/response/forward\" <by>returned <br>1 <by>error(s)
 
-<br> 1) <br>Request Failure: <bc>POST <by>response provided for \"<bc>https://example.com<bc>/forward\" <by>returned <br>1 <by>error(s)
+<bb> 1) <br>Request Failure: <bc>POST <by>response provided for \"<bc>https://example.com<bc>/forward\" <by>returned <br>1 <by>error(s)
 
-    <br> 1.1) <by>Request <by>body form data does not match, expected:
+    <bb> 1.1) <by>Request <by>body form data does not match, expected:
 
               - <bb>form.<bb>array[]: <bg>Array <by>with <br>4 <by>item(s) does not match expected length of <bg>5
 
@@ -816,9 +816,9 @@ fn test_provided_response_with_expected_body_form_mismatch_exact() {
     assert_fail!(r#"
 <br>Response Failure: <bc>POST <by>request to \"<bc>http://localhost:4000<bc>/response/forward\" <by>returned <br>1 <by>error(s)
 
-<br> 1) <br>Request Failure: <bc>POST <by>response provided for \"<bc>https://example.com<bc>/forward\" <by>returned <br>1 <by>error(s)
+<bb> 1) <br>Request Failure: <bc>POST <by>response provided for \"<bc>https://example.com<bc>/forward\" <by>returned <br>1 <by>error(s)
 
-    <br> 1.1) <by>Request <by>body form data does not match, expected:
+    <bb> 1.1) <by>Request <by>body form data does not match, expected:
 
               - <bb>form.<bb>array[]: <bg>Array <by>with <br>4 <by>item(s) does not match expected length of <bg>5
 

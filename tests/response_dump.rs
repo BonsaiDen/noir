@@ -22,9 +22,9 @@ fn test_provided_response_dump_text() {
     assert_fail!(r#"
 <br>Response Failure: <bc>POST <by>request to \"<bc>http://localhost:4000<bc>/response/forward\" <by>returned <br>1 <by>error(s)
 
-<br> 1) <br>Request Failure: <bc>POST <by>response provided for \"<bc>https://example.com<bc>/forward\" <by>returned <br>1 <by>error(s)
+<bb> 1) <br>Request Failure: <bc>POST <by>response provided for \"<bc>https://example.com<bc>/forward\" <by>returned <br>1 <by>error(s)
 
-    <br> 1.1) <by>Request <by>headers dump:
+    <bb> 1.1) <by>Request <by>headers dump:
 
               <bn>Content-Length: <bp>13
               <bn>  Content-Type: <bp>text/plain
@@ -55,9 +55,9 @@ fn test_provided_response_dump_invalid_utf8() {
     assert_fail!(r#"
 <br>Response Failure: <bc>POST <by>request to \"<bc>http://localhost:4000<bc>/response/forward\" <by>returned <br>1 <by>error(s)
 
-<br> 1) <br>Request Failure: <bc>POST <by>response provided for \"<bc>https://example.com<bc>/forward\" <by>returned <br>1 <by>error(s)
+<bb> 1) <br>Request Failure: <bc>POST <by>response provided for \"<bc>https://example.com<bc>/forward\" <by>returned <br>1 <by>error(s)
 
-    <br> 1.1) <by>Request <by>headers dump:
+    <bb> 1.1) <by>Request <by>headers dump:
 
               <bn>Content-Length: <bp>5
               <bn>  Content-Type: <bp>text/plain
@@ -90,9 +90,9 @@ fn test_provided_response_dump_raw() {
     assert_fail!(r#"
 <br>Response Failure: <bc>POST <by>request to \"<bc>http://localhost:4000<bc>/response/forward\" <by>returned <br>1 <by>error(s)
 
-<br> 1) <br>Request Failure: <bc>POST <by>response provided for \"<bc>https://example.com<bc>/forward\" <by>returned <br>1 <by>error(s)
+<bb> 1) <br>Request Failure: <bc>POST <by>response provided for \"<bc>https://example.com<bc>/forward\" <by>returned <br>1 <by>error(s)
 
-    <br> 1.1) <by>Request <by>headers dump:
+    <bb> 1.1) <by>Request <by>headers dump:
 
               <bn>Content-Length: <bp>16
               <bn>  Content-Type: <bp>application/octet-stream
@@ -136,9 +136,9 @@ fn test_provided_response_dump_json() {
     assert_fail!(r#"
 <br>Response Failure: <bc>POST <by>request to \"<bc>http://localhost:4000<bc>/response/forward\" <by>returned <br>1 <by>error(s)
 
-<br> 1) <br>Request Failure: <bc>POST <by>response provided for \"<bc>https://example.com<bc>/forward\" <by>returned <br>1 <by>error(s)
+<bb> 1) <br>Request Failure: <bc>POST <by>response provided for \"<bc>https://example.com<bc>/forward\" <by>returned <br>1 <by>error(s)
 
-    <br> 1.1) <by>Request <by>headers dump:
+    <bb> 1.1) <by>Request <by>headers dump:
 
               <bn>Content-Length: <bp>121
               <bn>  Content-Type: <bp>application/json
@@ -189,9 +189,9 @@ fn test_provided_response_dump_json_invalid() {
     assert_fail!(r#"
 <br>Response Failure: <bc>POST <by>request to \"<bc>http://localhost:4000<bc>/response/forward\" <by>returned <br>1 <by>error(s)
 
-<br> 1) <br>Request Failure: <bc>POST <by>response provided for \"<bc>https://example.com<bc>/forward\" <by>returned <br>1 <by>error(s)
+<bb> 1) <br>Request Failure: <bc>POST <by>response provided for \"<bc>https://example.com<bc>/forward\" <by>returned <br>1 <by>error(s)
 
-    <br> 1.1) <by>Request <by>headers dump:
+    <bb> 1.1) <by>Request <by>headers dump:
 
               <bn>Content-Length: <bp>9
               <bn>  Content-Type: <bp>application/json
@@ -222,9 +222,9 @@ fn test_provided_response_dump_json_invalid_utf8() {
     assert_fail!(r#"
 <br>Response Failure: <bc>POST <by>request to \"<bc>http://localhost:4000<bc>/response/forward\" <by>returned <br>1 <by>error(s)
 
-<br> 1) <br>Request Failure: <bc>POST <by>response provided for \"<bc>https://example.com<bc>/forward\" <by>returned <br>1 <by>error(s)
+<bb> 1) <br>Request Failure: <bc>POST <by>response provided for \"<bc>https://example.com<bc>/forward\" <by>returned <br>1 <by>error(s)
 
-    <br> 1.1) <by>Request <by>headers dump:
+    <bb> 1.1) <by>Request <by>headers dump:
 
               <bn>Content-Length: <bp>5
               <bn>  Content-Type: <bp>application/json
@@ -274,9 +274,9 @@ fn test_provided_response_dump_form() {
     assert_fail!(r#"
 <br>Response Failure: <bc>POST <by>request to \"<bc>http://localhost:4000<bc>/response/forward\" <by>returned <br>1 <by>error(s)
 
-<br> 1) <br>Request Failure: <bc>POST <by>response provided for \"<bc>https://example.com<bc>/forward\" <by>returned <br>1 <by>error(s)
+<bb> 1) <br>Request Failure: <bc>POST <by>response provided for \"<bc>https://example.com<bc>/forward\" <by>returned <br>1 <by>error(s)
 
-    <br> 1.1) <by>Request <by>headers dump:
+    <bb> 1.1) <by>Request <by>headers dump:
 
               <bn>Content-Length: <bp>857
               <bn>  Content-Type: <bp>application/form-data; boundary=boundary12345

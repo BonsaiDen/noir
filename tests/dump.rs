@@ -31,7 +31,7 @@ fn test_dump_response_with_raw_body() {
     assert_fail!(r#"
 <br>Response Failure: <bc>POST <by>request to \"<bc>http://localhost:4000<bc>/echo\" <by>returned <br>1 <by>error(s)
 
-<br> 1) <by>Response <by>headers dump:
+<bb> 1) <by>Response <by>headers dump:
 
         <bn>        Accept: <bp>application/json
         <bn>Content-Length: <bp>64
@@ -68,7 +68,7 @@ fn test_dump_response_with_text_body() {
     assert_fail!(r#"
 <br>Response Failure: <bc>POST <by>request to \"<bc>http://localhost:4000<bc>/echo\" <by>returned <br>1 <by>error(s)
 
-<br> 1) <by>Response <by>headers dump:
+<bb> 1) <by>Response <by>headers dump:
 
         <bn>        Accept: <bp>application/json
         <bn>Content-Length: <bp>39
@@ -102,7 +102,7 @@ fn test_dump_response_with_text_body_invalid_utf8() {
     assert_fail!(r#"
 <br>Response Failure: <bc>POST <by>request to \"<bc>http://localhost:4000<bc>/echo\" <by>returned <br>1 <by>error(s)
 
-<br> 1) <by>Response <by>headers dump:
+<bb> 1) <by>Response <by>headers dump:
 
         <bn>        Accept: <bp>application/json
         <bn>Content-Length: <bp>5
@@ -141,7 +141,7 @@ fn test_dump_response_with_json_body() {
     assert_fail!(r#"
 <br>Response Failure: <bc>POST <by>request to \"<bc>http://localhost:4000<bc>/echo\" <by>returned <br>1 <by>error(s)
 
-<br> 1) <by>Response <by>headers dump:
+<bb> 1) <by>Response <by>headers dump:
 
         <bn>        Accept: <bp>application/json
         <bn>Content-Length: <bp>58
@@ -182,7 +182,7 @@ fn test_dump_response_with_json_body_invalid() {
     assert_fail!(r#"
 <br>Response Failure: <bc>POST <by>request to \"<bc>http://localhost:4000<bc>/echo\" <by>returned <br>1 <by>error(s)
 
-<br> 1) <by>Response <by>headers dump:
+<bb> 1) <by>Response <by>headers dump:
 
         <bn>Content-Length: <bp>9
         <bn>  Content-Type: <bp>application/json

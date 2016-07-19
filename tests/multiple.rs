@@ -20,7 +20,7 @@ fn test_multiple_errors_raw_body() {
     assert_fail!(r#"
 <br>Response Failure: <bc>GET <by>request to \"<bc>http://localhost:4000<bc>/status/404\" <by>returned <br>3 <by>error(s)
 
-<br> 1) <by>Response <by>status code does not match value, expected:
+<bb> 1) <by>Response <by>status code does not match value, expected:
 
         \"<bg>200 OK\"
 
@@ -28,9 +28,9 @@ fn test_multiple_errors_raw_body() {
 
         \"<br>404 Not Found\"
 
-<br> 2) <by>Response <by>header \"<bb>Server\" <by>was expected <bg>to be present<by>, but <br>is missing<by>.
+<bb> 2) <by>Response <by>header \"<bb>Server\" <by>was expected <bg>to be present<by>, but <br>is missing<by>.
 
-<br> 3) <by>Response <by>raw body data does not match, expected the following <bg>11 bytes<by>:
+<bb> 3) <by>Response <by>raw body data does not match, expected the following <bg>11 bytes<by>:
 
        [<bg>0x48, <bg>0x65, <bg>0x6C, <bg>0x6C, <bg>0x6F, <bg>0x20, <bg>0x57, <bg>0x6F, <bg>0x72, <bg>0x6C, <bg>0x64]
 
@@ -62,7 +62,7 @@ fn test_multiple_errors_text_body() {
     assert_fail!(r#"
 <br>Response Failure: <bc>POST <by>request to \"<bc>http://localhost:4000<bc>/echo\" <by>returned <br>3 <by>error(s)
 
-<br> 1) <by>Response <by>status code does not match value, expected:
+<bb> 1) <by>Response <by>status code does not match value, expected:
 
         \"<bg>404 Not Found\"
 
@@ -70,9 +70,9 @@ fn test_multiple_errors_text_body() {
 
         \"<br>200 OK\"
 
-<br> 2) <by>Response <by>header \"<bb>Server\" <by>was expected <bg>to be present<by>, but <br>is missing<by>.
+<bb> 2) <by>Response <by>header \"<bb>Server\" <by>was expected <bg>to be present<by>, but <br>is missing<by>.
 
-<br> 3) <by>Response <by>does not match, expected:
+<bb> 3) <by>Response <by>does not match, expected:
 
         \"<bg>Hello World\"
 

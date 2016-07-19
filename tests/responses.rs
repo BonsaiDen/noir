@@ -51,9 +51,9 @@ fn test_responses_provided_missing() {
     assert_fail!(r#"
 <br>Response Failure: <bc>GET <by>request to \"<bc>http://localhost:4000<bc>/responses/none\" <by>returned <br>1 <by>error(s)
 
-<br> 1) <br>Request Failure: <bc>GET <by>response provided for \"<bc>https://example.com<bc>/one\" <by>returned <br>1 <by>error(s)
+<bb> 1) <br>Request Failure: <bc>GET <by>response provided for \"<bc>https://example.com<bc>/one\" <by>returned <br>1 <by>error(s)
 
-    <br> 1.1) <by>Expected <bg>a request <by>for the response, but got <br>none<by>.
+    <bb> 1.1) <by>Expected <bg>a request <by>for the response, but got <br>none<by>.
 
 
 "#, actual);
@@ -108,13 +108,13 @@ fn test_responses_provided_multiple_errors() {
     assert_fail!(r#"
 <br>Response Failure: <bc>GET <by>request to \"<bc>http://localhost:4000<bc>/responses/one\" <by>returned <br>3 <by>error(s)
 
-<br> 1) <br>Request Failure: <bc>GET <by>response provided for \"<bc>https://example.com<bc>/one\" <by>returned <br>3 <by>error(s)
+<bb> 1) <br>Request Failure: <bc>GET <by>response provided for \"<bc>https://example.com<bc>/one\" <by>returned <br>3 <by>error(s)
 
-    <br> 1.1) <by>Request <by>header \"<bb>Content-Type\" <by>was expected <bg>to be present<by>, but <br>is missing<by>.
+    <bb> 1.1) <by>Request <by>header \"<bb>Content-Type\" <by>was expected <bg>to be present<by>, but <br>is missing<by>.
 
-    <br> 1.2) <by>Request <by>header \"<bb>Server\" <by>was expected <bg>to be present<by>, but <br>is missing<by>.
+    <bb> 1.2) <by>Request <by>header \"<bb>Server\" <by>was expected <bg>to be present<by>, but <br>is missing<by>.
 
-    <br> 1.3) <by>Request <by>raw body data does not match, expected the following <bg>11 bytes<by>:
+    <bb> 1.3) <by>Request <by>raw body data does not match, expected the following <bg>11 bytes<by>:
 
              [<bg>0x48, <bg>0x65, <bg>0x6C, <bg>0x6C, <bg>0x6F, <bg>0x20, <bg>0x57, <bg>0x6F, <bg>0x72, <bg>0x6C, <bg>0x64]
 
