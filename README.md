@@ -13,7 +13,7 @@ for HTTP APIs.
 
 ## Screenshots
 
-![noir](https://cloud.githubusercontent.com/assets/124674/16595344/ff85391e-42ee-11e6-954e-f7af61e06c87.png)
+![noir](https://cloud.githubusercontent.com/assets/124674/16967785/2129ad12-4e0b-11e6-80f0-d741e8122e04.gif)
 
 
 ## Features
