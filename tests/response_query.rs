@@ -44,13 +44,13 @@ fn test_responses_provided_with_query_string_mismatch() {
     };
 
     assert_fail!(r#"
-<br>Response Failure: <bc>GET <by>request to \"<bc>http://localhost:4000<bc>/responses/query\" <by>returned <br>2 <by>error(s)
+<br>Response Failure: <bn>GET <by>request to \"<bn>http://localhost:4000<bn>/responses/query\" <by>returned <br>2 <by>error(s)
 
-<bb> 1) <br>Request Failure: <bc>GET <by>response provided for \"<bc>https://example.com<bc>/two?key=value&array%5B%5D=item1&array%5B%5D=item2&array%5B%5D=item3&foo=bar&single=item\" <by>returned <br>1 <by>error(s)
+<bb> 1) <br>Request Failure: <bn>GET <by>response provided for \"<bn>https://example.com<bn>/two?key=value&array%5B%5D=item1&array%5B%5D=item2&array%5B%5D=item3&foo=bar&single=item\" <by>returned <br>1 <by>error(s)
 
     <bb> 1.1) <by>Expected <bg>a request <by>for the response, but got <br>none<by>.
 
-<bb> 2) <br>Request Failure: <by>Unexpected <bc>GET <by>request to \"<bc>https://example.com<bc>/one?key=value&array%5B%5D=item1&array%5B%5D=item2&array%5B%5D=item3&foo=bar&single=item\"<by>, no response was provided.
+<bb> 2) <br>Request Failure: <by>Unexpected <bn>GET <by>request to \"<bn>https://example.com<bn>/one?key=value&array%5B%5D=item1&array%5B%5D=item2&array%5B%5D=item3&foo=bar&single=item\"<by>, no response was provided.
 
 
 "#, actual);

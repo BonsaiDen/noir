@@ -92,10 +92,10 @@ impl MockRequest for HttpRequest {
             "{} {} {} {} \"{}{}\"{}",
             "Request Failure:".red().bold(),
             "Unexpected".yellow(),
-            format!("{}", self.method).cyan().bold(),
+            format!("{}", self.method).cyan(),
             "request to".yellow(),
-            self.url().cyan().bold(),
-            self.path.cyan().bold(),
+            self.url().cyan(),
+            self.path.cyan(),
             ", no response was provided.".yellow()
         ))
     }

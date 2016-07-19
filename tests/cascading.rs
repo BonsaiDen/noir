@@ -18,9 +18,9 @@ fn test_cascading_missing_response_suppress() {
     };
 
     assert_fail!(r#"
-<br>Response Failure: <bc>GET <by>request to \"<bc>http://localhost:4000<bc>/responses/one\" <by>returned <br>1 <by>error(s)
+<br>Response Failure: <bn>GET <by>request to \"<bn>http://localhost:4000<bn>/responses/one\" <by>returned <br>1 <by>error(s)
 
-<bb> 1) <br>Request Failure: <by>Unexpected <bc>GET <by>request to \"<bc>https://example.com<bc>/one\"<by>, no response was provided.
+<bb> 1) <br>Request Failure: <by>Unexpected <bn>GET <by>request to \"<bn>https://example.com<bn>/one\"<by>, no response was provided.
 
 <bg>Note: <bbb>Suppressed <bb>3 <bbb>request error(s) that may have resulted from failed response expectations.
 
@@ -46,7 +46,7 @@ fn test_cascading_missing_response_show() {
     };
 
     assert_fail!(r#"
-<br>Response Failure: <bc>GET <by>request to \"<bc>http://localhost:4000<bc>/responses/one\" <by>returned <br>4 <by>error(s)
+<br>Response Failure: <bn>GET <by>request to \"<bn>http://localhost:4000<bn>/responses/one\" <by>returned <br>4 <by>error(s)
 
 <bb> 1) <by>Response <by>status code does not match value, expected:
 
@@ -68,7 +68,7 @@ fn test_cascading_missing_response_show() {
         <br>0x65, <br>0x20, <br>0x70, <br>0x72, <br>0x6F, <br>0x76, <br>0x69, <br>0x64, <br>0x65, <br>0x64, <br>0x20, <br>0x69, <br>0x6E, <br>0x20, <br>0x74, <br>0x65,
         <br>0x73, <br>0x74, <br>0x2E]
 
-<bb> 4) <br>Request Failure: <by>Unexpected <bc>GET <by>request to \"<bc>https://example.com<bc>/one\"<by>, no response was provided.
+<bb> 4) <br>Request Failure: <by>Unexpected <bn>GET <by>request to \"<bn>https://example.com<bn>/one\"<by>, no response was provided.
 
 
 "#, actual);
@@ -90,9 +90,9 @@ fn test_cascading_mismatch_response_suppress() {
     };
 
     assert_fail!(r#"
-<br>Response Failure: <bc>GET <by>request to \"<bc>http://localhost:4000<bc>/responses/one\" <by>returned <br>1 <by>error(s)
+<br>Response Failure: <bn>GET <by>request to \"<bn>http://localhost:4000<bn>/responses/one\" <by>returned <br>1 <by>error(s)
 
-<bb> 1) <br>Request Failure: <bc>GET <by>response provided for \"<bc>https://example.com<bc>/one\" <by>returned <br>1 <by>error(s)
+<bb> 1) <br>Request Failure: <bn>GET <by>response provided for \"<bn>https://example.com<bn>/one\" <by>returned <br>1 <by>error(s)
 
     <bb> 1.1) <by>Request <by>raw body data does not match, expected the following <bg>3 bytes<by>:
 
@@ -129,7 +129,7 @@ fn test_cascading_mismatch_response_show() {
     };
 
     assert_fail!(r#"
-<br>Response Failure: <bc>GET <by>request to \"<bc>http://localhost:4000<bc>/responses/one\" <by>returned <br>3 <by>error(s)
+<br>Response Failure: <bn>GET <by>request to \"<bn>http://localhost:4000<bn>/responses/one\" <by>returned <br>3 <by>error(s)
 
 <bb> 1) <by>Response <by>header \"<bb>Server\" <by>was expected <bg>to be present<by>, but <br>is missing<by>.
 
@@ -141,7 +141,7 @@ fn test_cascading_mismatch_response_show() {
 
        []
 
-<bb> 3) <br>Request Failure: <bc>GET <by>response provided for \"<bc>https://example.com<bc>/one\" <by>returned <br>1 <by>error(s)
+<bb> 3) <br>Request Failure: <bn>GET <by>response provided for \"<bn>https://example.com<bn>/one\" <by>returned <br>1 <by>error(s)
 
     <bb> 3.1) <by>Request <by>raw body data does not match, expected the following <bg>3 bytes<by>:
 
@@ -172,13 +172,13 @@ fn test_cascading_out_of_order_responses_suppress() {
     };
 
     assert_fail!(r#"
-<br>Response Failure: <bc>GET <by>request to \"<bc>http://localhost:4000<bc>/responses/two\" <by>returned <br>2 <by>error(s)
+<br>Response Failure: <bn>GET <by>request to \"<bn>http://localhost:4000<bn>/responses/two\" <by>returned <br>2 <by>error(s)
 
-<bb> 1) <br>Request Failure: <bc>GET <by>response provided for \"<bc>https://example.com<bc>/two\" <by>returned <br>1 <by>error(s)
+<bb> 1) <br>Request Failure: <bn>GET <by>response provided for \"<bn>https://example.com<bn>/two\" <by>returned <br>1 <by>error(s)
 
     <bb> 1.1) <by>Response fetched out of order, <bg>provided for request <bb>1<by>, <br>fetched by request <bb>2<by>.
 
-<bb> 2) <br>Request Failure: <bc>GET <by>response provided for \"<bc>https://example.com<bc>/one\" <by>returned <br>1 <by>error(s)
+<bb> 2) <br>Request Failure: <bn>GET <by>response provided for \"<bn>https://example.com<bn>/one\" <by>returned <br>1 <by>error(s)
 
     <bb> 2.1) <by>Response fetched out of order, <bg>provided for request <bb>2<by>, <br>fetched by request <bb>1<by>.
 
@@ -210,7 +210,7 @@ fn test_cascading_out_of_order_responses_show() {
     };
 
     assert_fail!(r#"
-<br>Response Failure: <bc>GET <by>request to \"<bc>http://localhost:4000<bc>/responses/two\" <by>returned <br>4 <by>error(s)
+<br>Response Failure: <bn>GET <by>request to \"<bn>http://localhost:4000<bn>/responses/two\" <by>returned <br>4 <by>error(s)
 
 <bb> 1) <by>Response <by>header \"<bb>Server\" <by>was expected <bg>to be present<by>, but <br>is missing<by>.
 
@@ -222,11 +222,11 @@ fn test_cascading_out_of_order_responses_show() {
 
        []
 
-<bb> 3) <br>Request Failure: <bc>GET <by>response provided for \"<bc>https://example.com<bc>/two\" <by>returned <br>1 <by>error(s)
+<bb> 3) <br>Request Failure: <bn>GET <by>response provided for \"<bn>https://example.com<bn>/two\" <by>returned <br>1 <by>error(s)
 
     <bb> 3.1) <by>Response fetched out of order, <bg>provided for request <bb>1<by>, <br>fetched by request <bb>2<by>.
 
-<bb> 4) <br>Request Failure: <bc>GET <by>response provided for \"<bc>https://example.com<bc>/one\" <by>returned <br>1 <by>error(s)
+<bb> 4) <br>Request Failure: <bn>GET <by>response provided for \"<bn>https://example.com<bn>/one\" <by>returned <br>1 <by>error(s)
 
     <bb> 4.1) <by>Response fetched out of order, <bg>provided for request <bb>2<by>, <br>fetched by request <bb>1<by>.
 

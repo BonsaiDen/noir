@@ -18,7 +18,7 @@ fn test_multiple_errors_raw_body() {
     };
 
     assert_fail!(r#"
-<br>Response Failure: <bc>GET <by>request to \"<bc>http://localhost:4000<bc>/status/404\" <by>returned <br>3 <by>error(s)
+<br>Response Failure: <bn>GET <by>request to \"<bn>http://localhost:4000<bn>/status/404\" <by>returned <br>3 <by>error(s)
 
 <bb> 1) <by>Response <by>status code does not match value, expected:
 
@@ -60,7 +60,7 @@ fn test_multiple_errors_text_body() {
     };
 
     assert_fail!(r#"
-<br>Response Failure: <bc>POST <by>request to \"<bc>http://localhost:4000<bc>/echo\" <by>returned <br>3 <by>error(s)
+<br>Response Failure: <bn>POST <by>request to \"<bn>http://localhost:4000<bn>/echo\" <by>returned <br>3 <by>error(s)
 
 <bb> 1) <by>Response <by>status code does not match value, expected:
 

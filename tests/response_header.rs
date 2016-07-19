@@ -78,9 +78,9 @@ fn test_responses_provided_with_expected_header_mismatch() {
     };
 
     assert_fail!(r#"
-<br>Response Failure: <bc>GET <by>request to \"<bc>http://localhost:4000<bc>/responses/one\" <by>returned <br>1 <by>error(s)
+<br>Response Failure: <bn>GET <by>request to \"<bn>http://localhost:4000<bn>/responses/one\" <by>returned <br>1 <by>error(s)
 
-<bb> 1) <br>Request Failure: <bc>GET <by>response provided for \"<bc>https://example.com<bc>/one\" <by>returned <br>1 <by>error(s)
+<bb> 1) <br>Request Failure: <bn>GET <by>response provided for \"<bn>https://example.com<bn>/one\" <by>returned <br>1 <by>error(s)
 
     <bb> 1.1) <by>Request <by>header \"<bb>Accept\" <by>does not match, expected:
 
@@ -124,9 +124,9 @@ fn test_responses_provided_with_unexpected_header_mismatch() {
     };
 
     assert_fail!(r#"
-<br>Response Failure: <bc>GET <by>request to \"<bc>http://localhost:4000<bc>/responses/one\" <by>returned <br>1 <by>error(s)
+<br>Response Failure: <bn>GET <by>request to \"<bn>http://localhost:4000<bn>/responses/one\" <by>returned <br>1 <by>error(s)
 
-<bb> 1) <br>Request Failure: <bc>GET <by>response provided for \"<bc>https://example.com<bc>/one\" <by>returned <br>1 <by>error(s)
+<bb> 1) <br>Request Failure: <bn>GET <by>response provided for \"<bn>https://example.com<bn>/one\" <by>returned <br>1 <by>error(s)
 
     <bb> 1.1) <by>Request <by>header \"<bb>Accept\" <by>was expected <bg>to be absent<by>, but <br>is present<by>.
 

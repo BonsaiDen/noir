@@ -27,7 +27,7 @@ fn test_get_with_expected_status_mismatch() {
     };
 
     assert_fail!(r#"
-<br>Response Failure: <bc>GET <by>request to \"<bc>http://localhost:4000<bc>/status/404\" <by>returned <br>1 <by>error(s)
+<br>Response Failure: <bn>GET <by>request to \"<bn>http://localhost:4000<bn>/status/404\" <by>returned <br>1 <by>error(s)
 
 <bb> 1) <by>Response <by>status code does not match value, expected:
 

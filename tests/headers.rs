@@ -59,7 +59,7 @@ fn test_headers_expected_mismatch() {
     };
 
     assert_fail!(r#"
-<br>Response Failure: <bc>GET <by>request to \"<bc>http://localhost:4000<bc>/get/hello\" <by>returned <br>1 <by>error(s)
+<br>Response Failure: <bn>GET <by>request to \"<bn>http://localhost:4000<bn>/get/hello\" <by>returned <br>1 <by>error(s)
 
 <bb> 1) <by>Response <by>header \"<bb>Server\" <by>does not match, expected:
 
@@ -120,7 +120,7 @@ fn test_headers_unexpected_mismatch() {
     };
 
     assert_fail!(r#"
-<br>Response Failure: <bc>GET <by>request to \"<bc>http://localhost:4000<bc>/get/hello\" <by>returned <br>1 <by>error(s)
+<br>Response Failure: <bn>GET <by>request to \"<bn>http://localhost:4000<bn>/get/hello\" <by>returned <br>1 <by>error(s)
 
 <bb> 1) <by>Response <by>header \"<bb>Server\" <by>was expected <bg>to be absent<by>, but <br>is present<by>.
 

@@ -165,9 +165,9 @@ fn test_with_form_body_error_missing_disposition_header() {
     };
 
     assert_fail!(r#"
-<br>Response Failure: <bc>POST <by>request to \"<bc>http://localhost:4000<bc>/response/forward\" <by>returned <br>1 <by>error(s)
+<br>Response Failure: <bn>POST <by>request to \"<bn>http://localhost:4000<bn>/response/forward\" <by>returned <br>1 <by>error(s)
 
-<bb> 1) <br>Request Failure: <bc>POST <by>response provided for \"<bc>https://example.com<bc>/forward\" <by>returned <br>1 <by>error(s)
+<bb> 1) <br>Request Failure: <bn>POST <by>response provided for \"<bn>https://example.com<bn>/forward\" <by>returned <br>1 <by>error(s)
 
     <bb> 1.1) <by>Request <by>form body could not be parsed:
 
@@ -198,9 +198,9 @@ fn test_with_form_body_error_broken_headers() {
     };
 
     assert_fail!(r#"
-<br>Response Failure: <bc>POST <by>request to \"<bc>http://localhost:4000<bc>/response/forward\" <by>returned <br>1 <by>error(s)
+<br>Response Failure: <bn>POST <by>request to \"<bn>http://localhost:4000<bn>/response/forward\" <by>returned <br>1 <by>error(s)
 
-<bb> 1) <br>Request Failure: <bc>POST <by>response provided for \"<bc>https://example.com<bc>/forward\" <by>returned <br>1 <by>error(s)
+<bb> 1) <br>Request Failure: <bn>POST <by>response provided for \"<bn>https://example.com<bn>/forward\" <by>returned <br>1 <by>error(s)
 
     <bb> 1.1) <by>Request <by>form body could not be parsed:
 
@@ -231,9 +231,9 @@ fn test_with_form_body_error_filename_invalid_utf8() {
     };
 
     assert_fail!(r#"
-<br>Response Failure: <bc>POST <by>request to \"<bc>http://localhost:4000<bc>/response/forward\" <by>returned <br>1 <by>error(s)
+<br>Response Failure: <bn>POST <by>request to \"<bn>http://localhost:4000<bn>/response/forward\" <by>returned <br>1 <by>error(s)
 
-<bb> 1) <br>Request Failure: <bc>POST <by>response provided for \"<bc>https://example.com<bc>/forward\" <by>returned <br>1 <by>error(s)
+<bb> 1) <br>Request Failure: <bn>POST <by>response provided for \"<bn>https://example.com<bn>/forward\" <by>returned <br>1 <by>error(s)
 
     <bb> 1.1) <by>Request <by>form body could not be parsed:
 
@@ -264,9 +264,9 @@ fn test_with_form_body_error_too_many_headers() {
     };
 
     assert_fail!(r#"
-<br>Response Failure: <bc>POST <by>request to \"<bc>http://localhost:4000<bc>/response/forward\" <by>returned <br>1 <by>error(s)
+<br>Response Failure: <bn>POST <by>request to \"<bn>http://localhost:4000<bn>/response/forward\" <by>returned <br>1 <by>error(s)
 
-<bb> 1) <br>Request Failure: <bc>POST <by>response provided for \"<bc>https://example.com<bc>/forward\" <by>returned <br>1 <by>error(s)
+<bb> 1) <br>Request Failure: <bn>POST <by>response provided for \"<bn>https://example.com<bn>/forward\" <by>returned <br>1 <by>error(s)
 
     <bb> 1.1) <by>Request <by>form body could not be parsed:
 

@@ -30,7 +30,7 @@ fn test_api_start_timeout() {
     };
 
     assert_fail!(r#"
-<br>API Failure: <by>Server for \"<bc>http://localhost:4001\" <by>did not respond within <bn>1000ms<by>.
+<br>API Failure: <by>Server for \"<bn>http://localhost:4001\" <by>did not respond within <bg>1000ms<by>.
 
 "#, actual);
 
@@ -57,9 +57,9 @@ fn test_api_request_timeout() {
     };
 
     assert_fail!(r#"
-<br>Response Failure: <bc>GET <by>request to \"<bc>http://localhost:4000<bc>/timeout\" <by>returned <br>1 <by>error(s)
+<br>Response Failure: <bn>GET <by>request to \"<bn>http://localhost:4000<bn>/timeout\" <by>returned <br>1 <by>error(s)
 
-<bb> 1) <br>API Failure: <by>No response within <bn>1000ms<by>.
+<bb> 1) <br>API Failure: <by>No response within <bg>1000ms<by>.
 
 
 "#, actual);

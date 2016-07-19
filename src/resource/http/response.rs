@@ -365,10 +365,10 @@ impl<E: HttpEndpoint> MockResponse for HttpResponse<E> {
     ) -> String {
         format!(
             "{} {} \"{}{}\" {} {} {}",
-            format!("{}", self.method).cyan().bold(),
+            format!("{}", self.method).cyan(),
             "response provided for".yellow(),
-            self.endpoint.url().cyan().bold(),
-            self.path.cyan().bold(),
+            self.endpoint.url().cyan(),
+            self.path.cyan(),
             "returned".yellow(),
             format!("{}", error_count).red().bold(),
             "error(s)".yellow()

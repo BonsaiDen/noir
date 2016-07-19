@@ -49,9 +49,9 @@ fn test_responses_provided_missing() {
     };
 
     assert_fail!(r#"
-<br>Response Failure: <bc>GET <by>request to \"<bc>http://localhost:4000<bc>/responses/none\" <by>returned <br>1 <by>error(s)
+<br>Response Failure: <bn>GET <by>request to \"<bn>http://localhost:4000<bn>/responses/none\" <by>returned <br>1 <by>error(s)
 
-<bb> 1) <br>Request Failure: <bc>GET <by>response provided for \"<bc>https://example.com<bc>/one\" <by>returned <br>1 <by>error(s)
+<bb> 1) <br>Request Failure: <bn>GET <by>response provided for \"<bn>https://example.com<bn>/one\" <by>returned <br>1 <by>error(s)
 
     <bb> 1.1) <by>Expected <bg>a request <by>for the response, but got <br>none<by>.
 
@@ -106,9 +106,9 @@ fn test_responses_provided_multiple_errors() {
     };
 
     assert_fail!(r#"
-<br>Response Failure: <bc>GET <by>request to \"<bc>http://localhost:4000<bc>/responses/one\" <by>returned <br>3 <by>error(s)
+<br>Response Failure: <bn>GET <by>request to \"<bn>http://localhost:4000<bn>/responses/one\" <by>returned <br>3 <by>error(s)
 
-<bb> 1) <br>Request Failure: <bc>GET <by>response provided for \"<bc>https://example.com<bc>/one\" <by>returned <br>3 <by>error(s)
+<bb> 1) <br>Request Failure: <bn>GET <by>response provided for \"<bn>https://example.com<bn>/one\" <by>returned <br>3 <by>error(s)
 
     <bb> 1.1) <by>Request <by>header \"<bb>Content-Type\" <by>was expected <bg>to be present<by>, but <br>is missing<by>.
 

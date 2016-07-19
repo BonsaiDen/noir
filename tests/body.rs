@@ -45,7 +45,7 @@ fn test_body_text_mismatch_diff_added() {
     };
 
     assert_fail!(r#"
-<br>Response Failure: <bc>GET <by>request to \"<bc>http://localhost:4000<bc>/get/hello\" <by>returned <br>1 <by>error(s)
+<br>Response Failure: <bn>GET <by>request to \"<bn>http://localhost:4000<bn>/get/hello\" <by>returned <br>1 <by>error(s)
 
 <bb> 1) <by>Response <by>does not match, expected:
 
@@ -74,7 +74,7 @@ fn test_body_text_mismatch_diff_removed() {
     };
 
     assert_fail!(r#"
-<br>Response Failure: <bc>GET <by>request to \"<bc>http://localhost:4000<bc>/get/hello\" <by>returned <br>1 <by>error(s)
+<br>Response Failure: <bn>GET <by>request to \"<bn>http://localhost:4000<bn>/get/hello\" <by>returned <br>1 <by>error(s)
 
 <bb> 1) <by>Response <by>does not match, expected:
 
@@ -107,7 +107,7 @@ fn test_body_with_expected_text_invalid_utf8() {
     };
 
     assert_fail!(r#"
-<br>Response Failure: <bc>POST <by>request to \"<bc>http://localhost:4000<bc>/echo\" <by>returned <br>1 <by>error(s)
+<br>Response Failure: <bn>POST <by>request to \"<bn>http://localhost:4000<bn>/echo\" <by>returned <br>1 <by>error(s)
 
 <bb> 1) <by>Response <by>text body contains invalid UTF-8:
 
@@ -132,7 +132,7 @@ fn test_body_with_expected_text_expected_invalid_utf8() {
     };
 
     assert_fail!(r#"
-<br>Response Failure: <bc>POST <by>request to \"<bc>http://localhost:4000<bc>/echo\" <by>returned <br>1 <by>error(s)
+<br>Response Failure: <bn>POST <by>request to \"<bn>http://localhost:4000<bn>/echo\" <by>returned <br>1 <by>error(s)
 
 <bb> 1) <by>Response <by>body, expected text provided by test contains invalid UTF-8:
 
@@ -180,7 +180,7 @@ fn test_body_expected_raw_mismatch() {
     };
 
     assert_fail!(r#"
-<br>Response Failure: <bc>POST <by>request to \"<bc>http://localhost:4000<bc>/echo\" <by>returned <br>1 <by>error(s)
+<br>Response Failure: <bn>POST <by>request to \"<bn>http://localhost:4000<bn>/echo\" <by>returned <br>1 <by>error(s)
 
 <bb> 1) <by>Response <by>raw body data does not match, expected the following <bg>16 bytes<by>:
 
@@ -272,7 +272,7 @@ fn test_body_with_expected_json_mismatch() {
     };
 
     assert_fail!(r#"
-<br>Response Failure: <bc>POST <by>request to \"<bc>http://localhost:4000<bc>/echo\" <by>returned <br>1 <by>error(s)
+<br>Response Failure: <bn>POST <by>request to \"<bn>http://localhost:4000<bn>/echo\" <by>returned <br>1 <by>error(s)
 
 <bb> 1) <by>Response <by>body JSON does not match, expected:
 
@@ -340,7 +340,7 @@ fn test_body_with_expected_json_mismatch_exact() {
     };
 
     assert_fail!(r#"
-<br>Response Failure: <bc>POST <by>request to \"<bc>http://localhost:4000<bc>/echo\" <by>returned <br>1 <by>error(s)
+<br>Response Failure: <bn>POST <by>request to \"<bn>http://localhost:4000<bn>/echo\" <by>returned <br>1 <by>error(s)
 
 <bb> 1) <by>Response <by>body JSON does not match, expected:
 
@@ -389,7 +389,7 @@ fn test_body_with_expected_json_invalid() {
     };
 
     assert_fail!(r#"
-<br>Response Failure: <bc>POST <by>request to \"<bc>http://localhost:4000<bc>/echo\" <by>returned <br>1 <by>error(s)
+<br>Response Failure: <bn>POST <by>request to \"<bn>http://localhost:4000<bn>/echo\" <by>returned <br>1 <by>error(s)
 
 <bb> 1) <by>Response <by>body JSON is invalid:
 
@@ -416,7 +416,7 @@ fn test_body_with_expected_json_invalid_utf8() {
     };
 
     assert_fail!(r#"
-<br>Response Failure: <bc>POST <by>request to \"<bc>http://localhost:4000<bc>/echo\" <by>returned <br>1 <by>error(s)
+<br>Response Failure: <bn>POST <by>request to \"<bn>http://localhost:4000<bn>/echo\" <by>returned <br>1 <by>error(s)
 
 <bb> 1) <by>Response <by>body JSON contains invalid UTF-8:
 
@@ -443,7 +443,7 @@ fn test_body_with_expected_json_expected_invalid() {
     };
 
     assert_fail!(r#"
-<br>Response Failure: <bc>POST <by>request to \"<bc>http://localhost:4000<bc>/echo\" <by>returned <br>1 <by>error(s)
+<br>Response Failure: <bn>POST <by>request to \"<bn>http://localhost:4000<bn>/echo\" <by>returned <br>1 <by>error(s)
 
 <bb> 1) <by>Response <by>body, expected <by>body JSON provided by test is invalid:
 
@@ -470,7 +470,7 @@ fn test_body_with_expected_json_expected_invalid_utf8() {
     };
 
     assert_fail!(r#"
-<br>Response Failure: <bc>POST <by>request to \"<bc>http://localhost:4000<bc>/echo\" <by>returned <br>1 <by>error(s)
+<br>Response Failure: <bn>POST <by>request to \"<bn>http://localhost:4000<bn>/echo\" <by>returned <br>1 <by>error(s)
 
 <bb> 1) <by>Response <by>body, expected <by>body JSON provided by test contains invalid UTF-8:
 
@@ -508,7 +508,7 @@ fn test_body_with_expected_json_compare_depth_one() {
     };
 
     assert_fail!(r#"
-<br>Response Failure: <bc>POST <by>request to \"<bc>http://localhost:4000<bc>/echo\" <by>returned <br>1 <by>error(s)
+<br>Response Failure: <bn>POST <by>request to \"<bn>http://localhost:4000<bn>/echo\" <by>returned <br>1 <by>error(s)
 
 <bb> 1) <by>Response <by>body JSON does not match, expected:
 

@@ -319,9 +319,9 @@ impl<A: HttpApi> HttpRequest<A> {
                 "\n{} {} \"{}\" {} {}{}\n\n",
                 "API Failure:".red().bold(),
                 "Server for".yellow(),
-                self.api.url().as_str().cyan().bold(),
+                self.api.url().as_str().cyan(),
                 "did not respond within".yellow(),
-                "1000ms".cyan(),
+                "1000ms".green().bold(),
                 ".".yellow()
             ));
         }
@@ -348,10 +348,10 @@ impl<A: HttpApi> HttpRequest<A> {
             report.push_str(format!(
                 "\n{} {} {} \"{}{}\" {} {} {}\n",
                 "Response Failure:".red().bold(),
-                format!("{}", self.method).cyan().bold(),
+                format!("{}", self.method).cyan(),
                 "request to".yellow(),
-                self.api.url().cyan().bold(),
-                self.path.cyan().bold(),
+                self.api.url().cyan(),
+                self.path.cyan(),
                 "returned".yellow(),
                 format!("{}", error_count).red().bold(),
                 "error(s)".yellow()
@@ -446,7 +446,7 @@ impl<A: HttpApi> HttpRequest<A> {
                 "{} {} {}{}",
                 "API Failure:".red().bold(),
                 "No response within".yellow(),
-                "1000ms".cyan(),
+                "1000ms".green().bold(),
                 ".".yellow()
 
             )], 1, 0)
