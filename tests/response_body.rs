@@ -9,13 +9,46 @@ use json::JsonValue;
 
 // Provided response bodies for request ---------------------------------------
 #[test]
+fn test_provided_response_without_body() {
+
+    use hyper::header::ContentLength;
+    let actual = {
+        API::get("/responses/one")
+            .provide(responses![
+                EXAMPLE.get("/one")
+            ])
+            // Content length should be set to 0
+            .expected_header(ContentLength(0))
+            .expected_body("Response Body")
+            .collect()
+    };
+
+    assert_fail!(r#"
+<br>Response Failure: <bc>GET <by>request to \"<bc>http://localhost:4000<bc>/responses/one\" <by>returned <br>1 <by>error(s)
+
+<br> 1) <by>Response <by>raw body data does not match, expected the following <bg>13 bytes<by>:
+
+       [<bg>0x52, <bg>0x65, <bg>0x73, <bg>0x70, <bg>0x6F, <bg>0x6E, <bg>0x73, <bg>0x65, <bg>0x20, <bg>0x42, <bg>0x6F, <bg>0x64, <bg>0x79]
+
+    <by>but got the following <br>0 bytes <by>instead:
+
+       []
+
+
+"#, actual);
+
+}
+
+#[test]
 fn test_provided_response_with_response_body_text() {
 
+    use hyper::header::ContentLength;
     let actual = {
         API::get("/responses/one")
             .provide(responses![
                 EXAMPLE.get("/one").with_body("Response Body")
             ])
+            .expected_header(ContentLength(13))
             .expected_body("Response Body")
             .collect()
     };
@@ -53,6 +86,24 @@ fn test_provided_response_with_response_body_json() {
             .expected_body(object!{
                 "key" => "value"
             })
+            .collect()
+    };
+
+    assert_pass!(actual);
+
+}
+
+#[test]
+fn test_provided_response_with_overriden_content_length() {
+
+    use hyper::header::ContentLength;
+    let actual = {
+        API::get("/responses/one")
+            .provide(responses![
+                EXAMPLE.get("/one")
+                    .with_header(ContentLength(5))
+            ])
+            .expected_header(ContentLength(5))
             .collect()
     };
 

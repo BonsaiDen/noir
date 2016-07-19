@@ -15,7 +15,7 @@ use std::net::ToSocketAddrs;
 // External Dependencies ------------------------------------------------------
 use hyper::method::Method;
 use hyper::status::StatusCode;
-use hyper::header::{Accept, Connection, ContentType, Server, qitem};
+use hyper::header::{Accept, Connection, ContentType, ContentLength, Server, qitem};
 use hyper::mime::{Mime, TopLevel, SubLevel, Attr, Value};
 use hyper::server::{Request, Response};
 use hyper::uri::RequestUri;
@@ -202,9 +202,9 @@ fn external_request(res: &mut Response, path: &'static str) -> String {
     match req {
         Ok(mut r) => {
 
-            // TODO IW: Support binary responses
             let mut body = String::new();
-            r.read_to_string(&mut body).unwrap();
+            // TODO IW: Handle cases where ContentLength set is bigger than actual data
+            r.read_to_string(&mut body).ok();
             *res.status_mut() = r.status;
 
             // Handle form-data responses
@@ -217,6 +217,14 @@ fn external_request(res: &mut Response, path: &'static str) -> String {
                     *b = "boundary12345".to_string();
                 }
 
+            }
+
+            // Fill body in case it failed to read completely
+            // This is needed by the ContentLength override tests
+            if let Some(&ContentLength(len)) = r.headers.get::<ContentLength>() {
+                if body.len() < len as usize {
+                    body = (0..len as usize).map(|_| "-").collect::<Vec<&str>>().join("");
+                }
             }
 
             *res.headers_mut() = r.headers.clone();
@@ -281,6 +289,7 @@ pub fn multiline(output: String) -> String {
         raw_string = raw_string.replace("[1;35m", "<bp>");
         raw_string = raw_string.replace("[36m", "<bn>");
         raw_string = raw_string.replace("[1;36m", "<bc>");
+        raw_string = raw_string.replace("[1;30m", "<bbb>");
         raw_string = raw_string.replace("[0m", "");
         raw_string = raw_string.replace("[1;42;37m", "<gbg>");
         raw_string = raw_string.replace("[1;41;37m", "<gbr>");

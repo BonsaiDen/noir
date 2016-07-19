@@ -62,7 +62,8 @@ pub fn http_body_into_parts(body: HttpBody) -> (Option<Mime>, Option<Vec<u8>>) {
 impl<'a> From<&'a mut Response> for HttpBody {
     fn from(res: &mut Response) -> HttpBody {
         let mut body: Vec<u8> = Vec::new();
-        res.read_to_end(&mut body).unwrap();
+        // If the res body is empty, this will fail so we simply ignore it
+        res.read_to_end(&mut body).ok();
         http_body_from_parts(body, &res.headers)
     }
 }

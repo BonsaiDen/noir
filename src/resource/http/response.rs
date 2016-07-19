@@ -15,7 +15,7 @@ use colored::*;
 use hyper::method::Method;
 use hyper::server::Response as ServerResponse;
 use hyper::status::StatusCode;
-use hyper::header::{Header, Headers, HeaderFormat, ContentType};
+use hyper::header::{Header, Headers, HeaderFormat, ContentType, ContentLength};
 
 
 // Internal Dependencies ------------------------------------------------------
@@ -261,6 +261,15 @@ impl<E: HttpEndpoint> MockResponse for HttpResponse<E> {
                 if let Some(content_mime) = content_mime {
                     if !self.response_headers.has::<ContentType>() {
                         self.response_headers.set(ContentType(content_mime));
+                    }
+                }
+
+                // Set Content-Length based on body (unless already specified)
+                if !self.response_headers.has::<ContentLength>() {
+                    if body.is_none() {
+                        // Explicitly set 0 to avoid having to wait for read
+                        // timeouts
+                        self.response_headers.set(ContentLength(0));
                     }
                 }
 

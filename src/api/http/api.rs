@@ -183,6 +183,7 @@ fn request<A: HttpApi + 'static>(
 
             // API server didn't start in time
             if ticks == 100 {
+                // TODO IW: Allow to configure timeout?
                 api_timed_out = true;
 
             // Insert into map

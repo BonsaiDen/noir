@@ -7,7 +7,6 @@
 // except according to those terms.
 
 // STD Dependencies -----------------------------------------------------------
-use std::time::Duration;
 use std::sync::{Arc, Mutex};
 
 
@@ -329,7 +328,7 @@ impl<A: HttpApi> HttpRequest<A> {
 
         // Limit ourselves to one test at a time in order to ensure correct
         // handling of mocked requests and responses
-        let (errors, error_count) = if let Ok(_) = REQUEST_LOCK.lock() {
+        let (errors, error_count, suppressed_count) = if let Ok(_) = REQUEST_LOCK.lock() {
             self.request()
 
         } else {
@@ -338,7 +337,7 @@ impl<A: HttpApi> HttpRequest<A> {
                 "Internal Error:".red().bold(),
                 "Request lock failed.".yellow()
 
-            )], 1)
+            )], 1, 0)
         };
 
         if !errors.is_empty() {
@@ -368,6 +367,18 @@ impl<A: HttpApi> HttpRequest<A> {
                 ).as_str());
             }
 
+            // Suppressed error information
+            if suppressed_count != 0 {
+                report.push_str(format!(
+                    "\n{} {} {} {}\n",
+                    "Note:".green().bold(),
+                    "Suppressed".black().bold(),
+                    format!("{}", suppressed_count).blue().bold(),
+                    "request error(s) that may have resulted from failed response expectations.".black().bold()
+
+                ).as_str());
+            }
+
             // Padding
             report.push_str("\n\n");
 
@@ -379,7 +390,7 @@ impl<A: HttpApi> HttpRequest<A> {
 
     }
 
-    fn request(&mut self) -> (Vec<String>, usize) {
+    fn request(&mut self) -> (Vec<String>, usize, usize) {
 
         // Convert body into Mime and Vec<u8>
         let (content_mime, body) = if let Some(body) = self.request_body.take() {
@@ -400,8 +411,8 @@ impl<A: HttpApi> HttpRequest<A> {
 
         // Create Client
         let mut client = Client::new();
-        client.set_read_timeout(Some(Duration::from_millis(1000)));
-        client.set_write_timeout(Some(Duration::from_millis(1000)));
+        client.set_read_timeout(Some(self.options.api_request_timeout));
+        client.set_write_timeout(Some(self.options.api_request_timeout));
 
         // Setup Request
         let mut request = client.request(
@@ -437,7 +448,8 @@ impl<A: HttpApi> HttpRequest<A> {
                 "No response within".yellow(),
                 "1000ms".cyan(),
                 ".".yellow()
-            )], 1)
+
+            )], 1, 0)
         };
 
         for mock in &mut self.provided_mocks {
@@ -448,7 +460,7 @@ impl<A: HttpApi> HttpRequest<A> {
 
     }
 
-    fn validate(&mut self, mut response: Response) -> (Vec<String>, usize) {
+    fn validate(&mut self, mut response: Response) -> (Vec<String>, usize, usize) {
 
         let mut errors = Vec::new();
         if self.dump_response {
@@ -472,8 +484,12 @@ impl<A: HttpApi> HttpRequest<A> {
             self.expected_exact_body
         ));
 
+        let mut response_errors = Vec::new();
         let mut error_count = errors.len();
-        let index_offset = error_count;
+        let index_offset = match self.options.error_suppress_cascading {
+            true => 0,
+            false => error_count
+        };
 
         for (
             mut response,
@@ -482,14 +498,14 @@ impl<A: HttpApi> HttpRequest<A> {
 
         ) in ResponseProvider::provided_responses() {
 
-            let response_errors = response.validate(response_index, request_index);
-            if !response_errors.is_empty() {
-                let header = response.validate_header(response_errors.len());
-                error_count += response_errors.len();
-                errors.push(format_response_errors(
+            let errors = response.validate(response_index, request_index);
+            if !errors.is_empty() {
+                let header = response.validate_header(errors.len());
+                error_count += errors.len();
+                response_errors.push(format_response_errors(
                     header,
                     index_offset + response_index + 1,
-                    response_errors
+                    errors
                 ));
             }
 
@@ -497,14 +513,28 @@ impl<A: HttpApi> HttpRequest<A> {
 
         for mut request in ResponseProvider::additional_requests() {
             if let Some(error) = request.validate() {
-                errors.push(error);
+                response_errors.push(error);
                 error_count += 1;
             }
         }
 
         ResponseProvider::reset();
 
-        (errors, error_count)
+        // Suppress cascading errors that may be the result from response errors
+        if !response_errors.is_empty() &&
+            self.options.error_suppress_cascading {
+
+            // Remove the suppressed errors
+            let suppressed_count = errors.len();
+            errors.clear();
+
+            errors.append(&mut response_errors);
+            (errors, error_count - suppressed_count, suppressed_count)
+
+        } else {
+            errors.append(&mut response_errors);
+            (errors, error_count, 0)
+        }
 
     }
 
