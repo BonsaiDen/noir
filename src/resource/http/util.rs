@@ -179,7 +179,7 @@ fn format_body(body: Result<ParsedHttpBody, String>) -> String {
                             let value = format!("{:?}", value);
                             format!(
                                 "{} {} \"{}\" {}\n\n              \"{}\"\n",
-                                format!("{:2})", i + 1).cyan().bold(),
+                                format!("{:2})", i + 1).blue().bold(),
                                 "Field".yellow(),
                                 name.cyan(),
                                 "dump:".yellow(),
@@ -189,7 +189,7 @@ fn format_body(body: Result<ParsedHttpBody, String>) -> String {
                         HttpFormDataField::Array(name, values) => {
                             format!(
                                 "{} {} \"{}\" ({}) {}\n\n              {}\n",
-                                format!("{:2})", i + 1).cyan().bold(),
+                                format!("{:2})", i + 1).blue().bold(),
                                 "Array".yellow(),
                                 name.cyan(),
                                 format!("{} items", values.len()).purple().bold(),
@@ -219,7 +219,7 @@ fn format_body(body: Result<ParsedHttpBody, String>) -> String {
 
                             format!(
                                 "{} {} \"{}\" (\"{}\", {}) {}\n",
-                                format!("{:2})", i + 1).cyan().bold(),
+                                format!("{:2})", i + 1).blue().bold(),
                                 "File".yellow(),
                                 name.cyan(),
                                 filename.purple().bold(),

@@ -284,23 +284,23 @@ fn test_provided_response_dump_form() {
 
           <by>Request <by>form dump with <bn>5 fields<by>:
 
-              <bc> 1) <by>Field \"<bn>field\" <by>dump:
+              <bb> 1) <by>Field \"<bn>field\" <by>dump:
 
                     \"<bp>someValue\\n\"
 
-              <bc> 2) <by>Array \"<bn>array[]\" (<bp>5 items) <by>dump:
+              <bb> 2) <by>Array \"<bn>array[]\" (<bp>5 items) <by>dump:
 
                     \"<bp>1\", \"<bp>2\", \"<bp>3\", \"<bp>4\", \"<bp>5\\n\"
 
-              <bc> 3) <by>File \"<bn>vec_file\" (\"<bp>file.bin\", <bp>application/octet-stream) <by>raw body dump of <bn>8 bytes<by>:
+              <bb> 3) <by>File \"<bn>vec_file\" (\"<bp>file.bin\", <bp>application/octet-stream) <by>raw body dump of <bn>8 bytes<by>:
 
                    [<bp>0x01, <bp>0x02, <bp>0x03, <bp>0x04, <bp>0x05, <bp>0x06, <bp>0x07, <bp>0x08]
 
-              <bc> 4) <by>File \"<bn>str_file\" (\"<bp>readme.md\", <bp>text/plain) <by>body dump:
+              <bb> 4) <by>File \"<bn>str_file\" (\"<bp>readme.md\", <bp>text/plain) <by>body dump:
 
                     \"<bp>Hello World\"
 
-              <bc> 5) <by>File \"<bn>fs_file\" (\"<bp>form_test.md\", <bp>text/plain) <by>body dump:
+              <bb> 5) <by>File \"<bn>fs_file\" (\"<bp>form_test.md\", <bp>text/plain) <by>body dump:
 
                     \"<bp>Form Test Data File\\n\"
 
