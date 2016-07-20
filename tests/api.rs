@@ -16,6 +16,10 @@ impl HttpApi for TimeoutAPI {
         4001
     }
 
+    fn timeout(&self) -> Duration {
+        Duration::from_millis(500)
+    }
+
     fn start(&self) {
         // Do nothing so we timeout
     }

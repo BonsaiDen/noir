@@ -9,9 +9,9 @@
 // STD Dependencies -----------------------------------------------------------
 use std::thread;
 use std::cell::RefCell;
-use std::time::Duration;
 use std::sync::{Arc, Mutex};
 use std::collections::HashMap;
+use std::time::{Duration, Instant};
 
 
 // External Dependencies ------------------------------------------------------
@@ -95,6 +95,14 @@ pub trait HttpApi: Send + Copy + Default {
         format!("{}{}", self.url(), path)
     }
 
+    /// Should return the maximum duration to wait for the API to become
+    /// available when a test is started.
+    ///
+    /// Defaults to `1000ms`.
+    fn timeout(&self) -> Duration {
+        Duration::from_millis(1000)
+    }
+
     /// Returns a `OPTIONS` request that will be performed against the API.
     fn options(path: &'static str) -> HttpRequest<Self> where Self: 'static {
         request(Self::default(), Method::Options, path)
@@ -169,21 +177,23 @@ fn request<A: HttpApi + 'static>(
                 api.start();
             });
 
-            // Wait for API server to be started
-            let mut ticks = 0;
-            while ticks < 100 {
-                let client = Client::new();
+            let now = Instant::now();
+            let timeout = api.timeout();
+
+            // Wait for API server to be available
+            while now.elapsed() < timeout {
+                let mut client = Client::new();
+                client.set_read_timeout(Some(timeout));
+                client.set_write_timeout(Some(timeout));
                 match client.head(api.url().as_str()).send() {
                     Err(hyper::Error::Io(_)) => { /* waiting for server */ },
                     _ => break
                 }
                 thread::sleep(Duration::from_millis(10));
-                ticks += 1;
             }
 
             // API server didn't start in time
-            if ticks == 100 {
-                // TODO IW: Allow to configure timeout?
+            if now.elapsed() >= timeout {
                 api_timed_out = true;
 
             // Insert into map

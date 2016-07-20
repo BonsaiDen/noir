@@ -23,7 +23,7 @@ pub struct Options {
     /// items and their types and values will be at level `1`.
     pub json_compare_depth: usize,
 
-    /// Maximum duration until a HTTP request to a `Api` does time out.
+    /// Maximum duration until a HTTP request to a `HttpApi` does time out.
     /// Defaults to `1000ms`.
     pub api_request_timeout: Duration,
 
