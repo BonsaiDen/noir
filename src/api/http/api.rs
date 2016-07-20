@@ -182,14 +182,21 @@ fn request<A: HttpApi + 'static>(
 
             // Wait for API server to be available
             while now.elapsed() < timeout {
+
                 let mut client = Client::new();
-                client.set_read_timeout(Some(timeout));
-                client.set_write_timeout(Some(timeout));
+
+                // Windows has rather huge timeouts configured here by default
+                // so we want to avoid stalling the tests by reducing these
+                client.set_read_timeout(Some(Duration::from_millis(50)));
+                client.set_write_timeout(Some(Duration::from_millis(50)));
+
                 match client.head(api.url().as_str()).send() {
                     Err(hyper::Error::Io(_)) => { /* waiting for server */ },
                     _ => break
                 }
+
                 thread::sleep(Duration::from_millis(10));
+
             }
 
             // API server didn't start in time
