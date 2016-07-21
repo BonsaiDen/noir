@@ -16,6 +16,7 @@ use hyper::header::{Header, Headers, HeaderView, HeaderFormat};
 
 
 // Internal Dependencies ------------------------------------------------------
+use util;
 use super::HttpLike;
 
 
@@ -71,17 +72,26 @@ pub fn validate_http_request_headers<T: HttpLike>(
         if let Some(expected_value) = result.headers().get_raw(header.name()) {
             let actual_value = header.value_string();
             if expected_value[0].as_slice() != actual_value.as_bytes() {
-                let expected_value = String::from_utf8(expected_value[0].clone()).unwrap();
+
+                let expected = String::from_utf8(expected_value[0].clone()).unwrap();
+                let (expected, actual, diff) = util::diff::text(
+                    expected.as_str(),
+                    actual_value.as_str()
+                );
+
                 errors.push(format!(
-                    "{} {} \"{}\" {}\n\n        \"{}\"\n\n    {}\n\n        \"{}\"",
+                    "{} {} \"{}\" {}\n\n        \"{}\"\n\n    {}\n\n        \"{}\"\n\n    {}\n\n        \"{}\"",
                     context.yellow(),
                     "header".yellow(),
                     header.name().blue().bold(),
                     "does not match, expected:".yellow(),
-                    actual_value.green().bold(),
+                    actual.green().bold(),
                     "but got:".yellow(),
-                    expected_value.red().bold()
+                    expected.red().bold(),
+                    "difference:".yellow(),
+                    diff
                 ));
+
             }
 
         } else {

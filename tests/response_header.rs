@@ -90,6 +90,10 @@ fn test_responses_provided_with_expected_header_mismatch() {
 
               \"<br>application/json\"
 
+          <by>difference:
+
+              \"<gbr>application/json <gbg>text/plain\"
+
 
 "#, actual);
 

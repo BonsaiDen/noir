@@ -69,6 +69,10 @@ fn test_headers_expected_mismatch() {
 
         \"<br>Servername\"
 
+    <by>difference:
+
+        \"Servername <gbg>Foo\"
+
 
 "#, actual);
 
