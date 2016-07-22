@@ -587,6 +587,27 @@
 <span id="543">543</span>
 <span id="544">544</span>
 <span id="545">545</span>
+<span id="546">546</span>
+<span id="547">547</span>
+<span id="548">548</span>
+<span id="549">549</span>
+<span id="550">550</span>
+<span id="551">551</span>
+<span id="552">552</span>
+<span id="553">553</span>
+<span id="554">554</span>
+<span id="555">555</span>
+<span id="556">556</span>
+<span id="557">557</span>
+<span id="558">558</span>
+<span id="559">559</span>
+<span id="560">560</span>
+<span id="561">561</span>
+<span id="562">562</span>
+<span id="563">563</span>
+<span id="564">564</span>
+<span id="565">565</span>
+<span id="566">566</span>
 </pre><pre class='rust '>
 <span class='comment'>// Copyright (c) 2016 Ivo Wetzel</span>
 
@@ -612,8 +633,8 @@
 
 <span class='comment'>// Deep Form Compare ----------------------------------------------------------</span>
 <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>compare</span>(
-    <span class='ident'>expected</span>: <span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>HttpFormDataField</span><span class='op'>&gt;</span>,
-    <span class='ident'>actual</span>: <span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>HttpFormDataField</span><span class='op'>&gt;</span>,
+    <span class='ident'>expected</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>HttpFormDataField</span>],
+    <span class='ident'>actual</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>HttpFormDataField</span>],
     <span class='ident'>check_additional_keys</span>: <span class='ident'>bool</span>
 
 ) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span>(), <span class='ident'>Vec</span><span class='op'>&lt;</span>(<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;</span>, <span class='ident'>String</span>)<span class='op'>&gt;&gt;</span> {
@@ -644,8 +665,8 @@
 
 <span class='comment'>// Recursive Compare Function -------------------------------------------------</span>
 <span class='kw'>fn</span> <span class='ident'>compare_form</span>(
-    <span class='ident'>a</span>: <span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>HttpFormDataField</span><span class='op'>&gt;</span>,
-    <span class='ident'>b</span>: <span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>HttpFormDataField</span><span class='op'>&gt;</span>,
+    <span class='ident'>a</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>HttpFormDataField</span>],
+    <span class='ident'>b</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>HttpFormDataField</span>],
     <span class='ident'>check_additional_keys</span>: <span class='ident'>bool</span>,
     <span class='ident'>path</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;</span>
 
@@ -655,8 +676,8 @@
         <span class='kw'>return</span> <span class='macro'>vec</span><span class='macro'>!</span>[];
     }
 
-    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>a_fields</span> <span class='op'>=</span> <span class='ident'>map_form_fields</span>(<span class='kw-2'>&amp;</span><span class='ident'>a</span>);
-    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>b_fields</span> <span class='op'>=</span> <span class='ident'>map_form_fields</span>(<span class='kw-2'>&amp;</span><span class='ident'>b</span>);
+    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>a_fields</span> <span class='op'>=</span> <span class='ident'>map_form_fields</span>(<span class='ident'>a</span>);
+    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>b_fields</span> <span class='op'>=</span> <span class='ident'>map_form_fields</span>(<span class='ident'>b</span>);
 
     <span class='ident'>a_fields</span>.<span class='ident'>sort_by</span>(<span class='op'>|</span><span class='ident'>a</span>, <span class='ident'>b</span><span class='op'>|</span> <span class='ident'>a</span>.<span class='number'>0</span>.<span class='ident'>cmp</span>(<span class='ident'>b</span>.<span class='number'>0</span>));
     <span class='ident'>b_fields</span>.<span class='ident'>sort_by</span>(<span class='op'>|</span><span class='ident'>a</span>, <span class='ident'>b</span><span class='op'>|</span> <span class='ident'>a</span>.<span class='number'>0</span>.<span class='ident'>cmp</span>(<span class='ident'>b</span>.<span class='number'>0</span>));
@@ -667,14 +688,14 @@
     <span class='kw'>for</span> (<span class='ident'>a_name</span>, <span class='ident'>a_type</span>, <span class='ident'>a_field</span>) <span class='kw'>in</span> <span class='ident'>a_fields</span> {
 
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>found</span> <span class='op'>=</span> <span class='boolvalue'>false</span>;
-        <span class='ident'>b_fields</span>.<span class='ident'>retain</span>(<span class='op'>|</span><span class='kw-2'>&amp;</span>(<span class='kw-2'>ref</span> <span class='ident'>b_name</span>, <span class='kw-2'>ref</span> <span class='ident'>b_type</span>, <span class='kw-2'>ref</span> <span class='ident'>b_field</span>)<span class='op'>|</span> {
+        <span class='ident'>b_fields</span>.<span class='ident'>retain</span>(<span class='op'>|</span><span class='kw-2'>&amp;</span>(<span class='kw-2'>ref</span> <span class='ident'>b_name</span>, <span class='ident'>b_type</span>, <span class='kw-2'>ref</span> <span class='ident'>b_field</span>)<span class='op'>|</span> {
             <span class='kw'>if</span> <span class='ident'>a_name</span> <span class='op'>==</span> <span class='op'>*</span><span class='ident'>b_name</span> {
 
                 <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>field_path</span> <span class='op'>=</span> <span class='ident'>path</span>.<span class='ident'>clone</span>();
                 <span class='ident'>field_path</span>.<span class='ident'>push</span>(<span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;.{}&quot;</span>, <span class='ident'>a_name</span>.<span class='ident'>blue</span>().<span class='ident'>bold</span>()));
                 <span class='ident'>errors</span>.<span class='ident'>append</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>compare_form_fields</span>(
                     <span class='ident'>a_type</span>,
-                    <span class='ident'>b_type</span>.<span class='ident'>clone</span>(),
+                    <span class='ident'>b_type</span>,
                     <span class='ident'>a_field</span>,
                     <span class='ident'>b_field</span>,
                     <span class='ident'>field_path</span>,
@@ -724,10 +745,10 @@
     <span class='kw'>if</span> <span class='ident'>type_a</span> <span class='op'>==</span> <span class='ident'>type_b</span> {
 
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>errors</span> <span class='op'>=</span> <span class='macro'>vec</span><span class='macro'>!</span>[];
-        <span class='kw'>match</span> <span class='ident'>a</span> {
+        <span class='kw'>match</span> <span class='op'>*</span><span class='ident'>a</span> {
 
-            <span class='kw-2'>&amp;</span><span class='ident'>HttpFormDataField</span>::<span class='ident'>Field</span>(_, <span class='kw-2'>ref</span> <span class='ident'>value_a</span>) <span class='op'>=&gt;</span> {
-                <span class='kw'>if</span> <span class='kw'>let</span> <span class='kw-2'>&amp;</span><span class='ident'>HttpFormDataField</span>::<span class='ident'>Field</span>(_, <span class='kw-2'>ref</span> <span class='ident'>value_b</span>) <span class='op'>=</span> <span class='ident'>b</span> {
+            <span class='ident'>HttpFormDataField</span>::<span class='ident'>Field</span>(_, <span class='kw-2'>ref</span> <span class='ident'>value_a</span>) <span class='op'>=&gt;</span> {
+                <span class='kw'>if</span> <span class='kw'>let</span> <span class='ident'>HttpFormDataField</span>::<span class='ident'>Field</span>(_, <span class='kw-2'>ref</span> <span class='ident'>value_b</span>) <span class='op'>=</span> <span class='op'>*</span><span class='ident'>b</span> {
                     <span class='kw'>if</span> <span class='ident'>value_a</span> <span class='op'>!=</span> <span class='ident'>value_b</span> {
                         <span class='kw'>let</span> (<span class='ident'>expected</span>, <span class='ident'>actual</span>, <span class='ident'>diff</span>) <span class='op'>=</span> <span class='ident'>util</span>::<span class='ident'>diff</span>::<span class='ident'>text</span>(<span class='ident'>value_b</span>, <span class='ident'>value_a</span>);
                         <span class='ident'>errors</span>.<span class='ident'>push</span>((
@@ -747,8 +768,8 @@
                 }
             },
 
-            <span class='kw-2'>&amp;</span><span class='ident'>HttpFormDataField</span>::<span class='ident'>Array</span>(_, <span class='kw-2'>ref</span> <span class='ident'>value_a</span>) <span class='op'>=&gt;</span> {
-                <span class='kw'>if</span> <span class='kw'>let</span> <span class='kw-2'>&amp;</span><span class='ident'>HttpFormDataField</span>::<span class='ident'>Array</span>(_, <span class='kw-2'>ref</span> <span class='ident'>value_b</span>) <span class='op'>=</span> <span class='ident'>b</span> {
+            <span class='ident'>HttpFormDataField</span>::<span class='ident'>Array</span>(_, <span class='kw-2'>ref</span> <span class='ident'>value_a</span>) <span class='op'>=&gt;</span> {
+                <span class='kw'>if</span> <span class='kw'>let</span> <span class='ident'>HttpFormDataField</span>::<span class='ident'>Array</span>(_, <span class='kw-2'>ref</span> <span class='ident'>value_b</span>) <span class='op'>=</span> <span class='op'>*</span><span class='ident'>b</span> {
 
                     <span class='kw'>let</span> <span class='ident'>len_a</span> <span class='op'>=</span> <span class='ident'>value_a</span>.<span class='ident'>len</span>();
                     <span class='kw'>let</span> <span class='ident'>len_b</span> <span class='op'>=</span> <span class='ident'>value_b</span>.<span class='ident'>len</span>();
@@ -789,8 +810,8 @@
                 }
             },
 
-            <span class='kw-2'>&amp;</span><span class='ident'>HttpFormDataField</span>::<span class='ident'>FileVec</span>(_, <span class='kw-2'>ref</span> <span class='ident'>filename_a</span>, <span class='kw-2'>ref</span> <span class='ident'>mime_a</span>, <span class='kw-2'>ref</span> <span class='ident'>data_a</span>) <span class='op'>=&gt;</span> {
-                <span class='kw'>if</span> <span class='kw'>let</span> <span class='kw-2'>&amp;</span><span class='ident'>HttpFormDataField</span>::<span class='ident'>FileVec</span>(_, <span class='kw-2'>ref</span> <span class='ident'>filename_b</span>, <span class='kw-2'>ref</span> <span class='ident'>mime_b</span>, <span class='kw-2'>ref</span> <span class='ident'>data_b</span>) <span class='op'>=</span> <span class='ident'>b</span> {
+            <span class='ident'>HttpFormDataField</span>::<span class='ident'>FileVec</span>(_, <span class='kw-2'>ref</span> <span class='ident'>filename_a</span>, <span class='kw-2'>ref</span> <span class='ident'>mime_a</span>, _) <span class='op'>=&gt;</span> {
+                <span class='kw'>if</span> <span class='kw'>let</span> <span class='ident'>HttpFormDataField</span>::<span class='ident'>FileVec</span>(_, <span class='kw-2'>ref</span> <span class='ident'>filename_b</span>, <span class='kw-2'>ref</span> <span class='ident'>mime_b</span>, _) <span class='op'>=</span> <span class='op'>*</span><span class='ident'>b</span> {
 
                     <span class='kw'>if</span> <span class='ident'>filename_a</span> <span class='op'>!=</span> <span class='ident'>filename_b</span> {
                         <span class='ident'>errors</span>.<span class='ident'>push</span>((
@@ -798,9 +819,9 @@
                             <span class='macro'>format</span><span class='macro'>!</span>(
                                 <span class='string'>&quot;{} (\&quot;{}\&quot;) {} (\&quot;{}\&quot;)&quot;</span>,
                                 <span class='string'>&quot;Filename&quot;</span>.<span class='ident'>green</span>().<span class='ident'>bold</span>(),
-                                <span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;{}&quot;</span>, <span class='ident'>filename_b</span>).<span class='ident'>red</span>().<span class='ident'>bold</span>(),
+                                <span class='ident'>filename_b</span>.<span class='ident'>red</span>().<span class='ident'>bold</span>(),
                                 <span class='string'>&quot;does not match expected value&quot;</span>.<span class='ident'>yellow</span>(),
-                                <span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;{}&quot;</span>, <span class='ident'>filename_a</span>).<span class='ident'>green</span>().<span class='ident'>bold</span>()
+                                <span class='ident'>filename_a</span>.<span class='ident'>green</span>().<span class='ident'>bold</span>()
                             )
                         ))
                     }
@@ -810,7 +831,7 @@
                             <span class='ident'>path</span>.<span class='ident'>clone</span>(),
                             <span class='macro'>format</span><span class='macro'>!</span>(
                                 <span class='string'>&quot;{} ({}) {} ({})&quot;</span>,
-                                <span class='string'>&quot;Mimetype&quot;</span>.<span class='ident'>green</span>().<span class='ident'>bold</span>(),
+                                <span class='string'>&quot;MIME type&quot;</span>.<span class='ident'>green</span>().<span class='ident'>bold</span>(),
                                 <span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;{}&quot;</span>, <span class='ident'>mime_b</span>).<span class='ident'>red</span>().<span class='ident'>bold</span>(),
                                 <span class='string'>&quot;does not match expected value&quot;</span>.<span class='ident'>yellow</span>(),
                                 <span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;{}&quot;</span>, <span class='ident'>mime_a</span>).<span class='ident'>green</span>().<span class='ident'>bold</span>()
@@ -844,7 +865,11 @@
 
 
 <span class='comment'>// Helpers --------------------------------------------------------------------</span>
-<span class='kw'>fn</span> <span class='ident'>missing_field_errors</span>(<span class='ident'>typ</span>: <span class='ident'>FormFieldType</span>, <span class='ident'>errors</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Vec</span><span class='op'>&lt;</span>(<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;</span>, <span class='ident'>String</span>)<span class='op'>&gt;</span>, <span class='ident'>fields</span>: <span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span>(<span class='kw-2'>&amp;</span><span class='ident'>String</span>, <span class='ident'>FormFieldType</span>, <span class='kw-2'>&amp;</span><span class='ident'>HttpFormDataField</span>)<span class='op'>&gt;</span>) {
+<span class='kw'>fn</span> <span class='ident'>missing_field_errors</span>(
+    <span class='ident'>typ</span>: <span class='ident'>FormFieldType</span>,
+    <span class='ident'>errors</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Vec</span><span class='op'>&lt;</span>(<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;</span>, <span class='ident'>String</span>)<span class='op'>&gt;</span>,
+    <span class='ident'>fields</span>: <span class='kw-2'>&amp;</span>[(<span class='kw-2'>&amp;</span><span class='ident'>String</span>, <span class='ident'>FormFieldType</span>, <span class='kw-2'>&amp;</span><span class='ident'>HttpFormDataField</span>)]
+) {
 
     <span class='kw'>let</span> <span class='ident'>fields</span> <span class='op'>=</span> <span class='ident'>fields</span>.<span class='ident'>iter</span>().<span class='ident'>filter</span>(<span class='op'>|</span><span class='ident'>v</span><span class='op'>|</span> <span class='ident'>v</span>.<span class='number'>1</span> <span class='op'>==</span> <span class='ident'>typ</span>).<span class='ident'>collect</span>::<span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span>(<span class='kw-2'>&amp;</span><span class='ident'>String</span>, <span class='ident'>FormFieldType</span>, <span class='kw-2'>&amp;</span><span class='ident'>HttpFormDataField</span>)<span class='op'>&gt;&gt;</span>();
     <span class='kw'>if</span> <span class='op'>!</span><span class='ident'>fields</span>.<span class='ident'>is_empty</span>() {
@@ -865,7 +890,11 @@
 
 }
 
-<span class='kw'>fn</span> <span class='ident'>additional_field_errors</span>(<span class='ident'>typ</span>: <span class='ident'>FormFieldType</span>, <span class='ident'>errors</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Vec</span><span class='op'>&lt;</span>(<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;</span>, <span class='ident'>String</span>)<span class='op'>&gt;</span>, <span class='ident'>fields</span>: <span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span>(<span class='kw-2'>&amp;</span><span class='ident'>String</span>, <span class='ident'>FormFieldType</span>, <span class='kw-2'>&amp;</span><span class='ident'>HttpFormDataField</span>)<span class='op'>&gt;</span>) {
+<span class='kw'>fn</span> <span class='ident'>additional_field_errors</span>(
+    <span class='ident'>typ</span>: <span class='ident'>FormFieldType</span>,
+    <span class='ident'>errors</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Vec</span><span class='op'>&lt;</span>(<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;</span>, <span class='ident'>String</span>)<span class='op'>&gt;</span>,
+    <span class='ident'>fields</span>: <span class='kw-2'>&amp;</span>[(<span class='kw-2'>&amp;</span><span class='ident'>String</span>, <span class='ident'>FormFieldType</span>, <span class='kw-2'>&amp;</span><span class='ident'>HttpFormDataField</span>)]
+) {
 
     <span class='kw'>let</span> <span class='ident'>fields</span> <span class='op'>=</span> <span class='ident'>fields</span>.<span class='ident'>iter</span>().<span class='ident'>filter</span>(<span class='op'>|</span><span class='ident'>v</span><span class='op'>|</span> <span class='ident'>v</span>.<span class='number'>1</span> <span class='op'>==</span> <span class='ident'>typ</span>).<span class='ident'>collect</span>::<span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span>(<span class='kw-2'>&amp;</span><span class='ident'>String</span>, <span class='ident'>FormFieldType</span>, <span class='kw-2'>&amp;</span><span class='ident'>HttpFormDataField</span>)<span class='op'>&gt;&gt;</span>();
     <span class='kw'>if</span> <span class='op'>!</span><span class='ident'>fields</span>.<span class='ident'>is_empty</span>() {
@@ -886,16 +915,20 @@
 
 }
 
-<span class='kw'>fn</span> <span class='ident'>map_form_fields</span>(<span class='ident'>fields</span>: <span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>HttpFormDataField</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span>(<span class='kw-2'>&amp;</span><span class='ident'>String</span>, <span class='ident'>FormFieldType</span>, <span class='kw-2'>&amp;</span><span class='ident'>HttpFormDataField</span>)<span class='op'>&gt;</span> {
+<span class='kw'>fn</span> <span class='ident'>map_form_fields</span>(
+    <span class='ident'>fields</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>HttpFormDataField</span>]
+
+) <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span>(<span class='kw-2'>&amp;</span><span class='ident'>String</span>, <span class='ident'>FormFieldType</span>, <span class='kw-2'>&amp;</span><span class='ident'>HttpFormDataField</span>)<span class='op'>&gt;</span> {
     <span class='ident'>fields</span>.<span class='ident'>iter</span>().<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>field</span><span class='op'>|</span> {
-        <span class='kw'>match</span> <span class='ident'>field</span> {
-            <span class='kw-2'>&amp;</span><span class='ident'>HttpFormDataField</span>::<span class='ident'>Field</span>(<span class='kw-2'>ref</span> <span class='ident'>name</span>, _) <span class='op'>=&gt;</span> {
+        <span class='kw'>match</span> <span class='op'>*</span><span class='ident'>field</span> {
+            <span class='ident'>HttpFormDataField</span>::<span class='ident'>Field</span>(<span class='kw-2'>ref</span> <span class='ident'>name</span>, _) <span class='op'>=&gt;</span> {
                 (<span class='ident'>name</span>, <span class='ident'>FormFieldType</span>::<span class='ident'>Field</span>, <span class='ident'>field</span>)
             },
-            <span class='kw-2'>&amp;</span><span class='ident'>HttpFormDataField</span>::<span class='ident'>Array</span>(<span class='kw-2'>ref</span> <span class='ident'>name</span>, _) <span class='op'>=&gt;</span> {
+            <span class='ident'>HttpFormDataField</span>::<span class='ident'>Array</span>(<span class='kw-2'>ref</span> <span class='ident'>name</span>, _) <span class='op'>=&gt;</span> {
                 (<span class='ident'>name</span>, <span class='ident'>FormFieldType</span>::<span class='ident'>Array</span>, <span class='ident'>field</span>)
             },
-            <span class='kw-2'>&amp;</span><span class='ident'>HttpFormDataField</span>::<span class='ident'>FileVec</span>(<span class='kw-2'>ref</span> <span class='ident'>name</span>, _, _, _) <span class='op'>|</span> <span class='kw-2'>&amp;</span><span class='ident'>HttpFormDataField</span>::<span class='ident'>FileFs</span>(<span class='kw-2'>ref</span> <span class='ident'>name</span>, _, _, _) <span class='op'>=&gt;</span> {
+            <span class='ident'>HttpFormDataField</span>::<span class='ident'>FileVec</span>(<span class='kw-2'>ref</span> <span class='ident'>name</span>, _, _, _) <span class='op'>|</span>
+            <span class='ident'>HttpFormDataField</span>::<span class='ident'>FileFs</span>(<span class='kw-2'>ref</span> <span class='ident'>name</span>, _, _, _) <span class='op'>=&gt;</span> {
                 (<span class='ident'>name</span>, <span class='ident'>FormFieldType</span>::<span class='ident'>File</span>, <span class='ident'>field</span>)
             }
         }
@@ -958,11 +991,20 @@
         <span class='ident'>text</span>.<span class='ident'>replace</span>(<span class='string'>&quot;[0m&quot;</span>, <span class='string'>&quot;&quot;</span>)
     }
 
-    <span class='kw'>fn</span> <span class='ident'>cmp</span>(<span class='ident'>expected</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>HttpFormDataField</span><span class='op'>&gt;</span>, <span class='ident'>actual</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>HttpFormDataField</span><span class='op'>&gt;</span>, <span class='ident'>errors</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span>(<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='ident'>str</span><span class='op'>&gt;</span>, <span class='kw-2'>&amp;</span><span class='ident'>str</span>)<span class='op'>&gt;</span>) {
+    <span class='kw'>fn</span> <span class='ident'>cmp</span>(
+        <span class='ident'>expected</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>HttpFormDataField</span><span class='op'>&gt;</span>,
+        <span class='ident'>actual</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>HttpFormDataField</span><span class='op'>&gt;</span>,
+        <span class='ident'>errors</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span>(<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='ident'>str</span><span class='op'>&gt;</span>, <span class='kw-2'>&amp;</span><span class='ident'>str</span>)<span class='op'>&gt;</span>
+    ) {
         <span class='ident'>cmp_base</span>(<span class='ident'>expected</span>, <span class='ident'>actual</span>, <span class='ident'>errors</span>, <span class='boolvalue'>false</span>);
     }
 
-    <span class='kw'>fn</span> <span class='ident'>cmp_base</span>(<span class='ident'>expected</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>HttpFormDataField</span><span class='op'>&gt;</span>, <span class='ident'>actual</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>HttpFormDataField</span><span class='op'>&gt;</span>, <span class='ident'>errors</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span>(<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='ident'>str</span><span class='op'>&gt;</span>, <span class='kw-2'>&amp;</span><span class='ident'>str</span>)<span class='op'>&gt;</span>, <span class='ident'>add</span>: <span class='ident'>bool</span>) {
+    <span class='kw'>fn</span> <span class='ident'>cmp_base</span>(
+        <span class='ident'>expected</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>HttpFormDataField</span><span class='op'>&gt;</span>,
+        <span class='ident'>actual</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>HttpFormDataField</span><span class='op'>&gt;</span>,
+        <span class='ident'>errors</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span>(<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='ident'>str</span><span class='op'>&gt;</span>, <span class='kw-2'>&amp;</span><span class='ident'>str</span>)<span class='op'>&gt;</span>,
+        <span class='ident'>add</span>: <span class='ident'>bool</span>
+    ) {
         <span class='kw'>match</span> <span class='ident'>compare</span>(<span class='kw-2'>&amp;</span><span class='ident'>expected</span>, <span class='kw-2'>&amp;</span><span class='ident'>actual</span>, <span class='ident'>add</span>) {
             <span class='prelude-val'>Ok</span>(()) <span class='op'>=&gt;</span> {
                 <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>errors</span>.<span class='ident'>is_empty</span>());
@@ -1126,7 +1168,7 @@
             )
 
         }, <span class='macro'>vec</span><span class='macro'>!</span>[
-            (<span class='macro'>vec</span><span class='macro'>!</span>[<span class='string'>&quot;.&lt;bb&gt;file&quot;</span>], <span class='string'>&quot;&lt;bg&gt;Mimetype (&lt;br&gt;text/html) &lt;by&gt;does not match expected value (&lt;bg&gt;text/plain)&quot;</span>)
+            (<span class='macro'>vec</span><span class='macro'>!</span>[<span class='string'>&quot;.&lt;bb&gt;file&quot;</span>], <span class='string'>&quot;&lt;bg&gt;MIME type (&lt;br&gt;text/html) &lt;by&gt;does not match expected value (&lt;bg&gt;text/plain)&quot;</span>)
         ]);
 
     }

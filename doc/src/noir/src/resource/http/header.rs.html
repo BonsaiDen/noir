@@ -164,6 +164,21 @@
 <span id="120">120</span>
 <span id="121">121</span>
 <span id="122">122</span>
+<span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
+<span id="126">126</span>
+<span id="127">127</span>
+<span id="128">128</span>
+<span id="129">129</span>
+<span id="130">130</span>
+<span id="131">131</span>
+<span id="132">132</span>
+<span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
 </pre><pre class='rust '>
 <span class='comment'>// Copyright (c) 2016 Ivo Wetzel</span>
 
@@ -183,6 +198,7 @@
 
 
 <span class='comment'>// Internal Dependencies ------------------------------------------------------</span>
+<span class='kw'>use</span> <span class='ident'>util</span>;
 <span class='kw'>use</span> <span class='kw'>super</span>::<span class='ident'>HttpLike</span>;
 
 
@@ -190,6 +206,11 @@
 <span class='doccomment'>///</span>
 <span class='doccomment'>/// Used by the `headers![...]` macro to easily create a vector containing</span>
 <span class='doccomment'>/// different types that implement the `hyper::Header` trait.</span>
+<span class='doccomment'>///</span>
+<span class='doccomment'>/// # Test Failure Examples</span>
+<span class='doccomment'>///</span>
+<span class='doccomment'>/// [expanded](terminal://headers_expected_mismatch)</span>
+<span class='doccomment'>/// [expanded](terminal://headers_unexpected_mismatch)</span>
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>HttpHeader</span> {
     <span class='ident'>name</span>: <span class='ident'>String</span>,
     <span class='ident'>value</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>
@@ -238,17 +259,26 @@
         <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>expected_value</span>) <span class='op'>=</span> <span class='ident'>result</span>.<span class='ident'>headers</span>().<span class='ident'>get_raw</span>(<span class='ident'>header</span>.<span class='ident'>name</span>()) {
             <span class='kw'>let</span> <span class='ident'>actual_value</span> <span class='op'>=</span> <span class='ident'>header</span>.<span class='ident'>value_string</span>();
             <span class='kw'>if</span> <span class='ident'>expected_value</span>[<span class='number'>0</span>].<span class='ident'>as_slice</span>() <span class='op'>!=</span> <span class='ident'>actual_value</span>.<span class='ident'>as_bytes</span>() {
-                <span class='kw'>let</span> <span class='ident'>expected_value</span> <span class='op'>=</span> <span class='ident'>String</span>::<span class='ident'>from_utf8</span>(<span class='ident'>expected_value</span>[<span class='number'>0</span>].<span class='ident'>clone</span>()).<span class='ident'>unwrap</span>();
+
+                <span class='kw'>let</span> <span class='ident'>expected</span> <span class='op'>=</span> <span class='ident'>String</span>::<span class='ident'>from_utf8</span>(<span class='ident'>expected_value</span>[<span class='number'>0</span>].<span class='ident'>clone</span>()).<span class='ident'>unwrap</span>();
+                <span class='kw'>let</span> (<span class='ident'>expected</span>, <span class='ident'>actual</span>, <span class='ident'>diff</span>) <span class='op'>=</span> <span class='ident'>util</span>::<span class='ident'>diff</span>::<span class='ident'>text</span>(
+                    <span class='ident'>expected</span>.<span class='ident'>as_str</span>(),
+                    <span class='ident'>actual_value</span>.<span class='ident'>as_str</span>()
+                );
+
                 <span class='ident'>errors</span>.<span class='ident'>push</span>(<span class='macro'>format</span><span class='macro'>!</span>(
-                    <span class='string'>&quot;{} {} \&quot;{}\&quot; {}\n\n        \&quot;{}\&quot;\n\n    {}\n\n        \&quot;{}\&quot;&quot;</span>,
+                    <span class='string'>&quot;{} {} \&quot;{}\&quot; {}\n\n        \&quot;{}\&quot;\n\n    {}\n\n        \&quot;{}\&quot;\n\n    {}\n\n        \&quot;{}\&quot;&quot;</span>,
                     <span class='ident'>context</span>.<span class='ident'>yellow</span>(),
                     <span class='string'>&quot;header&quot;</span>.<span class='ident'>yellow</span>(),
                     <span class='ident'>header</span>.<span class='ident'>name</span>().<span class='ident'>blue</span>().<span class='ident'>bold</span>(),
                     <span class='string'>&quot;does not match, expected:&quot;</span>.<span class='ident'>yellow</span>(),
-                    <span class='ident'>actual_value</span>.<span class='ident'>green</span>().<span class='ident'>bold</span>(),
+                    <span class='ident'>actual</span>.<span class='ident'>green</span>().<span class='ident'>bold</span>(),
                     <span class='string'>&quot;but got:&quot;</span>.<span class='ident'>yellow</span>(),
-                    <span class='ident'>expected_value</span>.<span class='ident'>red</span>().<span class='ident'>bold</span>()
+                    <span class='ident'>expected</span>.<span class='ident'>red</span>().<span class='ident'>bold</span>(),
+                    <span class='string'>&quot;difference:&quot;</span>.<span class='ident'>yellow</span>(),
+                    <span class='ident'>diff</span>
                 ));
+
             }
 
         } <span class='kw'>else</span> {

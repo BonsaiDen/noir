@@ -47,7 +47,7 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-1035' class='srclink' href='../src/noir/src/resource/http/endpoint.rs.html#41-138' title='goto source code'>[src]</a></span></h1>
+               </span><a id='src-1051' class='srclink' href='../src/noir/src/resource/http/endpoint.rs.html#41-138' title='goto source code'>[src]</a></span></h1>
 <pre class='rust trait'>pub trait HttpEndpoint: <a class='trait' href='https://doc.rust-lang.org/nightly/core/marker/trait.Send.html' title='core::marker::Send'>Send</a> + <a class='trait' href='https://doc.rust-lang.org/nightly/core/marker/trait.Copy.html' title='core::marker::Copy'>Copy</a> {
     fn <a href='#tymethod.hostname' class='fnname'>hostname</a>(&amp;self) -&gt; &amp;'static <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>;
     fn <a href='#tymethod.port' class='fnname'>port</a>(&amp;self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u16.html'>u16</a>;
@@ -120,7 +120,7 @@ which matches the specified path.</p>
 </div><h3 id='method.patch' class='method stab '><code>fn <a href='#method.patch' class='fnname'>patch</a>(&amp;self, path: &amp;'static <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) -&gt; <a class='struct' href='../noir/struct.HttpResponse.html' title='noir::HttpResponse'>HttpResponse</a>&lt;Self&gt;</code></h3><div class='docblock'><p>Return a response to the next <code>PATCH</code> request made against the endpoint
 which matches the specified path.</p>
 </div><h3 id='method.ext' class='method stab '><code>fn <a href='#method.ext' class='fnname'>ext</a>(&amp;self, http_verb: &amp;'static <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>, path: &amp;'static <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) -&gt; <a class='struct' href='../noir/struct.HttpResponse.html' title='noir::HttpResponse'>HttpResponse</a>&lt;Self&gt;</code></h3><div class='docblock'><p>Return a response to the next request made against the endpoint
-which matches the specified path and http verb extension.</p>
+which matches the specified path and HTTP verb extension.</p>
 </div></div>
         <h2 id='implementors'>Implementors</h2>
         <ul class='item-list' id='implementors-list'>

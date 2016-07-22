@@ -655,6 +655,56 @@
 <span id="611">611</span>
 <span id="612">612</span>
 <span id="613">613</span>
+<span id="614">614</span>
+<span id="615">615</span>
+<span id="616">616</span>
+<span id="617">617</span>
+<span id="618">618</span>
+<span id="619">619</span>
+<span id="620">620</span>
+<span id="621">621</span>
+<span id="622">622</span>
+<span id="623">623</span>
+<span id="624">624</span>
+<span id="625">625</span>
+<span id="626">626</span>
+<span id="627">627</span>
+<span id="628">628</span>
+<span id="629">629</span>
+<span id="630">630</span>
+<span id="631">631</span>
+<span id="632">632</span>
+<span id="633">633</span>
+<span id="634">634</span>
+<span id="635">635</span>
+<span id="636">636</span>
+<span id="637">637</span>
+<span id="638">638</span>
+<span id="639">639</span>
+<span id="640">640</span>
+<span id="641">641</span>
+<span id="642">642</span>
+<span id="643">643</span>
+<span id="644">644</span>
+<span id="645">645</span>
+<span id="646">646</span>
+<span id="647">647</span>
+<span id="648">648</span>
+<span id="649">649</span>
+<span id="650">650</span>
+<span id="651">651</span>
+<span id="652">652</span>
+<span id="653">653</span>
+<span id="654">654</span>
+<span id="655">655</span>
+<span id="656">656</span>
+<span id="657">657</span>
+<span id="658">658</span>
+<span id="659">659</span>
+<span id="660">660</span>
+<span id="661">661</span>
+<span id="662">662</span>
+<span id="663">663</span>
 </pre><pre class='rust '>
 <span class='comment'>// Copyright (c) 2016 Ivo Wetzel</span>
 
@@ -665,7 +715,6 @@
 <span class='comment'>// except according to those terms.</span>
 
 <span class='comment'>// STD Dependencies -----------------------------------------------------------</span>
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>time</span>::<span class='ident'>Duration</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>sync</span>::{<span class='ident'>Arc</span>, <span class='ident'>Mutex</span>};
 
 
@@ -809,7 +858,7 @@
     <span class='doccomment'>/// Also sets the `Content-Type` header of the request based on the type</span>
     <span class='doccomment'>/// of the `body` argument.</span>
     <span class='doccomment'>///</span>
-    <span class='doccomment'>/// The set `Content-Type` can be overriden via `HttpRequest::with_header`.</span>
+    <span class='doccomment'>/// The set `Content-Type` can be overridden via `HttpRequest::with_header`.</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>with_body</span><span class='op'>&lt;</span><span class='ident'>S</span>: <span class='ident'>Into</span><span class='op'>&lt;</span><span class='ident'>HttpBody</span><span class='op'>&gt;&gt;</span>(<span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>body</span>: <span class='ident'>S</span>) <span class='op'>-&gt;</span> <span class='self'>Self</span> {
         <span class='self'>self</span>.<span class='ident'>request_body</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>body</span>.<span class='ident'>into</span>());
         <span class='self'>self</span>
@@ -828,6 +877,10 @@
     <span class='doccomment'>/// ### Test Failure</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// If the actual response status does not match the expected one.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// ### Test Failure Examples</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// [expanded](terminal://headers_expected)</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>expected_status</span>(<span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>status_code</span>: <span class='ident'>StatusCode</span>) <span class='op'>-&gt;</span> <span class='self'>Self</span> {
         <span class='self'>self</span>.<span class='ident'>expected_status</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>status_code</span>);
         <span class='self'>self</span>
@@ -849,6 +902,10 @@
     <span class='doccomment'>/// ### Test Failure</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// If the header is present on the response.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// ### Test Failure Examples</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// [expanded](terminal://headers_unexpected)</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>unexpected_header</span><span class='op'>&lt;</span><span class='ident'>H</span>: <span class='ident'>Header</span> <span class='op'>+</span> <span class='ident'>HeaderFormat</span><span class='op'>&gt;</span>(<span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='self'>Self</span> {
         <span class='self'>self</span>.<span class='ident'>unexpected_headers</span>.<span class='ident'>push</span>(<span class='op'>&lt;</span><span class='ident'>H</span><span class='op'>&gt;</span>::<span class='ident'>header_name</span>().<span class='ident'>to_string</span>());
         <span class='self'>self</span>
@@ -874,12 +931,12 @@
     <span class='doccomment'>/// Sets the expected response body for the request.</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// The expected and the actual body are compared based on the MIME type</span>
-    <span class='doccomment'>/// of the reponse.</span>
+    <span class='doccomment'>/// of the response.</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// ##### text/*</span>
     <span class='doccomment'>///</span>
-    <span class='doccomment'>/// These Compared as strings, if no other charset is set in the response</span>
-    <span class='doccomment'>/// MIME type, UTF-8 will be used as the default encoding.</span>
+    <span class='doccomment'>/// These Compared as strings, if no other character encoding is set in the</span>
+    <span class='doccomment'>/// response&#39;s MIME type, UTF-8 will be used as the default.</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// ##### application/json</span>
     <span class='doccomment'>///</span>
@@ -896,6 +953,12 @@
     <span class='doccomment'>/// ### Test Failure</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// If the actual response body does not match the expected one.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// ### Test Failure Examples</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// [expanded](terminal://body_expected_raw_mismatch)</span>
+    <span class='doccomment'>/// [collapsed](terminal://body_text_mismatch_diff_added)</span>
+    <span class='doccomment'>/// [collapsed](terminal://body_with_expected_json_mismatch)</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>expected_body</span><span class='op'>&lt;</span><span class='ident'>S</span>: <span class='ident'>Into</span><span class='op'>&lt;</span><span class='ident'>HttpBody</span><span class='op'>&gt;&gt;</span>(<span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>body</span>: <span class='ident'>S</span>) <span class='op'>-&gt;</span> <span class='self'>Self</span> {
         <span class='self'>self</span>.<span class='ident'>expected_body</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>body</span>.<span class='ident'>into</span>());
         <span class='self'>self</span>.<span class='ident'>expected_exact_body</span> <span class='op'>=</span> <span class='boolvalue'>false</span>;
@@ -905,7 +968,7 @@
     <span class='doccomment'>/// Sets the expected response body for the request (exact version).</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// This method is based on `HttpRequest::expected_body()` but performs</span>
-    <span class='doccomment'>/// additional comparison based on the mime type of the reponse:</span>
+    <span class='doccomment'>/// additional comparison based on the mime type of the response:</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// ##### application/json</span>
     <span class='doccomment'>///</span>
@@ -945,6 +1008,12 @@
     <span class='doccomment'>/// ### Test Failure</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// Always.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// ### Test Failure Examples</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// [expanded](terminal://dump_response_with_raw_body)</span>
+    <span class='doccomment'>/// [collapsed](terminal://dump_response_with_text_body)</span>
+    <span class='doccomment'>/// [collapsed](terminal://dump_response_with_json_body)</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>dump</span>(<span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='self'>Self</span> {
         <span class='self'>self</span>.<span class='ident'>dump_response</span> <span class='op'>=</span> <span class='boolvalue'>true</span>;
         <span class='self'>self</span>
@@ -976,27 +1045,27 @@
         <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>api_timed_out</span> {
             <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='macro'>format</span><span class='macro'>!</span>(
                 <span class='string'>&quot;\n{} {} \&quot;{}\&quot; {} {}{}\n\n&quot;</span>,
-                <span class='string'>&quot;Noir Api Failure:&quot;</span>.<span class='ident'>red</span>().<span class='ident'>bold</span>(),
+                <span class='string'>&quot;API Failure:&quot;</span>.<span class='ident'>red</span>().<span class='ident'>bold</span>(),
                 <span class='string'>&quot;Server for&quot;</span>.<span class='ident'>yellow</span>(),
-                <span class='self'>self</span>.<span class='ident'>api</span>.<span class='ident'>url</span>().<span class='ident'>as_str</span>().<span class='ident'>cyan</span>().<span class='ident'>bold</span>(),
+                <span class='self'>self</span>.<span class='ident'>api</span>.<span class='ident'>url</span>().<span class='ident'>as_str</span>().<span class='ident'>cyan</span>(),
                 <span class='string'>&quot;did not respond within&quot;</span>.<span class='ident'>yellow</span>(),
-                <span class='string'>&quot;1000ms&quot;</span>.<span class='ident'>cyan</span>(),
+                <span class='string'>&quot;1000ms&quot;</span>.<span class='ident'>green</span>().<span class='ident'>bold</span>(),
                 <span class='string'>&quot;.&quot;</span>.<span class='ident'>yellow</span>()
             ));
         }
 
         <span class='comment'>// Limit ourselves to one test at a time in order to ensure correct</span>
         <span class='comment'>// handling of mocked requests and responses</span>
-        <span class='kw'>let</span> (<span class='ident'>errors</span>, <span class='ident'>error_count</span>) <span class='op'>=</span> <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Ok</span>(_) <span class='op'>=</span> <span class='ident'>REQUEST_LOCK</span>.<span class='ident'>lock</span>() {
+        <span class='kw'>let</span> (<span class='ident'>errors</span>, <span class='ident'>error_count</span>, <span class='ident'>suppressed_count</span>) <span class='op'>=</span> <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Ok</span>(_) <span class='op'>=</span> <span class='ident'>REQUEST_LOCK</span>.<span class='ident'>lock</span>() {
             <span class='self'>self</span>.<span class='ident'>request</span>()
 
         } <span class='kw'>else</span> {
             (<span class='macro'>vec</span><span class='macro'>!</span>[<span class='macro'>format</span><span class='macro'>!</span>(
                 <span class='string'>&quot;{} {}&quot;</span>,
-                <span class='string'>&quot;Internal Noir Error:&quot;</span>.<span class='ident'>red</span>().<span class='ident'>bold</span>(),
+                <span class='string'>&quot;Internal Error:&quot;</span>.<span class='ident'>red</span>().<span class='ident'>bold</span>(),
                 <span class='string'>&quot;Request lock failed.&quot;</span>.<span class='ident'>yellow</span>()
 
-            )], <span class='number'>1</span>)
+            )], <span class='number'>1</span>, <span class='number'>0</span>)
         };
 
         <span class='kw'>if</span> <span class='op'>!</span><span class='ident'>errors</span>.<span class='ident'>is_empty</span>() {
@@ -1007,10 +1076,10 @@
             <span class='ident'>report</span>.<span class='ident'>push_str</span>(<span class='macro'>format</span><span class='macro'>!</span>(
                 <span class='string'>&quot;\n{} {} {} \&quot;{}{}\&quot; {} {} {}\n&quot;</span>,
                 <span class='string'>&quot;Response Failure:&quot;</span>.<span class='ident'>red</span>().<span class='ident'>bold</span>(),
-                <span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;{}&quot;</span>, <span class='self'>self</span>.<span class='ident'>method</span>).<span class='ident'>cyan</span>().<span class='ident'>bold</span>(),
+                <span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;{}&quot;</span>, <span class='self'>self</span>.<span class='ident'>method</span>).<span class='ident'>cyan</span>(),
                 <span class='string'>&quot;request to&quot;</span>.<span class='ident'>yellow</span>(),
-                <span class='self'>self</span>.<span class='ident'>api</span>.<span class='ident'>url</span>().<span class='ident'>cyan</span>().<span class='ident'>bold</span>(),
-                <span class='self'>self</span>.<span class='ident'>path</span>.<span class='ident'>cyan</span>().<span class='ident'>bold</span>(),
+                <span class='self'>self</span>.<span class='ident'>api</span>.<span class='ident'>url</span>().<span class='ident'>cyan</span>(),
+                <span class='self'>self</span>.<span class='ident'>path</span>.<span class='ident'>cyan</span>(),
                 <span class='string'>&quot;returned&quot;</span>.<span class='ident'>yellow</span>(),
                 <span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;{}&quot;</span>, <span class='ident'>error_count</span>).<span class='ident'>red</span>().<span class='ident'>bold</span>(),
                 <span class='string'>&quot;error(s)&quot;</span>.<span class='ident'>yellow</span>()
@@ -1020,8 +1089,20 @@
             <span class='comment'>// Response and Request Errors</span>
             <span class='kw'>for</span> (<span class='ident'>index</span>, <span class='ident'>e</span>) <span class='kw'>in</span> <span class='ident'>errors</span>.<span class='ident'>iter</span>().<span class='ident'>enumerate</span>() {
                 <span class='ident'>report</span>.<span class='ident'>push_str</span>(<span class='macro'>format</span><span class='macro'>!</span>(
-                    <span class='string'>&quot;\n{} {}\n&quot;</span>, <span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;{:2})&quot;</span>, <span class='ident'>index</span> <span class='op'>+</span> <span class='number'>1</span>).<span class='ident'>red</span>().<span class='ident'>bold</span>(),
+                    <span class='string'>&quot;\n{} {}\n&quot;</span>, <span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;{:2})&quot;</span>, <span class='ident'>index</span> <span class='op'>+</span> <span class='number'>1</span>).<span class='ident'>blue</span>().<span class='ident'>bold</span>(),
                     <span class='ident'>e</span>
+
+                ).<span class='ident'>as_str</span>());
+            }
+
+            <span class='comment'>// Suppressed error information</span>
+            <span class='kw'>if</span> <span class='ident'>suppressed_count</span> <span class='op'>!=</span> <span class='number'>0</span> {
+                <span class='ident'>report</span>.<span class='ident'>push_str</span>(<span class='macro'>format</span><span class='macro'>!</span>(
+                    <span class='string'>&quot;\n{} {} {} {}\n&quot;</span>,
+                    <span class='string'>&quot;Note:&quot;</span>.<span class='ident'>green</span>().<span class='ident'>bold</span>(),
+                    <span class='string'>&quot;Suppressed&quot;</span>.<span class='ident'>black</span>().<span class='ident'>bold</span>(),
+                    <span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;{}&quot;</span>, <span class='ident'>suppressed_count</span>).<span class='ident'>blue</span>().<span class='ident'>bold</span>(),
+                    <span class='string'>&quot;request error(s) that may have resulted from failed response expectations.&quot;</span>.<span class='ident'>black</span>().<span class='ident'>bold</span>()
 
                 ).<span class='ident'>as_str</span>());
             }
@@ -1037,7 +1118,7 @@
 
     }
 
-    <span class='kw'>fn</span> <span class='ident'>request</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> (<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;</span>, <span class='ident'>usize</span>) {
+    <span class='kw'>fn</span> <span class='ident'>request</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> (<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;</span>, <span class='ident'>usize</span>, <span class='ident'>usize</span>) {
 
         <span class='comment'>// Convert body into Mime and Vec&lt;u8&gt;</span>
         <span class='kw'>let</span> (<span class='ident'>content_mime</span>, <span class='ident'>body</span>) <span class='op'>=</span> <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>body</span>) <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>request_body</span>.<span class='ident'>take</span>() {
@@ -1049,7 +1130,7 @@
 
         <span class='comment'>// Set Content-Type based on body data if:</span>
         <span class='comment'>// A. The body has a Mime</span>
-        <span class='comment'>// B. No other ContentType has been set on the request</span>
+        <span class='comment'>// B. No other Content-Type has been set on the request</span>
         <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>content_mime</span>) <span class='op'>=</span> <span class='ident'>content_mime</span> {
             <span class='kw'>if</span> <span class='op'>!</span><span class='self'>self</span>.<span class='ident'>request_headers</span>.<span class='ident'>has</span>::<span class='op'>&lt;</span><span class='ident'>ContentType</span><span class='op'>&gt;</span>() {
                 <span class='self'>self</span>.<span class='ident'>request_headers</span>.<span class='ident'>set</span>(<span class='ident'>ContentType</span>(<span class='ident'>content_mime</span>));
@@ -1058,8 +1139,8 @@
 
         <span class='comment'>// Create Client</span>
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>client</span> <span class='op'>=</span> <span class='ident'>Client</span>::<span class='ident'>new</span>();
-        <span class='ident'>client</span>.<span class='ident'>set_read_timeout</span>(<span class='prelude-val'>Some</span>(<span class='ident'>Duration</span>::<span class='ident'>from_millis</span>(<span class='number'>1000</span>)));
-        <span class='ident'>client</span>.<span class='ident'>set_write_timeout</span>(<span class='prelude-val'>Some</span>(<span class='ident'>Duration</span>::<span class='ident'>from_millis</span>(<span class='number'>1000</span>)));
+        <span class='ident'>client</span>.<span class='ident'>set_read_timeout</span>(<span class='prelude-val'>Some</span>(<span class='self'>self</span>.<span class='ident'>options</span>.<span class='ident'>api_request_timeout</span>));
+        <span class='ident'>client</span>.<span class='ident'>set_write_timeout</span>(<span class='prelude-val'>Some</span>(<span class='self'>self</span>.<span class='ident'>options</span>.<span class='ident'>api_request_timeout</span>));
 
         <span class='comment'>// Setup Request</span>
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>request</span> <span class='op'>=</span> <span class='ident'>client</span>.<span class='ident'>request</span>(
@@ -1070,7 +1151,7 @@
             <span class='self'>self</span>.<span class='ident'>request_headers</span>.<span class='ident'>clone</span>()
         );
 
-        <span class='comment'>// Set body, if presetn</span>
+        <span class='comment'>// Set body, if present</span>
         <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>body</span>) <span class='op'>=</span> <span class='ident'>body</span>.<span class='ident'>as_ref</span>() {
             <span class='ident'>request</span> <span class='op'>=</span> <span class='ident'>request</span>.<span class='ident'>body</span>(
                 <span class='kw-2'>&amp;</span><span class='ident'>body</span>[..]
@@ -1091,11 +1172,12 @@
             <span class='prelude-val'>Ok</span>(<span class='ident'>response</span>) <span class='op'>=&gt;</span> <span class='self'>self</span>.<span class='ident'>validate</span>(<span class='ident'>response</span>),
             <span class='prelude-val'>Err</span>(_) <span class='op'>=&gt;</span> (<span class='macro'>vec</span><span class='macro'>!</span>[<span class='macro'>format</span><span class='macro'>!</span>(
                 <span class='string'>&quot;{} {} {}{}&quot;</span>,
-                <span class='string'>&quot;Noir Api Failure:&quot;</span>.<span class='ident'>red</span>().<span class='ident'>bold</span>(),
+                <span class='string'>&quot;API Failure:&quot;</span>.<span class='ident'>red</span>().<span class='ident'>bold</span>(),
                 <span class='string'>&quot;No response within&quot;</span>.<span class='ident'>yellow</span>(),
-                <span class='string'>&quot;1000ms&quot;</span>.<span class='ident'>cyan</span>(),
+                <span class='string'>&quot;1000ms&quot;</span>.<span class='ident'>green</span>().<span class='ident'>bold</span>(),
                 <span class='string'>&quot;.&quot;</span>.<span class='ident'>yellow</span>()
-            )], <span class='number'>1</span>)
+
+            )], <span class='number'>1</span>, <span class='number'>0</span>)
         };
 
         <span class='kw'>for</span> <span class='ident'>mock</span> <span class='kw'>in</span> <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>.<span class='ident'>provided_mocks</span> {
@@ -1106,7 +1188,7 @@
 
     }
 
-    <span class='kw'>fn</span> <span class='ident'>validate</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='kw-2'>mut</span> <span class='ident'>response</span>: <span class='ident'>Response</span>) <span class='op'>-&gt;</span> (<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;</span>, <span class='ident'>usize</span>) {
+    <span class='kw'>fn</span> <span class='ident'>validate</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='kw-2'>mut</span> <span class='ident'>response</span>: <span class='ident'>Response</span>) <span class='op'>-&gt;</span> (<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;</span>, <span class='ident'>usize</span>, <span class='ident'>usize</span>) {
 
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>errors</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>new</span>();
         <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>dump_response</span> {
@@ -1130,8 +1212,12 @@
             <span class='self'>self</span>.<span class='ident'>expected_exact_body</span>
         ));
 
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>response_errors</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>new</span>();
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>error_count</span> <span class='op'>=</span> <span class='ident'>errors</span>.<span class='ident'>len</span>();
-        <span class='kw'>let</span> <span class='ident'>index_offset</span> <span class='op'>=</span> <span class='ident'>error_count</span>;
+        <span class='kw'>let</span> <span class='ident'>index_offset</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='self'>self</span>.<span class='ident'>options</span>.<span class='ident'>error_suppress_cascading</span> {
+            <span class='boolvalue'>true</span> <span class='op'>=&gt;</span> <span class='number'>0</span>,
+            <span class='boolvalue'>false</span> <span class='op'>=&gt;</span> <span class='ident'>error_count</span>
+        };
 
         <span class='kw'>for</span> (
             <span class='kw-2'>mut</span> <span class='ident'>response</span>,
@@ -1140,14 +1226,14 @@
 
         ) <span class='kw'>in</span> <span class='ident'>ResponseProvider</span>::<span class='ident'>provided_responses</span>() {
 
-            <span class='kw'>let</span> <span class='ident'>response_errors</span> <span class='op'>=</span> <span class='ident'>response</span>.<span class='ident'>validate</span>(<span class='ident'>response_index</span>, <span class='ident'>request_index</span>);
-            <span class='kw'>if</span> <span class='op'>!</span><span class='ident'>response_errors</span>.<span class='ident'>is_empty</span>() {
-                <span class='kw'>let</span> <span class='ident'>header</span> <span class='op'>=</span> <span class='ident'>response</span>.<span class='ident'>validate_header</span>(<span class='ident'>response_errors</span>.<span class='ident'>len</span>());
-                <span class='ident'>error_count</span> <span class='op'>+=</span> <span class='ident'>response_errors</span>.<span class='ident'>len</span>();
-                <span class='ident'>errors</span>.<span class='ident'>push</span>(<span class='ident'>format_response_errors</span>(
+            <span class='kw'>let</span> <span class='ident'>errors</span> <span class='op'>=</span> <span class='ident'>response</span>.<span class='ident'>validate</span>(<span class='ident'>response_index</span>, <span class='ident'>request_index</span>);
+            <span class='kw'>if</span> <span class='op'>!</span><span class='ident'>errors</span>.<span class='ident'>is_empty</span>() {
+                <span class='kw'>let</span> <span class='ident'>header</span> <span class='op'>=</span> <span class='ident'>response</span>.<span class='ident'>validate_header</span>(<span class='ident'>errors</span>.<span class='ident'>len</span>());
+                <span class='ident'>error_count</span> <span class='op'>+=</span> <span class='ident'>errors</span>.<span class='ident'>len</span>();
+                <span class='ident'>response_errors</span>.<span class='ident'>push</span>(<span class='ident'>format_response_errors</span>(
                     <span class='ident'>header</span>,
                     <span class='ident'>index_offset</span> <span class='op'>+</span> <span class='ident'>response_index</span> <span class='op'>+</span> <span class='number'>1</span>,
-                    <span class='ident'>response_errors</span>
+                    <span class='ident'>errors</span>
                 ));
             }
 
@@ -1155,14 +1241,28 @@
 
         <span class='kw'>for</span> <span class='kw-2'>mut</span> <span class='ident'>request</span> <span class='kw'>in</span> <span class='ident'>ResponseProvider</span>::<span class='ident'>additional_requests</span>() {
             <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>error</span>) <span class='op'>=</span> <span class='ident'>request</span>.<span class='ident'>validate</span>() {
-                <span class='ident'>errors</span>.<span class='ident'>push</span>(<span class='ident'>error</span>);
+                <span class='ident'>response_errors</span>.<span class='ident'>push</span>(<span class='ident'>error</span>);
                 <span class='ident'>error_count</span> <span class='op'>+=</span> <span class='number'>1</span>;
             }
         }
 
         <span class='ident'>ResponseProvider</span>::<span class='ident'>reset</span>();
 
-        (<span class='ident'>errors</span>, <span class='ident'>error_count</span>)
+        <span class='comment'>// Suppress cascading errors that may be the result from response errors</span>
+        <span class='kw'>if</span> <span class='op'>!</span><span class='ident'>response_errors</span>.<span class='ident'>is_empty</span>() <span class='op'>&amp;&amp;</span>
+            <span class='self'>self</span>.<span class='ident'>options</span>.<span class='ident'>error_suppress_cascading</span> {
+
+            <span class='comment'>// Remove the suppressed errors</span>
+            <span class='kw'>let</span> <span class='ident'>suppressed_count</span> <span class='op'>=</span> <span class='ident'>errors</span>.<span class='ident'>len</span>();
+            <span class='ident'>errors</span>.<span class='ident'>clear</span>();
+
+            <span class='ident'>errors</span>.<span class='ident'>append</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>response_errors</span>);
+            (<span class='ident'>errors</span>, <span class='ident'>error_count</span> <span class='op'>-</span> <span class='ident'>suppressed_count</span>, <span class='ident'>suppressed_count</span>)
+
+        } <span class='kw'>else</span> {
+            <span class='ident'>errors</span>.<span class='ident'>append</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>response_errors</span>);
+            (<span class='ident'>errors</span>, <span class='ident'>error_count</span>, <span class='number'>0</span>)
+        }
 
     }
 
@@ -1212,7 +1312,7 @@
                             <span class='ident'>offset</span>,
                             <span class='ident'>index</span> <span class='op'>+</span> <span class='number'>1</span>
 
-                        ).<span class='ident'>red</span>().<span class='ident'>bold</span>(),
+                        ).<span class='ident'>blue</span>().<span class='ident'>bold</span>(),
                         <span class='ident'>line</span>
                     )
 

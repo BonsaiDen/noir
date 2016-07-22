@@ -47,20 +47,29 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-311' class='srclink' href='../src/noir/src/api/options.rs.html#10-21' title='goto source code'>[src]</a></span></h1>
+               </span><a id='src-324' class='srclink' href='../src/noir/src/api/options.rs.html#15-35' title='goto source code'>[src]</a></span></h1>
 <pre class='rust struct'>pub struct Options {
     pub json_compare_depth: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>,
-}</pre><div class='docblock'><p>Additional configuration options for api requests and responses.</p>
+    pub api_request_timeout: <a class='struct' href='https://doc.rust-lang.org/nightly/std/time/duration/struct.Duration.html' title='std::time::duration::Duration'>Duration</a>,
+    pub error_suppress_cascading: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>,
+}</pre><div class='docblock'><p>Additional configuration options for API requests and responses.</p>
 </div><h2 class='fields'>Fields</h2>
 <table><tr class='stab '>
-                             <td id='structfield.json_compare_depth'><code>json_compare_depth</code></td><td><div class='docblock'><p>Maximum depth for recursive json comparison. Defaults to <code>4096</code>.</p>
+                             <td id='structfield.json_compare_depth'><code>json_compare_depth</code></td><td><div class='docblock'><p>Maximum depth for recursive JSON comparison. Defaults to <code>4096</code>.</p>
 
-<p>For top level json objects their own keys and the types of their values
+<p>For top level JSON objects their own keys and the types of their values
 will be at depth <code>0</code>, the actual values will then be at depth <code>1</code>.</p>
 
-<p>For top level json arrays, their length will be at depth <code>0</code> and their
+<p>For top level JSON arrays, their length will be at depth <code>0</code> and their
 items and their types and values will be at level <code>1</code>.</p>
-</div></td></tr></table><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/default/trait.Default.html' title='core::default::Default'>Default</a> for <a class='struct' href='../noir/struct.Options.html' title='noir::Options'>Options</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-313' class='srclink' href='../src/noir/src/api/options.rs.html#23-29' title='goto source code'>[src]</a></span></h3>
+</div></td></tr><tr class='stab '>
+                             <td id='structfield.api_request_timeout'><code>api_request_timeout</code></td><td><div class='docblock'><p>Maximum duration until a HTTP request to a <code>HttpApi</code> does time out.
+Defaults to <code>1000ms</code>.</p>
+</div></td></tr><tr class='stab '>
+                             <td id='structfield.error_suppress_cascading'><code>error_suppress_cascading</code></td><td><div class='docblock'><p>Whether to hide any further errors which result from expectations that
+are checked after the first missing or unexpected request to an
+external resource. Default to <code>true</code>.</p>
+</div></td></tr></table><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/default/trait.Default.html' title='core::default::Default'>Default</a> for <a class='struct' href='../noir/struct.Options.html' title='noir::Options'>Options</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-328' class='srclink' href='../src/noir/src/api/options.rs.html#37-45' title='goto source code'>[src]</a></span></h3>
 <div class='impl-items'><h4 id='method.default' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/default/trait.Default.html#tymethod.default' class='fnname'>default</a>() -&gt; <a class='struct' href='../noir/struct.Options.html' title='noir::Options'>Options</a></code></h4>
 <div class='docblock'><p>Returns the &quot;default value&quot; for a type. <a href="https://doc.rust-lang.org/nightly/core/default/trait.Default.html#tymethod.default">Read more</a></p>
 </div></div></section>

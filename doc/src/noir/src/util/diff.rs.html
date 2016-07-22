@@ -109,7 +109,7 @@
             <span class='ident'>difference</span>::<span class='ident'>Difference</span>::<span class='ident'>Add</span>(<span class='ident'>s</span>) <span class='op'>=&gt;</span> <span class='ident'>s</span>.<span class='ident'>white</span>().<span class='ident'>on_green</span>().<span class='ident'>bold</span>().<span class='ident'>to_string</span>()
         }
 
-    }).<span class='ident'>filter</span>(<span class='op'>|</span><span class='ident'>s</span><span class='op'>|</span> <span class='ident'>s</span>.<span class='ident'>len</span>() <span class='op'>&gt;</span> <span class='number'>0</span>).<span class='ident'>collect</span>::<span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;&gt;</span>().<span class='ident'>join</span>(<span class='string'>&quot; &quot;</span>);
+    }).<span class='ident'>filter</span>(<span class='op'>|</span><span class='ident'>s</span><span class='op'>|</span> <span class='op'>!</span><span class='ident'>s</span>.<span class='ident'>is_empty</span>()).<span class='ident'>collect</span>::<span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;&gt;</span>().<span class='ident'>join</span>(<span class='string'>&quot; &quot;</span>);
 
     (<span class='ident'>expected</span>.<span class='ident'>to_string</span>(), <span class='ident'>actual</span>.<span class='ident'>to_string</span>(), <span class='ident'>diff</span>)
 

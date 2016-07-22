@@ -15,7 +15,317 @@
 
     
     
-</head>
+<style>.term-container {
+  background: #171717;
+  border-radius: 5px;
+  color: white;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  font-family: Mono, Monaco, courier;
+  font-size: 12px;
+  line-height: 20px;
+  padding: 14px 18px;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.expandable {
+  cursor: pointer;
+}
+
+.terminal-collapsed {
+  display: none;
+}
+
+.term-container img {
+  max-width: 100%;
+}
+
+.term-fg1 { } /* don't bold beccause it looks weird */
+.term-fg3 { font-style: italic; } /* italic */
+.term-fg4 { text-decoration: underline; } /* underline */
+.term-fg9 { text-decoration: line-through; } /* crossed-out */
+
+.term-fg30 { color: #666; } /* black (but we can't use black, so a diff color) */
+.term-fg31 { color: #e10c02; } /* red */
+.term-fg32 { color: #99ff5e; } /* green */
+.term-fg33 { color: #c6c502; } /* yellow */
+.term-fg34 { color: #8db7e0; } /* blue */
+.term-fg35 { color: #f271fb; } /* magenta */
+.term-fg36 { color: #00cdd9; } /* cyan */
+
+/* high intense colors */
+.term-fgi1 { color: #5ef765; }
+.term-fgi90 { color: #838887; } /* grey */
+
+/* background colors */
+.term-bg42 { background: #99ff5f; }
+.term-bg40 { background: #676767; }
+
+/* custom foreground/background combos for readability */
+.term-fg31.term-bg40 { color: #F8A39F; }
+
+/* xterm colors */
+.term-fgx16 { color: #000000; }
+.term-fgx17 { color: #00005f; }
+.term-fgx18 { color: #000087; }
+.term-fgx19 { color: #0000af; }
+.term-fgx20 { color: #0000d7; }
+.term-fgx21 { color: #0000ff; }
+.term-fgx22 { color: #005f00; }
+.term-fgx23 { color: #005f5f; }
+.term-fgx24 { color: #005f87; }
+.term-fgx25 { color: #005faf; }
+.term-fgx26 { color: #005fd7; }
+.term-fgx27 { color: #005fff; }
+.term-fgx28 { color: #008700; }
+.term-fgx29 { color: #00875f; }
+.term-fgx30 { color: #008787; }
+.term-fgx31 { color: #0087af; }
+.term-fgx32 { color: #0087d7; }
+.term-fgx33 { color: #0087ff; }
+.term-fgx34 { color: #00af00; }
+.term-fgx35 { color: #00af5f; }
+.term-fgx36 { color: #00af87; }
+.term-fgx37 { color: #00afaf; }
+.term-fgx38 { color: #00afd7; }
+.term-fgx39 { color: #00afff; }
+.term-fgx40 { color: #00d700; }
+.term-fgx41 { color: #00d75f; }
+.term-fgx42 { color: #00d787; }
+.term-fgx43 { color: #00d7af; }
+.term-fgx44 { color: #00d7d7; }
+.term-fgx45 { color: #00d7ff; }
+.term-fgx46 { color: #00ff00; }
+.term-fgx47 { color: #00ff5f; }
+.term-fgx48 { color: #00ff87; }
+.term-fgx49 { color: #00ffaf; }
+.term-fgx50 { color: #00ffd7; }
+.term-fgx51 { color: #00ffff; }
+.term-fgx52 { color: #5f0000; }
+.term-fgx53 { color: #5f005f; }
+.term-fgx54 { color: #5f0087; }
+.term-fgx55 { color: #5f00af; }
+.term-fgx56 { color: #5f00d7; }
+.term-fgx57 { color: #5f00ff; }
+.term-fgx58 { color: #5f5f00; }
+.term-fgx59 { color: #5f5f5f; }
+.term-fgx60 { color: #5f5f87; }
+.term-fgx61 { color: #5f5faf; }
+.term-fgx62 { color: #5f5fd7; }
+.term-fgx63 { color: #5f5fff; }
+.term-fgx64 { color: #5f8700; }
+.term-fgx65 { color: #5f875f; }
+.term-fgx66 { color: #5f8787; }
+.term-fgx67 { color: #5f87af; }
+.term-fgx68 { color: #5f87d7; }
+.term-fgx69 { color: #5f87ff; }
+.term-fgx70 { color: #5faf00; }
+.term-fgx71 { color: #5faf5f; }
+.term-fgx72 { color: #5faf87; }
+.term-fgx73 { color: #5fafaf; }
+.term-fgx74 { color: #5fafd7; }
+.term-fgx75 { color: #5fafff; }
+.term-fgx76 { color: #5fd700; }
+.term-fgx77 { color: #5fd75f; }
+.term-fgx78 { color: #5fd787; }
+.term-fgx79 { color: #5fd7af; }
+.term-fgx80 { color: #5fd7d7; }
+.term-fgx81 { color: #5fd7ff; }
+.term-fgx82 { color: #5fff00; }
+.term-fgx83 { color: #5fff5f; }
+.term-fgx84 { color: #5fff87; }
+.term-fgx85 { color: #5fffaf; }
+.term-fgx86 { color: #5fffd7; }
+.term-fgx87 { color: #5fffff; }
+.term-fgx88 { color: #870000; }
+.term-fgx89 { color: #87005f; }
+.term-fgx90 { color: #870087; }
+.term-fgx91 { color: #8700af; }
+.term-fgx92 { color: #8700d7; }
+.term-fgx93 { color: #8700ff; }
+.term-fgx94 { color: #875f00; }
+.term-fgx95 { color: #875f5f; }
+.term-fgx96 { color: #875f87; }
+.term-fgx97 { color: #875faf; }
+.term-fgx98 { color: #875fd7; }
+.term-fgx99 { color: #875fff; }
+.term-fgx100 { color: #878700; }
+.term-fgx101 { color: #87875f; }
+.term-fgx102 { color: #878787; }
+.term-fgx103 { color: #8787af; }
+.term-fgx104 { color: #8787d7; }
+.term-fgx105 { color: #8787ff; }
+.term-fgx106 { color: #87af00; }
+.term-fgx107 { color: #87af5f; }
+.term-fgx108 { color: #87af87; }
+.term-fgx109 { color: #87afaf; }
+.term-fgx110 { color: #87afd7; }
+.term-fgx111 { color: #87afff; }
+.term-fgx112 { color: #87d700; }
+.term-fgx113 { color: #87d75f; }
+.term-fgx114 { color: #87d787; }
+.term-fgx115 { color: #87d7af; }
+.term-fgx116 { color: #87d7d7; }
+.term-fgx117 { color: #87d7ff; }
+.term-fgx118 { color: #87ff00; }
+.term-fgx119 { color: #87ff5f; }
+.term-fgx120 { color: #87ff87; }
+.term-fgx121 { color: #87ffaf; }
+.term-fgx122 { color: #87ffd7; }
+.term-fgx123 { color: #87ffff; }
+.term-fgx124 { color: #af0000; }
+.term-fgx125 { color: #af005f; }
+.term-fgx126 { color: #af0087; }
+.term-fgx127 { color: #af00af; }
+.term-fgx128 { color: #af00d7; }
+.term-fgx129 { color: #af00ff; }
+.term-fgx130 { color: #af5f00; }
+.term-fgx131 { color: #af5f5f; }
+.term-fgx132 { color: #af5f87; }
+.term-fgx133 { color: #af5faf; }
+.term-fgx134 { color: #af5fd7; }
+.term-fgx135 { color: #af5fff; }
+.term-fgx136 { color: #af8700; }
+.term-fgx137 { color: #af875f; }
+.term-fgx138 { color: #af8787; }
+.term-fgx139 { color: #af87af; }
+.term-fgx140 { color: #af87d7; }
+.term-fgx141 { color: #af87ff; }
+.term-fgx142 { color: #afaf00; }
+.term-fgx143 { color: #afaf5f; }
+.term-fgx144 { color: #afaf87; }
+.term-fgx145 { color: #afafaf; }
+.term-fgx146 { color: #afafd7; }
+.term-fgx147 { color: #afafff; }
+.term-fgx148 { color: #afd700; }
+.term-fgx149 { color: #afd75f; }
+.term-fgx150 { color: #afd787; }
+.term-fgx151 { color: #afd7af; }
+.term-fgx152 { color: #afd7d7; }
+.term-fgx153 { color: #afd7ff; }
+.term-fgx154 { color: #afff00; }
+.term-fgx155 { color: #afff5f; }
+.term-fgx156 { color: #afff87; }
+.term-fgx157 { color: #afffaf; }
+.term-fgx158 { color: #afffd7; }
+.term-fgx159 { color: #afffff; }
+.term-fgx160 { color: #d70000; }
+.term-fgx161 { color: #d7005f; }
+.term-fgx162 { color: #d70087; }
+.term-fgx163 { color: #d700af; }
+.term-fgx164 { color: #d700d7; }
+.term-fgx165 { color: #d700ff; }
+.term-fgx166 { color: #d75f00; }
+.term-fgx167 { color: #d75f5f; }
+.term-fgx168 { color: #d75f87; }
+.term-fgx169 { color: #d75faf; }
+.term-fgx170 { color: #d75fd7; }
+.term-fgx171 { color: #d75fff; }
+.term-fgx172 { color: #d78700; }
+.term-fgx173 { color: #d7875f; }
+.term-fgx174 { color: #d78787; }
+.term-fgx175 { color: #d787af; }
+.term-fgx176 { color: #d787d7; }
+.term-fgx177 { color: #d787ff; }
+.term-fgx178 { color: #d7af00; }
+.term-fgx179 { color: #d7af5f; }
+.term-fgx180 { color: #d7af87; }
+.term-fgx181 { color: #d7afaf; }
+.term-fgx182 { color: #d7afd7; }
+.term-fgx183 { color: #d7afff; }
+.term-fgx184 { color: #d7d700; }
+.term-fgx185 { color: #d7d75f; }
+.term-fgx186 { color: #d7d787; }
+.term-fgx187 { color: #d7d7af; }
+.term-fgx188 { color: #d7d7d7; }
+.term-fgx189 { color: #d7d7ff; }
+.term-fgx190 { color: #d7ff00; }
+.term-fgx191 { color: #d7ff5f; }
+.term-fgx192 { color: #d7ff87; }
+.term-fgx193 { color: #d7ffaf; }
+.term-fgx194 { color: #d7ffd7; }
+.term-fgx195 { color: #d7ffff; }
+.term-fgx196 { color: #ff0000; }
+.term-fgx197 { color: #ff005f; }
+.term-fgx198 { color: #ff0087; }
+.term-fgx199 { color: #ff00af; }
+.term-fgx200 { color: #ff00d7; }
+.term-fgx201 { color: #ff00ff; }
+.term-fgx202 { color: #ff5f00; }
+.term-fgx203 { color: #ff5f5f; }
+.term-fgx204 { color: #ff5f87; }
+.term-fgx205 { color: #ff5faf; }
+.term-fgx206 { color: #ff5fd7; }
+.term-fgx207 { color: #ff5fff; }
+.term-fgx208 { color: #ff8700; }
+.term-fgx209 { color: #ff875f; }
+.term-fgx210 { color: #ff8787; }
+.term-fgx211 { color: #ff87af; }
+.term-fgx212 { color: #ff87d7; }
+.term-fgx213 { color: #ff87ff; }
+.term-fgx214 { color: #ffaf00; }
+.term-fgx215 { color: #ffaf5f; }
+.term-fgx216 { color: #ffaf87; }
+.term-fgx217 { color: #ffafaf; }
+.term-fgx218 { color: #ffafd7; }
+.term-fgx219 { color: #ffafff; }
+.term-fgx220 { color: #ffd700; }
+.term-fgx221 { color: #ffd75f; }
+.term-fgx222 { color: #ffd787; }
+.term-fgx223 { color: #ffd7af; }
+.term-fgx224 { color: #ffd7d7; }
+.term-fgx225 { color: #ffd7ff; }
+.term-fgx226 { color: #ffff00; }
+.term-fgx227 { color: #ffff5f; }
+.term-fgx228 { color: #ffff87; }
+.term-fgx229 { color: #ffffaf; }
+.term-fgx230 { color: #ffffd7; }
+.term-fgx231 { color: #ffffff; }
+.term-fgx232 { color: #080808; }
+.term-fgx233 { color: #121212; }
+.term-fgx234 { color: #1c1c1c; }
+.term-fgx235 { color: #262626; }
+.term-fgx236 { color: #303030; }
+.term-fgx237 { color: #3a3a3a; }
+.term-fgx238 { color: #444444; }
+.term-fgx239 { color: #4e4e4e; }
+.term-fgx240 { color: #585858; }
+.term-fgx241 { color: #626262; }
+.term-fgx242 { color: #6c6c6c; }
+.term-fgx243 { color: #767676; }
+.term-fgx244 { color: #808080; }
+.term-fgx245 { color: #8a8a8a; }
+.term-fgx246 { color: #949494; }
+.term-fgx247 { color: #9e9e9e; }
+.term-fgx248 { color: #a8a8a8; }
+.term-fgx249 { color: #b2b2b2; }
+.term-fgx250 { color: #bcbcbc; }
+.term-fgx251 { color: #c6c6c6; }
+.term-fgx252 { color: #d0d0d0; }
+.term-fgx253 { color: #dadada; }
+.term-fgx254 { color: #e4e4e4; }
+.term-fgx255 { color: #eeeeee; }
+</style>
+        <script type="text/javascript">
+        function toggleTerminal(el) {
+
+            var code = $(el).parent().next();
+            if (code.hasClass('terminal-expanded')) {
+                el.innerText = 'Expand';
+                code.get(0).className = 'terminal-collapsed';
+
+            } else {
+                el.innerText = 'Collapse';
+                code.get(0).className = 'terminal-expanded';
+            }
+
+            window.event.preventDefault();
+            return false;
+
+        }
+        </script>
+        
 <body class="rustdoc">
     <!--[if lte IE 8]>
     <div class="warning">
@@ -47,11 +357,11 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-1168' class='srclink' href='../src/noir/src/resource/http/response.rs.html#31-51' title='goto source code'>[src]</a></span></h1>
+               </span><a id='src-1184' class='srclink' href='../src/noir/src/resource/http/response.rs.html#31-51' title='goto source code'>[src]</a></span></h1>
 <pre class='rust struct'>pub struct HttpResponse&lt;E: <a class='trait' href='../noir/trait.HttpEndpoint.html' title='noir::HttpEndpoint'>HttpEndpoint</a>&gt; {
     // some fields omitted
 }</pre><div class='docblock'><p>A mocked HTTP response that is being provided to a testable API.</p>
-</div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl&lt;E: <a class='trait' href='../noir/trait.HttpEndpoint.html' title='noir::HttpEndpoint'>HttpEndpoint</a>&gt; <a class='struct' href='../noir/struct.HttpResponse.html' title='noir::HttpResponse'>HttpResponse</a>&lt;E&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a id='src-1184' class='srclink' href='../src/noir/src/resource/http/response.rs.html#53-218' title='goto source code'>[src]</a></span></h3>
+</div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl&lt;E: <a class='trait' href='../noir/trait.HttpEndpoint.html' title='noir::HttpEndpoint'>HttpEndpoint</a>&gt; <a class='struct' href='../noir/struct.HttpResponse.html' title='noir::HttpResponse'>HttpResponse</a>&lt;E&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a id='src-1200' class='srclink' href='../src/noir/src/resource/http/response.rs.html#53-231' title='goto source code'>[src]</a></span></h3>
 <div class='impl-items'><h4 id='method.with_status' class='method'><code>fn <a href='#method.with_status' class='fnname'>with_status</a>(self, status_code: <a class='enum' href='https://hyperium.github.io/hyper/hyper/status/enum.StatusCode.html' title='hyper::status::StatusCode'>StatusCode</a>) -&gt; Self</code></h4>
 <div class='docblock'><p>Sets the response status.</p>
 </div><h4 id='method.with_headers' class='method'><code>fn <a href='#method.with_headers' class='fnname'>with_headers</a>(self, headers: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='struct' href='../noir/struct.HttpHeader.html' title='noir::HttpHeader'>HttpHeader</a>&gt;) -&gt; Self</code></h4>
@@ -72,9 +382,9 @@ from the request&#39;s path.</p>
 <p>Also sets the <code>Content-Type</code> header of the response based on the type
 of the <code>body</code> argument.</p>
 
-<p>The set <code>Content-Type</code> can be overriden via <code>HttpResponse::with_header</code>.</p>
+<p>The set <code>Content-Type</code> can be overridden via <code>HttpResponse::with_header</code>.</p>
 </div><h4 id='method.with_error' class='method'><code>fn <a href='#method.with_error' class='fnname'>with_error</a>(self, error: <a class='struct' href='https://doc.rust-lang.org/nightly/std/io/error/struct.Error.html' title='std::io::error::Error'>Error</a>) -&gt; Self</code></h4>
-<div class='docblock'><p>Sets a low level io error to be returned once the response is read.</p>
+<div class='docblock'><p>Sets a low level IO error to be returned once the response is read.</p>
 </div><h4 id='method.with_options' class='method'><code>fn <a href='#method.with_options' class='fnname'>with_options</a>(self, options: <a class='struct' href='../noir/struct.Options.html' title='noir::Options'>Options</a>) -&gt; Self</code></h4>
 <div class='docblock'><p>Sets the response&#39;s configuration options.</p>
 
@@ -106,45 +416,210 @@ or their values differ from the expected ones.</p>
 <div class='docblock'><p>Sets the expected request body for the response.</p>
 
 <p>The expected and the actual body are compared based on the MIME type
-of the reponse.</p>
+of the request.</p>
 
 <h5 id='text' class='section-header'><a href='#text'>text/*</a></h5>
-<p>These Compared as strings, if no other charset is set in the response
-MIME type, UTF-8 will be used as the default encoding.</p>
+<p>These Compared as strings, if no other character encoding is set in the
+request&#39;s MIME type, UTF-8 will be used as the default.</p>
 
 <h5 id='applicationjson' class='section-header'><a href='#applicationjson'>application/json</a></h5>
-<p>JSON objects are deep compared, but <strong>additional keys on response objects
+<p>JSON objects are deep compared, but <strong>additional keys on request objects
 are ignored</strong>.</p>
 
 <p>This allows for simpler and more fine grained assertions against JSON
-responses.</p>
+requests.</p>
 
 <h5 id='all-other-mime-types' class='section-header'><a href='#all-other-mime-types'>All other mime types</a></h5>
 <p>These are compared on a byte by byte basis.</p>
 
 <h3 id='test-failure-3' class='section-header'><a href='#test-failure-3'>Test Failure</a></h3>
-<p>If the actual response body does not match the expected one.</p>
+<p>If the actual request body does not match the expected one.</p>
+
+<h3 id='test-failure-examples' class='section-header'><a href='#test-failure-examples'>Test Failure Examples</a></h3>
+<p><p>From <code>test_provided_response_with_expected_body_raw_mismatch</code> (<a class="expandable" onclick="toggleTerminal(this)">Collapse</a>)</p><div class="terminal-expanded"><div class="term-container"><span class="term-fg31 term-fg1">Response Failure:</span> <span class="term-fg36">POST</span> <span class="term-fg33">request to</span> &quot;<span class="term-fg36">http:&#47;&#47;localhost:4000&#47;response&#47;forward</span>&quot; <span class="term-fg33">returned</span> <span class="term-fg31 term-fg1">1</span> <span class="term-fg33">error(s)</span>
+&nbsp;
+<span class="term-fg34 term-fg1"> 1)</span> <span class="term-fg31 term-fg1">Request Failure:</span> <span class="term-fg36">POST</span> <span class="term-fg33">response provided for</span> &quot;<span class="term-fg36">https:&#47;&#47;example.com&#47;forward</span>&quot; <span class="term-fg33">returned</span> <span class="term-fg31 term-fg1">1</span> <span class="term-fg33">error(s)</span>
+&nbsp;
+    <span class="term-fg34 term-fg1"> 1.1)</span> <span class="term-fg33">Request</span> <span class="term-fg33">raw body data does not match, expected the following</span> <span class="term-fg32 term-fg1">16 bytes<span class="term-fg33">:</span></span>
+&nbsp;
+             [<span class="term-fg32 term-fg1">0x00</span>, <span class="term-fg32 term-fg1">0xA0</span>, <span class="term-fg32 term-fg1">0xFF</span>, <span class="term-fg32 term-fg1">0x80</span>, <span class="term-fg32 term-fg1">0x45</span>, <span class="term-fg32 term-fg1">0x13</span>, <span class="term-fg32 term-fg1">0x21</span>, <span class="term-fg32 term-fg1">0x78</span>, <span class="term-fg32 term-fg1">0x67</span>, <span class="term-fg32 term-fg1">0x08</span>, <span class="term-fg32 term-fg1">0x90</span>, <span class="term-fg32 term-fg1">0xCA</span>, <span class="term-fg32 term-fg1">0xD4</span>, <span class="term-fg32 term-fg1">0xE5</span>, <span class="term-fg32 term-fg1">0xF4</span>, <span class="term-fg32 term-fg1">0x89</span>]
+&nbsp;
+          <span class="term-fg33">but got the following</span> <span class="term-fg31 term-fg1">16 bytes</span> <span class="term-fg33">instead:</span>
+&nbsp;
+             [<span class="term-fg31 term-fg1">0x67</span>, <span class="term-fg31 term-fg1">0x08</span>, <span class="term-fg31 term-fg1">0x90</span>, <span class="term-fg31 term-fg1">0xCA</span>, <span class="term-fg31 term-fg1">0xD4</span>, <span class="term-fg31 term-fg1">0xE5</span>, <span class="term-fg31 term-fg1">0xF4</span>, <span class="term-fg31 term-fg1">0x89</span>, <span class="term-fg31 term-fg1">0x00</span>, <span class="term-fg31 term-fg1">0xA0</span>, <span class="term-fg31 term-fg1">0xFF</span>, <span class="term-fg31 term-fg1">0x80</span>, <span class="term-fg31 term-fg1">0x45</span>, <span class="term-fg31 term-fg1">0x13</span>, <span class="term-fg31 term-fg1">0x21</span>, <span class="term-fg31 term-fg1">0x78</span>]</div></div>
+<p>From <code>test_provided_response_with_expected_body_text_mismatch_diff_added</code> (<a class="expandable" onclick="toggleTerminal(this)">Expand</a>)</p><div class="terminal-collapsed"><div class="term-container"><span class="term-fg31 term-fg1">Response Failure:</span> <span class="term-fg36">POST</span> <span class="term-fg33">request to</span> &quot;<span class="term-fg36">http:&#47;&#47;localhost:4000&#47;response&#47;forward</span>&quot; <span class="term-fg33">returned</span> <span class="term-fg31 term-fg1">1</span> <span class="term-fg33">error(s)</span>
+&nbsp;
+<span class="term-fg34 term-fg1"> 1)</span> <span class="term-fg31 term-fg1">Request Failure:</span> <span class="term-fg36">POST</span> <span class="term-fg33">response provided for</span> &quot;<span class="term-fg36">https:&#47;&#47;example.com&#47;forward</span>&quot; <span class="term-fg33">returned</span> <span class="term-fg31 term-fg1">1</span> <span class="term-fg33">error(s)</span>
+&nbsp;
+    <span class="term-fg34 term-fg1"> 1.1)</span> <span class="term-fg33">Request</span> <span class="term-fg33">does not match, expected:</span>
+&nbsp;
+              &quot;<span class="term-fg32 term-fg1">Response</span>&quot;
+&nbsp;
+          <span class="term-fg33">but got:</span>
+&nbsp;
+              &quot;<span class="term-fg31 term-fg1">Response Body</span>&quot;
+&nbsp;
+          <span class="term-fg33">difference:</span>
+&nbsp;
+              &quot;Response <span class="term-fg37 term-bg42 term-fg1">Body</span>&quot;</div></div>
+<p>From <code>test_provided_response_with_expected_body_json_mismatch</code> (<a class="expandable" onclick="toggleTerminal(this)">Expand</a>)</p><div class="terminal-collapsed"><div class="term-container"><span class="term-fg31 term-fg1">Response Failure:</span> <span class="term-fg36">POST</span> <span class="term-fg33">request to</span> &quot;<span class="term-fg36">http:&#47;&#47;localhost:4000&#47;response&#47;forward</span>&quot; <span class="term-fg33">returned</span> <span class="term-fg31 term-fg1">1</span> <span class="term-fg33">error(s)</span>
+&nbsp;
+<span class="term-fg34 term-fg1"> 1)</span> <span class="term-fg31 term-fg1">Request Failure:</span> <span class="term-fg36">POST</span> <span class="term-fg33">response provided for</span> &quot;<span class="term-fg36">https:&#47;&#47;example.com&#47;forward</span>&quot; <span class="term-fg33">returned</span> <span class="term-fg31 term-fg1">1</span> <span class="term-fg33">error(s)</span>
+&nbsp;
+    <span class="term-fg34 term-fg1"> 1.1)</span> <span class="term-fg33">Request</span> <span class="term-fg33">body JSON does not match, expected:</span>
+&nbsp;
+              - <span class="term-fg34 term-fg1">json</span>.<span class="term-fg34 term-fg1">key</span>: <span class="term-fg32 term-fg1">String</span> <span class="term-fg33">does not match, expected:</span>
+&nbsp;
+                    &quot;<span class="term-fg32 term-fg1">different value</span>&quot;
+&nbsp;
+                <span class="term-fg33">but got:</span>
+&nbsp;
+                    &quot;<span class="term-fg31 term-fg1">value</span>&quot;
+&nbsp;
+                <span class="term-fg33">difference:</span>
+&nbsp;
+                    &quot;<span class="term-fg37 term-bg41 term-fg1">different</span> value&quot;
+&nbsp;
+              - <span class="term-fg34 term-fg1">json</span>.<span class="term-fg34 term-fg1">list</span>: <span class="term-fg32 term-fg1">Array</span> <span class="term-fg33">with</span> <span class="term-fg31 term-fg1">2</span> <span class="term-fg33">item(s) does not match expected length of</span> <span class="term-fg32 term-fg1">3</span>
+&nbsp;
+              - <span class="term-fg34 term-fg1">json</span>.<span class="term-fg34 term-fg1">some</span>.<span class="term-fg34 term-fg1">very</span>.<span class="term-fg34 term-fg1">deeply</span>.<span class="term-fg34 term-fg1">nested</span>.<span class="term-fg34 term-fg1">array</span>: <span class="term-fg32 term-fg1">Array</span> <span class="term-fg33">with</span> <span class="term-fg31 term-fg1">3</span> <span class="term-fg33">item(s) does not match expected length of</span> <span class="term-fg32 term-fg1">2</span>
+&nbsp;
+              - <span class="term-fg34 term-fg1">json</span>.<span class="term-fg34 term-fg1">some</span>.<span class="term-fg34 term-fg1">very</span>.<span class="term-fg34 term-fg1">deeply</span>.<span class="term-fg34 term-fg1">nested</span>.<span class="term-fg34 term-fg1">array<span class="term-fg35 term-fg1">[0]</span>: <span class="term-fg32 term-fg1">Boolean</span> (<span class="term-fg31 term-fg1">false</span>) <span class="term-fg33">does not match expected value</span> (<span class="term-fg32 term-fg1">true</span>)</span>
+&nbsp;
+              - <span class="term-fg34 term-fg1">json</span>.<span class="term-fg34 term-fg1">some</span>.<span class="term-fg34 term-fg1">very</span>.<span class="term-fg34 term-fg1">deeply</span>.<span class="term-fg34 term-fg1">nested</span>.<span class="term-fg34 term-fg1">array<span class="term-fg35 term-fg1">[1]</span>: <span class="term-fg32 term-fg1">Boolean</span> (<span class="term-fg31 term-fg1">true</span>) <span class="term-fg33">does not match expected value</span> (<span class="term-fg32 term-fg1">false</span>)</span>
+&nbsp;
+              - <span class="term-fg34 term-fg1">json</span>: <span class="term-fg32 term-fg1">Object</span> <span class="term-fg33">is missing</span> <span class="term-fg31 term-fg1">1</span> <span class="term-fg33">key(s)</span> (<span class="term-fg31 term-fg1">missing</span>)</div></div>
+<p>From <code>test_provided_response_with_expected_body_form_mismatch</code> (<a class="expandable" onclick="toggleTerminal(this)">Expand</a>)</p><div class="terminal-collapsed"><div class="term-container"><span class="term-fg31 term-fg1">Response Failure:</span> <span class="term-fg36">POST</span> <span class="term-fg33">request to</span> &quot;<span class="term-fg36">http:&#47;&#47;localhost:4000&#47;response&#47;forward</span>&quot; <span class="term-fg33">returned</span> <span class="term-fg31 term-fg1">1</span> <span class="term-fg33">error(s)</span>
+&nbsp;
+<span class="term-fg34 term-fg1"> 1)</span> <span class="term-fg31 term-fg1">Request Failure:</span> <span class="term-fg36">POST</span> <span class="term-fg33">response provided for</span> &quot;<span class="term-fg36">https:&#47;&#47;example.com&#47;forward</span>&quot; <span class="term-fg33">returned</span> <span class="term-fg31 term-fg1">1</span> <span class="term-fg33">error(s)</span>
+&nbsp;
+    <span class="term-fg34 term-fg1"> 1.1)</span> <span class="term-fg33">Request</span> <span class="term-fg33">body form data does not match, expected:</span>
+&nbsp;
+              - <span class="term-fg34 term-fg1">form</span>.<span class="term-fg34 term-fg1">array[]</span>: <span class="term-fg32 term-fg1">Array</span> <span class="term-fg33">with</span> <span class="term-fg31 term-fg1">4</span> <span class="term-fg33">item(s) does not match expected length of</span> <span class="term-fg32 term-fg1">5</span>
+&nbsp;
+              - <span class="term-fg34 term-fg1">form</span>.<span class="term-fg34 term-fg1">array[]<span class="term-fg35 term-fg1">[3]</span>: <span class="term-fg32 term-fg1">ArrayItem</span> <span class="term-fg33">value does not match, expected:</span></span>
+&nbsp;
+                    &quot;<span class="term-fg32 term-fg1">5\n</span>&quot;
+&nbsp;
+                <span class="term-fg33">but got:</span>
+&nbsp;
+                    &quot;<span class="term-fg31 term-fg1">4</span>&quot;
+&nbsp;
+                <span class="term-fg33">difference:</span>
+&nbsp;
+                    &quot;<span class="term-fg37 term-bg41 term-fg1">5\n</span> <span class="term-fg37 term-bg42 term-fg1">4</span>&quot;
+&nbsp;
+              - <span class="term-fg34 term-fg1">form</span>.<span class="term-fg34 term-fg1">field</span>: <span class="term-fg32 term-fg1">Field</span> <span class="term-fg33">value does not match, expected:</span>
+&nbsp;
+                    &quot;<span class="term-fg32 term-fg1">different someValue\n</span>&quot;
+&nbsp;
+                <span class="term-fg33">but got:</span>
+&nbsp;
+                    &quot;<span class="term-fg31 term-fg1">someValue\n</span>&quot;
+&nbsp;
+                <span class="term-fg33">difference:</span>
+&nbsp;
+                    &quot;<span class="term-fg37 term-bg41 term-fg1">different</span> someValue\n&quot;
+&nbsp;
+              - <span class="term-fg34 term-fg1">form</span>.<span class="term-fg34 term-fg1">mismatchedType</span>: <span class="term-fg32 term-fg1">Field</span> <span class="term-fg33">value does not match, expected:</span>
+&nbsp;
+                    &quot;<span class="term-fg32 term-fg1">array</span>&quot;
+&nbsp;
+                <span class="term-fg33">but got:</span>
+&nbsp;
+                    &quot;<span class="term-fg31 term-fg1">plain</span>&quot;
+&nbsp;
+                <span class="term-fg33">difference:</span>
+&nbsp;
+                    &quot;<span class="term-fg37 term-bg41 term-fg1">array</span> <span class="term-fg37 term-bg42 term-fg1">plain</span>&quot;
+&nbsp;
+              - <span class="term-fg34 term-fg1">form</span>.<span class="term-fg34 term-fg1">str_file</span>: <span class="term-fg32 term-fg1">MIME type</span> (<span class="term-fg31 term-fg1">text&#47;html</span>) <span class="term-fg33">does not match expected value</span> (<span class="term-fg32 term-fg1">text&#47;plain</span>)
+&nbsp;
+              - <span class="term-fg34 term-fg1">form</span>.<span class="term-fg34 term-fg1">vec_file</span>: <span class="term-fg32 term-fg1">Filename</span> (&quot;<span class="term-fg31 term-fg1">other.bin</span>&quot;) <span class="term-fg33">does not match expected value</span> (&quot;<span class="term-fg32 term-fg1">file.bin</span>&quot;)
+&nbsp;
+              - <span class="term-fg34 term-fg1">form</span>: <span class="term-fg33">Is missing</span> <span class="term-fg31 term-fg1">1</span> <span class="term-fg33">plain field(s)</span> (<span class="term-fg31 term-fg1">missingField</span>)</div></div></p>
 </div><h4 id='method.expected_exact_body' class='method'><code>fn <a href='#method.expected_exact_body' class='fnname'>expected_exact_body</a>&lt;S: <a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.Into.html' title='core::convert::Into'>Into</a>&lt;<a class='struct' href='../noir/struct.HttpBody.html' title='noir::HttpBody'>HttpBody</a>&gt;&gt;(self, body: S) -&gt; Self</code></h4>
 <div class='docblock'><p>Sets the expected request body for the response, exact version.</p>
 
 <p>This method is based on <code>HttpRequest::expected_body()</code> but performs
-additional comparison based on the mime type of the reponse:</p>
+additional comparison based on the mime type of the request:</p>
 
 <h5 id='applicationjson-1' class='section-header'><a href='#applicationjson-1'>application/json</a></h5>
 <p>In contrast to <code>HttpResponse::expected_body()</code> <strong>additional keys on
-response objects are compared and will fail the test</strong>.</p>
+request objects are compared and will fail the test</strong>.</p>
 
 <h5 id='all-other-mime-types-1' class='section-header'><a href='#all-other-mime-types-1'>All other mime types</a></h5>
 <p>See <code>HttpResponse::expected_body()</code>.</p>
 
 <h3 id='test-failure-4' class='section-header'><a href='#test-failure-4'>Test Failure</a></h3>
-<p>If the actual response body does not match the expected one.</p>
+<p>If the actual request body does not match the expected one.</p>
 </div><h4 id='method.dump' class='method'><code>fn <a href='#method.dump' class='fnname'>dump</a>(self) -&gt; Self</code></h4>
-<div class='docblock'><p>Dumps the response headers and body for this response.</p>
+<div class='docblock'><p>Dumps the request headers and body for this response.</p>
 
 <h3 id='test-failure-5' class='section-header'><a href='#test-failure-5'>Test Failure</a></h3>
 <p>Always.</p>
-</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl&lt;E: <a class='trait' href='../noir/trait.HttpEndpoint.html' title='noir::HttpEndpoint'>HttpEndpoint</a>&gt; <a class='trait' href='../noir/trait.MockResponse.html' title='noir::MockResponse'>MockResponse</a> for <a class='struct' href='../noir/struct.HttpResponse.html' title='noir::HttpResponse'>HttpResponse</a>&lt;E&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a id='src-1235' class='srclink' href='../src/noir/src/resource/http/response.rs.html#220-369' title='goto source code'>[src]</a></span></h3>
+
+<h3 id='test-failure-examples-1' class='section-header'><a href='#test-failure-examples-1'>Test Failure Examples</a></h3>
+<p><p>From <code>test_provided_response_dump_raw</code> (<a class="expandable" onclick="toggleTerminal(this)">Collapse</a>)</p><div class="terminal-expanded"><div class="term-container"><span class="term-fg31 term-fg1">Response Failure:</span> <span class="term-fg36">POST</span> <span class="term-fg33">request to</span> &quot;<span class="term-fg36">http:&#47;&#47;localhost:4000&#47;response&#47;forward</span>&quot; <span class="term-fg33">returned</span> <span class="term-fg31 term-fg1">1</span> <span class="term-fg33">error(s)</span>
+&nbsp;
+<span class="term-fg34 term-fg1"> 1)</span> <span class="term-fg31 term-fg1">Request Failure:</span> <span class="term-fg36">POST</span> <span class="term-fg33">response provided for</span> &quot;<span class="term-fg36">https:&#47;&#47;example.com&#47;forward</span>&quot; <span class="term-fg33">returned</span> <span class="term-fg31 term-fg1">1</span> <span class="term-fg33">error(s)</span>
+&nbsp;
+    <span class="term-fg34 term-fg1"> 1.1)</span> <span class="term-fg33">Request</span> <span class="term-fg33">headers dump:</span>
+&nbsp;
+              <span class="term-fg36">Content-Length</span>: <span class="term-fg35 term-fg1">16</span>
+              <span class="term-fg36">  Content-Type</span>: <span class="term-fg35 term-fg1">application&#47;octet-stream</span>
+              <span class="term-fg36">          Host</span>: <span class="term-fg35 term-fg1">example.com</span>
+&nbsp;
+          <span class="term-fg33">Request</span> <span class="term-fg33">raw body dump of</span> <span class="term-fg36">16 bytes<span class="term-fg33">:</span></span>
+&nbsp;
+             [<span class="term-fg35 term-fg1">0x00</span>, <span class="term-fg35 term-fg1">0xA0</span>, <span class="term-fg35 term-fg1">0xFF</span>, <span class="term-fg35 term-fg1">0x80</span>, <span class="term-fg35 term-fg1">0x45</span>, <span class="term-fg35 term-fg1">0x13</span>, <span class="term-fg35 term-fg1">0x21</span>, <span class="term-fg35 term-fg1">0x78</span>, <span class="term-fg35 term-fg1">0x67</span>, <span class="term-fg35 term-fg1">0x08</span>, <span class="term-fg35 term-fg1">0x90</span>, <span class="term-fg35 term-fg1">0xCA</span>, <span class="term-fg35 term-fg1">0xD4</span>, <span class="term-fg35 term-fg1">0xE5</span>, <span class="term-fg35 term-fg1">0xF4</span>, <span class="term-fg35 term-fg1">0x89</span>]</div></div>
+<p>From <code>test_provided_response_dump_text</code> (<a class="expandable" onclick="toggleTerminal(this)">Expand</a>)</p><div class="terminal-collapsed"><div class="term-container"><span class="term-fg31 term-fg1">Response Failure:</span> <span class="term-fg36">POST</span> <span class="term-fg33">request to</span> &quot;<span class="term-fg36">http:&#47;&#47;localhost:4000&#47;response&#47;forward</span>&quot; <span class="term-fg33">returned</span> <span class="term-fg31 term-fg1">1</span> <span class="term-fg33">error(s)</span>
+&nbsp;
+<span class="term-fg34 term-fg1"> 1)</span> <span class="term-fg31 term-fg1">Request Failure:</span> <span class="term-fg36">POST</span> <span class="term-fg33">response provided for</span> &quot;<span class="term-fg36">https:&#47;&#47;example.com&#47;forward</span>&quot; <span class="term-fg33">returned</span> <span class="term-fg31 term-fg1">1</span> <span class="term-fg33">error(s)</span>
+&nbsp;
+    <span class="term-fg34 term-fg1"> 1.1)</span> <span class="term-fg33">Request</span> <span class="term-fg33">headers dump:</span>
+&nbsp;
+              <span class="term-fg36">Content-Length</span>: <span class="term-fg35 term-fg1">13</span>
+              <span class="term-fg36">  Content-Type</span>: <span class="term-fg35 term-fg1">text&#47;plain</span>
+              <span class="term-fg36">          Host</span>: <span class="term-fg35 term-fg1">example.com</span>
+&nbsp;
+          <span class="term-fg33">Request</span> <span class="term-fg33">body dump:</span>
+&nbsp;
+              &quot;<span class="term-fg35 term-fg1">Response Body</span>&quot;</div></div>
+<p>From <code>test_provided_response_dump_json</code> (<a class="expandable" onclick="toggleTerminal(this)">Expand</a>)</p><div class="terminal-collapsed"><div class="term-container"><span class="term-fg31 term-fg1">Response Failure:</span> <span class="term-fg36">POST</span> <span class="term-fg33">request to</span> &quot;<span class="term-fg36">http:&#47;&#47;localhost:4000&#47;response&#47;forward</span>&quot; <span class="term-fg33">returned</span> <span class="term-fg31 term-fg1">1</span> <span class="term-fg33">error(s)</span>
+&nbsp;
+<span class="term-fg34 term-fg1"> 1)</span> <span class="term-fg31 term-fg1">Request Failure:</span> <span class="term-fg36">POST</span> <span class="term-fg33">response provided for</span> &quot;<span class="term-fg36">https:&#47;&#47;example.com&#47;forward</span>&quot; <span class="term-fg33">returned</span> <span class="term-fg31 term-fg1">1</span> <span class="term-fg33">error(s)</span>
+&nbsp;
+    <span class="term-fg34 term-fg1"> 1.1)</span> <span class="term-fg33">Request</span> <span class="term-fg33">headers dump:</span>
+&nbsp;
+              <span class="term-fg36">Content-Length</span>: <span class="term-fg35 term-fg1">121</span>
+              <span class="term-fg36">  Content-Type</span>: <span class="term-fg35 term-fg1">application&#47;json</span>
+              <span class="term-fg36">          Host</span>: <span class="term-fg35 term-fg1">example.com</span>
+&nbsp;
+          <span class="term-fg33">Request</span> <span class="term-fg33">body dump:</span>
+&nbsp;
+              <span class="term-fg36">{</span>
+<span class="term-fg36">                  &quot;additional&quot;: 32,</span>
+<span class="term-fg36">                  &quot;key&quot;: &quot;different value&quot;,</span>
+<span class="term-fg36">                  &quot;list&quot;: [</span>
+<span class="term-fg36">                      2,</span>
+<span class="term-fg36">                      3</span>
+<span class="term-fg36">                  ],</span>
+<span class="term-fg36">                  &quot;some&quot;: {</span>
+<span class="term-fg36">                      &quot;very&quot;: {</span>
+<span class="term-fg36">                          &quot;deeply&quot;: {</span>
+<span class="term-fg36">                              &quot;nested&quot;: {</span>
+<span class="term-fg36">                                  &quot;array&quot;: [</span>
+<span class="term-fg36">                                      false,</span>
+<span class="term-fg36">                                      true,</span>
+<span class="term-fg36">                                      false</span>
+<span class="term-fg36">                                  ]</span>
+<span class="term-fg36">                              }</span>
+<span class="term-fg36">                          }</span>
+<span class="term-fg36">                      }</span>
+<span class="term-fg36">                  }</span>
+<span class="term-fg36">              }</span></div></div></p>
+</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl&lt;E: <a class='trait' href='../noir/trait.HttpEndpoint.html' title='noir::HttpEndpoint'>HttpEndpoint</a>&gt; <a class='trait' href='../noir/trait.MockResponse.html' title='noir::MockResponse'>MockResponse</a> for <a class='struct' href='../noir/struct.HttpResponse.html' title='noir::HttpResponse'>HttpResponse</a>&lt;E&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a id='src-1251' class='srclink' href='../src/noir/src/resource/http/response.rs.html#233-391' title='goto source code'>[src]</a></span></h3>
 <div class='impl-items'><h4 id='method.matches' class='method'><code>fn <a href='../noir/trait.MockResponse.html#tymethod.matches' class='fnname'>matches</a>(&amp;self, request: &amp;<a class='struct' href='https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html' title='alloc::boxed::Box'>Box</a>&lt;<a class='trait' href='../noir/trait.MockRequest.html' title='noir::MockRequest'>MockRequest</a>&gt;) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></h4>
 <div class='docblock'><p>Compare the response against any type implementing <code>MockRequest</code> and return <code>true</code> if they belong together. <a href="../noir/trait.MockResponse.html#tymethod.matches">Read more</a></p>
 </div><h4 id='method.respond' class='method'><code>fn <a href='../noir/trait.MockResponse.html#tymethod.respond' class='fnname'>respond</a>(&amp;mut self, request: <a class='struct' href='https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html' title='alloc::boxed::Box'>Box</a>&lt;<a class='trait' href='../noir/trait.MockRequest.html' title='noir::MockRequest'>MockRequest</a>&gt;) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a>&gt;, <a class='struct' href='https://doc.rust-lang.org/nightly/std/io/error/struct.Error.html' title='std::io::error::Error'>Error</a>&gt;</code></h4>

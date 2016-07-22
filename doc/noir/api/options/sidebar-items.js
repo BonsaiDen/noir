@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["Options","Additional configuration options for api requests and responses."]]});
+initSidebarItems({"struct":[["Options","Additional configuration options for API requests and responses."]]});
