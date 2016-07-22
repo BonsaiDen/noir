@@ -3,17 +3,12 @@
 A [rust](https://rust-lang.org/) based, DSL alike and request driven, black box testing library 
 for HTTP APIs. 
 
-- [Documentation](https://bonsaiden.github.io/noir/doc/noir/) for the latest release on crates.io.
+- [Documentation](https://bonsaiden.github.io/noir/doc/noir/) and examples for the latest release on crates.io.
 
 
 > Please Note: **noir** is still work in progress, there are lots of typos in 
 > its docs, quite a few bugs in the code and most likely also few API that won't 
 > be the same in the final release.
-
-
-## Screenshots
-
-![noir](https://cloud.githubusercontent.com/assets/124674/16967785/2129ad12-4e0b-11e6-80f0-d741e8122e04.gif)
 
 
 ## Features
