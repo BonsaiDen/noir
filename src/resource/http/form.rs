@@ -60,6 +60,14 @@ use hyper::header::{Headers, ContentType, ContentDisposition, DispositionParam};
 /// };
 /// # }
 /// ```
+///
+/// # Test Failure Examples
+///
+/// [expanded](terminal://provided_response_dump_form)
+/// [expanded](terminal://provided_response_with_expected_body_form_mismatch)
+/// [collapsed](terminal://with_form_body_error_broken_headers)
+/// [collapsed](terminal://with_form_body_error_missing_disposition_header)
+/// [collapsed](terminal://with_form_body_error_too_many_headers)
 pub struct HttpFormData {
     mime: SubLevel,
     fields: Vec<HttpFormDataField>

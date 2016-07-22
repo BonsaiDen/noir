@@ -15,9 +15,9 @@ fn test_responses_provided_with_header() {
                             qitem(Mime(TopLevel::Application, SubLevel::Json, vec![]))
                        ]))
             ])
-           .expected_header(Accept(vec![
+            .expected_header(Accept(vec![
                 qitem(Mime(TopLevel::Application, SubLevel::Json, vec![]))
-           ]))
+            ]))
             .collect()
     };
 

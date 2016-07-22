@@ -1,0 +1,11 @@
+[package]
+name = "screenshots"
+version = "0.1.0"
+authors = ["Ivo Wetzel <ivo.wetzel@googlemail.com>"]
+
+[[bin]]
+name = "doc"
+path = "doc.rs"
+
+[dependencies]
+regex = "*"

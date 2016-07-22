@@ -24,6 +24,11 @@ use super::HttpLike;
 ///
 /// Used by the `headers![...]` macro to easily create a vector containing
 /// different types that implement the `hyper::Header` trait.
+///
+/// # Test Failure Examples
+///
+/// [expanded](terminal://headers_expected_mismatch)
+/// [expanded](terminal://headers_unexpected_mismatch)
 pub struct HttpHeader {
     name: String,
     value: Vec<u8>

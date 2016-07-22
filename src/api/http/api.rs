@@ -51,6 +51,11 @@ use super::request::HttpRequest;
 /// }
 /// # fn main() {}
 /// ```
+///
+/// # Test Failure Examples
+///
+/// [expanded](terminal://api_start_timeout)
+/// [expanded](terminal://api_request_timeout)
 pub trait HttpApi: Send + Copy + Default {
 
     /// A blocking callback for provision of the API.

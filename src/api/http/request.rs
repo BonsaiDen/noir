@@ -169,6 +169,10 @@ impl<A: HttpApi> HttpRequest<A> {
     /// ### Test Failure
     ///
     /// If the actual response status does not match the expected one.
+    ///
+    /// ### Test Failure Examples
+    ///
+    /// [expanded](terminal://headers_expected)
     pub fn expected_status(mut self, status_code: StatusCode) -> Self {
         self.expected_status = Some(status_code);
         self
@@ -190,6 +194,10 @@ impl<A: HttpApi> HttpRequest<A> {
     /// ### Test Failure
     ///
     /// If the header is present on the response.
+    ///
+    /// ### Test Failure Examples
+    ///
+    /// [expanded](terminal://headers_unexpected)
     pub fn unexpected_header<H: Header + HeaderFormat>(mut self) -> Self {
         self.unexpected_headers.push(<H>::header_name().to_string());
         self
@@ -237,6 +245,12 @@ impl<A: HttpApi> HttpRequest<A> {
     /// ### Test Failure
     ///
     /// If the actual response body does not match the expected one.
+    ///
+    /// ### Test Failure Examples
+    ///
+    /// [expanded](terminal://body_expected_raw_mismatch)
+    /// [collapsed](terminal://body_text_mismatch_diff_added)
+    /// [collapsed](terminal://body_with_expected_json_mismatch)
     pub fn expected_body<S: Into<HttpBody>>(mut self, body: S) -> Self {
         self.expected_body = Some(body.into());
         self.expected_exact_body = false;
@@ -286,6 +300,12 @@ impl<A: HttpApi> HttpRequest<A> {
     /// ### Test Failure
     ///
     /// Always.
+    ///
+    /// ### Test Failure Examples
+    ///
+    /// [expanded](terminal://dump_response_with_raw_body)
+    /// [collapsed](terminal://dump_response_with_text_body)
+    /// [collapsed](terminal://dump_response_with_json_body)
     pub fn dump(mut self) -> Self {
         self.dump_response = true;
         self

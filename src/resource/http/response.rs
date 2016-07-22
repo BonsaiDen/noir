@@ -176,6 +176,13 @@ impl<E: HttpEndpoint> HttpResponse<E> {
     /// ### Test Failure
     ///
     /// If the actual request body does not match the expected one.
+    ///
+    /// ### Test Failure Examples
+    ///
+    /// [expanded](terminal://provided_response_with_expected_body_raw_mismatch)
+    /// [collapsed](terminal://provided_response_with_expected_body_text_mismatch_diff_added)
+    /// [collapsed](terminal://provided_response_with_expected_body_json_mismatch)
+    /// [collapsed](terminal://provided_response_with_expected_body_form_mismatch)
     pub fn expected_body<S: Into<HttpBody>>(mut self, body: S) -> Self {
         self.expected_body = Some(body.into());
         self.expected_exact_body = false;
@@ -210,6 +217,12 @@ impl<E: HttpEndpoint> HttpResponse<E> {
     /// ### Test Failure
     ///
     /// Always.
+    ///
+    /// ### Test Failure Examples
+    ///
+    /// [expanded](terminal://provided_response_dump_raw)
+    /// [collapsed](terminal://provided_response_dump_text)
+    /// [collapsed](terminal://provided_response_dump_json)
     pub fn dump(mut self) -> Self {
         self.dump_request = true;
         self
