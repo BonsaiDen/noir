@@ -357,11 +357,11 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-1184' class='srclink' href='../src/noir/src/resource/http/response.rs.html#31-51' title='goto source code'>[src]</a></span></h1>
+               </span><a id='src-1182' class='srclink' href='../src/noir/src/resource/http/response.rs.html#31-51' title='goto source code'>[src]</a></span></h1>
 <pre class='rust struct'>pub struct HttpResponse&lt;E: <a class='trait' href='../noir/trait.HttpEndpoint.html' title='noir::HttpEndpoint'>HttpEndpoint</a>&gt; {
     // some fields omitted
 }</pre><div class='docblock'><p>A mocked HTTP response that is being provided to a testable API.</p>
-</div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl&lt;E: <a class='trait' href='../noir/trait.HttpEndpoint.html' title='noir::HttpEndpoint'>HttpEndpoint</a>&gt; <a class='struct' href='../noir/struct.HttpResponse.html' title='noir::HttpResponse'>HttpResponse</a>&lt;E&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a id='src-1200' class='srclink' href='../src/noir/src/resource/http/response.rs.html#53-231' title='goto source code'>[src]</a></span></h3>
+</div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl&lt;E: <a class='trait' href='../noir/trait.HttpEndpoint.html' title='noir::HttpEndpoint'>HttpEndpoint</a>&gt; <a class='struct' href='../noir/struct.HttpResponse.html' title='noir::HttpResponse'>HttpResponse</a>&lt;E&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a id='src-1198' class='srclink' href='../src/noir/src/resource/http/response.rs.html#53-231' title='goto source code'>[src]</a></span></h3>
 <div class='impl-items'><h4 id='method.with_status' class='method'><code>fn <a href='#method.with_status' class='fnname'>with_status</a>(self, status_code: <a class='enum' href='https://hyperium.github.io/hyper/hyper/status/enum.StatusCode.html' title='hyper::status::StatusCode'>StatusCode</a>) -&gt; Self</code></h4>
 <div class='docblock'><p>Sets the response status.</p>
 </div><h4 id='method.with_headers' class='method'><code>fn <a href='#method.with_headers' class='fnname'>with_headers</a>(self, headers: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='struct' href='../noir/struct.HttpHeader.html' title='noir::HttpHeader'>HttpHeader</a>&gt;) -&gt; Self</code></h4>
@@ -451,7 +451,7 @@ requests.</p>
 &nbsp;
 <span class="term-fg34 term-fg1"> 1)</span> <span class="term-fg31 term-fg1">Request Failure:</span> <span class="term-fg36">POST</span> <span class="term-fg33">response provided for</span> &quot;<span class="term-fg36">https:&#47;&#47;example.com&#47;forward</span>&quot; <span class="term-fg33">returned</span> <span class="term-fg31 term-fg1">1</span> <span class="term-fg33">error(s)</span>
 &nbsp;
-    <span class="term-fg34 term-fg1"> 1.1)</span> <span class="term-fg33">Request</span> <span class="term-fg33">does not match, expected:</span>
+    <span class="term-fg34 term-fg1"> 1.1)</span> <span class="term-fg33">Request</span> <span class="term-fg33">text body does not match, expected:</span>
 &nbsp;
               &quot;<span class="term-fg32 term-fg1">Response</span>&quot;
 &nbsp;
@@ -466,7 +466,7 @@ requests.</p>
 &nbsp;
 <span class="term-fg34 term-fg1"> 1)</span> <span class="term-fg31 term-fg1">Request Failure:</span> <span class="term-fg36">POST</span> <span class="term-fg33">response provided for</span> &quot;<span class="term-fg36">https:&#47;&#47;example.com&#47;forward</span>&quot; <span class="term-fg33">returned</span> <span class="term-fg31 term-fg1">1</span> <span class="term-fg33">error(s)</span>
 &nbsp;
-    <span class="term-fg34 term-fg1"> 1.1)</span> <span class="term-fg33">Request</span> <span class="term-fg33">body JSON does not match, expected:</span>
+    <span class="term-fg34 term-fg1"> 1.1)</span> <span class="term-fg33">Request</span> <span class="term-fg33">body JSON does not match:</span>
 &nbsp;
               - <span class="term-fg34 term-fg1">json</span>.<span class="term-fg34 term-fg1">key</span>: <span class="term-fg32 term-fg1">String</span> <span class="term-fg33">does not match, expected:</span>
 &nbsp;
@@ -493,7 +493,7 @@ requests.</p>
 &nbsp;
 <span class="term-fg34 term-fg1"> 1)</span> <span class="term-fg31 term-fg1">Request Failure:</span> <span class="term-fg36">POST</span> <span class="term-fg33">response provided for</span> &quot;<span class="term-fg36">https:&#47;&#47;example.com&#47;forward</span>&quot; <span class="term-fg33">returned</span> <span class="term-fg31 term-fg1">1</span> <span class="term-fg33">error(s)</span>
 &nbsp;
-    <span class="term-fg34 term-fg1"> 1.1)</span> <span class="term-fg33">Request</span> <span class="term-fg33">body form data does not match, expected:</span>
+    <span class="term-fg34 term-fg1"> 1.1)</span> <span class="term-fg33">Request</span> <span class="term-fg33">body form data does not match:</span>
 &nbsp;
               - <span class="term-fg34 term-fg1">form</span>.<span class="term-fg34 term-fg1">array[]</span>: <span class="term-fg32 term-fg1">Array</span> <span class="term-fg33">with</span> <span class="term-fg31 term-fg1">4</span> <span class="term-fg33">item(s) does not match expected length of</span> <span class="term-fg32 term-fg1">5</span>
 &nbsp;
@@ -619,7 +619,7 @@ request objects are compared and will fail the test</strong>.</p>
 <span class="term-fg36">                      }</span>
 <span class="term-fg36">                  }</span>
 <span class="term-fg36">              }</span></div></div></p>
-</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl&lt;E: <a class='trait' href='../noir/trait.HttpEndpoint.html' title='noir::HttpEndpoint'>HttpEndpoint</a>&gt; <a class='trait' href='../noir/trait.MockResponse.html' title='noir::MockResponse'>MockResponse</a> for <a class='struct' href='../noir/struct.HttpResponse.html' title='noir::HttpResponse'>HttpResponse</a>&lt;E&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a id='src-1251' class='srclink' href='../src/noir/src/resource/http/response.rs.html#233-391' title='goto source code'>[src]</a></span></h3>
+</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl&lt;E: <a class='trait' href='../noir/trait.HttpEndpoint.html' title='noir::HttpEndpoint'>HttpEndpoint</a>&gt; <a class='trait' href='../noir/trait.MockResponse.html' title='noir::MockResponse'>MockResponse</a> for <a class='struct' href='../noir/struct.HttpResponse.html' title='noir::HttpResponse'>HttpResponse</a>&lt;E&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a id='src-1249' class='srclink' href='../src/noir/src/resource/http/response.rs.html#233-391' title='goto source code'>[src]</a></span></h3>
 <div class='impl-items'><h4 id='method.matches' class='method'><code>fn <a href='../noir/trait.MockResponse.html#tymethod.matches' class='fnname'>matches</a>(&amp;self, request: &amp;<a class='struct' href='https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html' title='alloc::boxed::Box'>Box</a>&lt;<a class='trait' href='../noir/trait.MockRequest.html' title='noir::MockRequest'>MockRequest</a>&gt;) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></h4>
 <div class='docblock'><p>Compare the response against any type implementing <code>MockRequest</code> and return <code>true</code> if they belong together. <a href="../noir/trait.MockResponse.html#tymethod.matches">Read more</a></p>
 </div><h4 id='method.respond' class='method'><code>fn <a href='../noir/trait.MockResponse.html#tymethod.respond' class='fnname'>respond</a>(&amp;mut self, request: <a class='struct' href='https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html' title='alloc::boxed::Box'>Box</a>&lt;<a class='trait' href='../noir/trait.MockRequest.html' title='noir::MockRequest'>MockRequest</a>&gt;) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a>&gt;, <a class='struct' href='https://doc.rust-lang.org/nightly/std/io/error/struct.Error.html' title='std::io::error::Error'>Error</a>&gt;</code></h4>

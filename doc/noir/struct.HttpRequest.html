@@ -478,7 +478,7 @@ responses.</p>
        [<span class="term-fg31 term-fg1">0x00</span>, <span class="term-fg31 term-fg1">0xA0</span>, <span class="term-fg31 term-fg1">0xFF</span>, <span class="term-fg31 term-fg1">0x80</span>, <span class="term-fg31 term-fg1">0x45</span>, <span class="term-fg31 term-fg1">0x13</span>, <span class="term-fg31 term-fg1">0x21</span>, <span class="term-fg31 term-fg1">0x78</span>, <span class="term-fg31 term-fg1">0x67</span>, <span class="term-fg31 term-fg1">0x08</span>, <span class="term-fg31 term-fg1">0x90</span>, <span class="term-fg31 term-fg1">0xCA</span>, <span class="term-fg31 term-fg1">0xD4</span>, <span class="term-fg31 term-fg1">0xE5</span>, <span class="term-fg31 term-fg1">0xF4</span>, <span class="term-fg31 term-fg1">0x89</span>]</div></div>
 <p>From <code>test_body_text_mismatch_diff_added</code> (<a class="expandable" onclick="toggleTerminal(this)">Expand</a>)</p><div class="terminal-collapsed"><div class="term-container"><span class="term-fg31 term-fg1">Response Failure:</span> <span class="term-fg36">GET</span> <span class="term-fg33">request to</span> &quot;<span class="term-fg36">http:&#47;&#47;localhost:4000&#47;get&#47;hello</span>&quot; <span class="term-fg33">returned</span> <span class="term-fg31 term-fg1">1</span> <span class="term-fg33">error(s)</span>
 &nbsp;
-<span class="term-fg34 term-fg1"> 1)</span> <span class="term-fg33">Response</span> <span class="term-fg33">does not match, expected:</span>
+<span class="term-fg34 term-fg1"> 1)</span> <span class="term-fg33">Response</span> <span class="term-fg33">text body does not match, expected:</span>
 &nbsp;
         &quot;<span class="term-fg32 term-fg1">Hello     \n</span>&quot;
 &nbsp;
@@ -491,7 +491,7 @@ responses.</p>
         &quot;Hello <span class="term-fg37 term-bg42 term-fg1">World</span> <span class="term-fg37 term-bg41 term-fg1">\n</span>&quot;</div></div>
 <p>From <code>test_body_with_expected_json_mismatch</code> (<a class="expandable" onclick="toggleTerminal(this)">Expand</a>)</p><div class="terminal-collapsed"><div class="term-container"><span class="term-fg31 term-fg1">Response Failure:</span> <span class="term-fg36">POST</span> <span class="term-fg33">request to</span> &quot;<span class="term-fg36">http:&#47;&#47;localhost:4000&#47;echo</span>&quot; <span class="term-fg33">returned</span> <span class="term-fg31 term-fg1">1</span> <span class="term-fg33">error(s)</span>
 &nbsp;
-<span class="term-fg34 term-fg1"> 1)</span> <span class="term-fg33">Response</span> <span class="term-fg33">body JSON does not match, expected:</span>
+<span class="term-fg34 term-fg1"> 1)</span> <span class="term-fg33">Response</span> <span class="term-fg33">body JSON does not match:</span>
 &nbsp;
         - <span class="term-fg34 term-fg1">json</span>.<span class="term-fg34 term-fg1">key</span>: <span class="term-fg32 term-fg1">String</span> <span class="term-fg33">does not match, expected:</span>
 &nbsp;

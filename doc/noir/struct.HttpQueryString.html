@@ -357,7 +357,7 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-721' class='srclink' href='../src/noir/src/resource/http/query.rs.html#41-43' title='goto source code'>[src]</a></span></h1>
+               </span><a id='src-719' class='srclink' href='../src/noir/src/resource/http/query.rs.html#41-43' title='goto source code'>[src]</a></span></h1>
 <pre class='rust struct'>pub struct HttpQueryString {
     // some fields omitted
 }</pre><div class='docblock'><p>An abstraction over a HTTP query string.</p>
@@ -378,7 +378,13 @@
 );</pre>
 
 <h1 id='test-failure-examples' class='section-header'><a href='#test-failure-examples'>Test Failure Examples</a></h1>
-<p></p>
+<p><p>From <code>test_responses_provided_with_query_string_mismatch</code> (<a class="expandable" onclick="toggleTerminal(this)">Collapse</a>)</p><div class="terminal-expanded"><div class="term-container"><span class="term-fg31 term-fg1">Response Failure:</span> <span class="term-fg36">GET</span> <span class="term-fg33">request to</span> &quot;<span class="term-fg36">http:&#47;&#47;localhost:4000&#47;responses&#47;query</span>&quot; <span class="term-fg33">returned</span> <span class="term-fg31 term-fg1">2</span> <span class="term-fg33">error(s)</span>
+&nbsp;
+<span class="term-fg34 term-fg1"> 1)</span> <span class="term-fg31 term-fg1">Request Failure:</span> <span class="term-fg36">GET</span> <span class="term-fg33">response provided for</span> &quot;<span class="term-fg36">https:&#47;&#47;example.com&#47;two?key=value&amp;array%5B%5D=item1&amp;array%5B%5D=item2&amp;array%5B%5D=item3&amp;foo=bar&amp;single=item</span>&quot; <span class="term-fg33">returned</span> <span class="term-fg31 term-fg1">1</span> <span class="term-fg33">error(s)</span>
+&nbsp;
+    <span class="term-fg34 term-fg1"> 1.1)</span> <span class="term-fg33">Expected</span> <span class="term-fg32 term-fg1">a request</span> <span class="term-fg33">for the response, but got</span> <span class="term-fg31 term-fg1">none<span class="term-fg33">.</span></span>
+&nbsp;
+<span class="term-fg34 term-fg1"> 2)</span> <span class="term-fg31 term-fg1">Request Failure:</span> <span class="term-fg33">Unexpected</span> <span class="term-fg36">GET</span> <span class="term-fg33">request to</span> &quot;<span class="term-fg36">https:&#47;&#47;example.com&#47;one?key=value&amp;array%5B%5D=item1&amp;array%5B%5D=item2&amp;array%5B%5D=item3&amp;foo=bar&amp;single=item</span>&quot;<span class="term-fg33">, no response was provided.</span></div></div></p>
 </div></section>
     <section id='search' class="content hidden"></section>
 
