@@ -27,13 +27,14 @@ for HTTP APIs.
   - [x] Set up expectations for headers and bodies of the requests your API performs
 
 - [x] Detailed and colored test output to helps you quickly figuring out what exactly went wrong
-- [x] Great support for JSON featuring deep, detailed object and array diffing, showing you paths, types and values
-- [x] Uses hyper for all HTTP related interfaces
+- [x] Deep JSON comparison with detailed object and array diffing, showing paths, types and values
+- [x] Comes with Macros for HTTP multipart form data
+- [x] Deep form data comparison with detailed diffing of fields, files and their mime types and bodies
+- [x] Hyper used for all HTTP related interfaces
 
 
 ### Work in Progress / Unstable
 
-- [ ] Macros for easy definition of HTTP multipart forms in tests
 - [ ] API for providing custom / external mocks to be active during a test request
 
 
