@@ -22,7 +22,7 @@ use hyper::mime::{Mime, TopLevel, SubLevel};
 // Internal Dependencies ------------------------------------------------------
 use util;
 use Options;
-use super::{HttpLike, HttpFormData};
+use super::HttpFormData;
 use super::form::{
     http_form_into_body_parts,
     http_form_into_fields,
@@ -70,6 +70,10 @@ impl<'a> From<&'a mut Response> for HttpBody {
 
 impl From<Vec<u8>> for HttpBody {
     /// Creates a HTTP body from a byte vector.
+    ///
+    /// # Test Failure Examples
+    ///
+    /// [expanded](terminal://body_expected_raw_mismatch)
     fn from(vec: Vec<u8>) -> HttpBody {
         HttpBody {
             data: vec,
@@ -80,6 +84,10 @@ impl From<Vec<u8>> for HttpBody {
 
 impl From<&'static str> for HttpBody {
     /// Creates a HTTP body from a string slice.
+    ///
+    /// # Test Failure Examples
+    ///
+    /// [expanded](terminal://body_text_mismatch_diff_added)
     fn from(string: &'static str) -> HttpBody {
         HttpBody {
             data: string.into(),
@@ -90,6 +98,10 @@ impl From<&'static str> for HttpBody {
 
 impl From<String> for HttpBody {
     /// Creates a HTTP body from a `String`.
+    ///
+    /// # Test Failure Examples
+    ///
+    /// [expanded](terminal://body_text_mismatch_diff_removed)
     fn from(string: String) -> HttpBody {
         HttpBody {
             data: string.into(),
@@ -100,6 +112,10 @@ impl From<String> for HttpBody {
 
 impl From<json::JsonValue> for HttpBody {
     /// Creates a HTTP body from a JSON value.
+    ///
+    /// # Test Failure Examples
+    ///
+    /// [expanded](terminal://body_with_expected_json_mismatch)
     fn from(json: json::JsonValue) -> HttpBody {
         HttpBody {
             data: json::stringify(json).into(),
@@ -110,6 +126,10 @@ impl From<json::JsonValue> for HttpBody {
 
 impl From<HttpFormData> for HttpBody {
     /// Creates a HTTP body from form data.
+    ///
+    /// # Test Failure Examples
+    ///
+    /// [expanded](terminal://provided_response_with_expected_body_form_mismatch)
     fn from(form: HttpFormData) -> HttpBody {
         let (mime_type, body) = http_form_into_body_parts(form);
         HttpBody {
@@ -119,25 +139,24 @@ impl From<HttpFormData> for HttpBody {
     }
 }
 
-pub fn validate_http_request_body<T: HttpLike>(
+pub fn validate_http_body(
     errors: &mut Vec<String>,
     options: &Options,
-    result: &mut T,
+    actual_body: HttpBody,
     context: &str,
-    expected_body: &&HttpBody,
+    expected_body: &HttpBody,
     expected_exact_body: bool
 ) {
 
     // Quick check before we perform heavy weight parsing
     // This might cause false negative for JSON, but we'll perform a deep
     // compare anyway.
-    let body = result.into_http_body();
-    if body.data == expected_body.data {
+    if actual_body.data == expected_body.data {
         return;
     }
 
     // Parse and compare different body types
-    let body = parse_http_body(&body);
+    let body = parse_http_body(&actual_body);
     errors.push(match body {
 
         Ok(actual) => match actual {

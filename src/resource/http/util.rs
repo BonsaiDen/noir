@@ -13,8 +13,8 @@ use std::str;
 // External Dependencies ------------------------------------------------------
 use json;
 use colored::*;
-use hyper::header::{Headers, ContentType};
 use hyper::status::StatusCode;
+use hyper::header::{Headers, ContentType};
 
 
 // Internal Dependencies ------------------------------------------------------
@@ -26,7 +26,7 @@ use super::body::{
     ParsedHttpBody,
     parse_http_body,
     http_body_from_parts,
-    validate_http_request_body
+    validate_http_body
 };
 use super::header::validate_http_request_headers;
 
@@ -90,10 +90,11 @@ pub fn validate_http_request<T: HttpLike>(
     );
 
     if let Some(ref expected_body) = expected_body.as_ref() {
-        validate_http_request_body(
+        let body = result.into_http_body();
+        validate_http_body(
             &mut errors,
             options,
-            result,
+            body,
             context,
             expected_body,
             expected_exact_body
