@@ -37,7 +37,7 @@ use url::form_urlencoded::Serializer;
 ///
 /// # Test Failure Examples
 ///
-/// [form](terminal://responses_provided_with_query_string)
+/// [expanded](terminal://responses_provided_with_query_string_mismatch)
 pub struct HttpQueryString {
     fields: Vec<HttpQueryStringItem>
 }
