@@ -17,14 +17,17 @@ use colored::*;
 
 // Internal Dependencies ------------------------------------------------------
 use util;
+use Options;
 use resource::http::HttpFormDataField;
+use resource::http::util::validate_http_multipart_body;
 
 
 // Deep Form Compare ----------------------------------------------------------
 pub fn compare(
     expected: &[HttpFormDataField],
     actual: &[HttpFormDataField],
-    check_additional_keys: bool
+    check_additional_keys: bool,
+    options: &Options
 
 ) -> Result<(), Vec<(Vec<String>, String)>> {
 
@@ -32,6 +35,7 @@ pub fn compare(
         expected,
         actual,
         check_additional_keys,
+        options,
         vec![]
     );
 
@@ -57,6 +61,7 @@ fn compare_form(
     a: &[HttpFormDataField],
     b: &[HttpFormDataField],
     check_additional_keys: bool,
+    options: &Options,
     path: Vec<String>
 
 ) -> Vec<(Vec<String>, String)> {
@@ -83,12 +88,14 @@ fn compare_form(
                 let mut field_path = path.clone();
                 field_path.push(format!(".{}", a_name.blue().bold()));
                 errors.append(&mut compare_form_fields(
+                    field_path,
+                    "Field",
+                    check_additional_keys,
+                    options,
                     a_type,
                     b_type,
                     a_field,
-                    b_field,
-                    field_path,
-                    "Field"
+                    b_field
                 ));
 
                 found = true;
@@ -122,12 +129,14 @@ fn compare_form(
 
 // Form Field Comparision -----------------------------------------------------
 fn compare_form_fields(
+    path: Vec<String>,
+    name: &'static str,
+    check_additional_keys: bool,
+    options: &Options,
     type_a: FormFieldType,
     type_b: FormFieldType,
     a: &HttpFormDataField,
-    b: &HttpFormDataField,
-    path: Vec<String>,
-    name: &'static str
+    b: &HttpFormDataField
 
 ) -> Vec<(Vec<String>, String)> {
 
@@ -186,12 +195,14 @@ fn compare_form_fields(
                         let b = HttpFormDataField::Field("".to_string(), b_item.to_string());
 
                         errors.append(&mut compare_form_fields(
+                            item_path,
+                            "ArrayItem",
+                            check_additional_keys,
+                            options,
                             FormFieldType::Field,
                             FormFieldType::Field,
                             &a,
-                            &b,
-                            item_path,
-                            "ArrayItem"
+                            &b
                         ));
 
                     }
@@ -199,8 +210,8 @@ fn compare_form_fields(
                 }
             },
 
-            HttpFormDataField::FileVec(_, ref filename_a, ref mime_a, _) => {
-                if let HttpFormDataField::FileVec(_, ref filename_b, ref mime_b, _) = *b {
+            HttpFormDataField::FileVec(_, ref filename_a, ref mime_a, ref data_a) => {
+                if let HttpFormDataField::FileVec(_, ref filename_b, ref mime_b, ref data_b) = *b {
 
                     if filename_a != filename_b {
                         errors.push((
@@ -228,7 +239,30 @@ fn compare_form_fields(
                         ))
                     }
 
-                    // TODO IW: Compare file content based on mime type
+                    // TODO IW: Fix text file assertion text
+                    for error in validate_http_multipart_body(
+                        &options,
+                        data_b,
+                        mime_b,
+                        data_a,
+                        mime_a,
+                        check_additional_keys
+                    ) {
+                        let error = error.split('\n').enumerate().map(|(i, line)| {
+                            if i == 0 {
+                                line.to_string()
+
+                            } else {
+                                format!("      {}", line)
+                            }
+
+                        }).collect::<Vec<String>>().join("\n") ;
+
+                        errors.push((
+                            path.clone(),
+                            format!("{}{}", "File".yellow(), error)
+                        ))
+                    }
 
                 }
             },
@@ -350,6 +384,7 @@ mod tests {
     use hyper::mime::{Mime, TopLevel, SubLevel};
     use resource::http::HttpFormDataField;
     use super::compare;
+    use Options;
 
     macro_rules! form {
         {} => (vec![]);
@@ -394,7 +429,8 @@ mod tests {
         errors: Vec<(Vec<&str>, &str)>,
         add: bool
     ) {
-        match compare(&expected, &actual, add) {
+        let options: Options = Default::default();
+        match compare(&expected, &actual, add, &options) {
             Ok(()) => {
                 assert!(errors.is_empty());
             },

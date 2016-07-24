@@ -41,7 +41,7 @@ fn test_with_form_body_url_encoded_trailing_comma() {
 }
 
 #[test]
-fn test_with_form_body_url_multipart_vec_file() {
+fn test_with_form_body_multipart_vec_file() {
 
     let actual = {
         API::post("/form")
@@ -61,7 +61,7 @@ fn test_with_form_body_url_multipart_vec_file() {
 }
 
 #[test]
-fn test_with_form_body_url_multipart_str_file() {
+fn test_with_form_body_multipart_str_file() {
 
     let actual = {
         API::post("/form")
@@ -81,7 +81,7 @@ fn test_with_form_body_url_multipart_str_file() {
 }
 
 #[test]
-fn test_with_form_body_url_multipart_string_file() {
+fn test_with_form_body_multipart_string_file() {
 
     let actual = {
         API::post("/form")
@@ -101,7 +101,7 @@ fn test_with_form_body_url_multipart_string_file() {
 }
 
 #[test]
-fn test_with_form_body_url_multipart_json_file() {
+fn test_with_form_body_multipart_json_file() {
 
     let actual = {
         API::post("/form")
@@ -123,7 +123,7 @@ fn test_with_form_body_url_multipart_json_file() {
 }
 
 #[test]
-fn test_with_form_body_url_multipart_fs_file() {
+fn test_with_form_body_multipart_fs_file() {
 
     use std::fs::File;
 
@@ -271,6 +271,212 @@ fn test_with_form_body_error_too_many_headers() {
     <bb> 1.1) <by>Request <by>form body could not be parsed:
 
               <br>Unexpected headers in multi part field.
+
+
+"#, actual);
+
+}
+
+
+// Form File Body Data --------------------------------------------------------
+#[test]
+fn test_with_form_body_multipart_file_raw_mismatch() {
+
+    let actual = {
+        API::post("/response/forward")
+            .with_body(form! {
+                "vec_file" => (
+                    "file.bin",
+                    Mime(TopLevel::Application, SubLevel::OctetStream, vec![]),
+                    vec![1, 2, 3, 4, 5, 6, 7, 8]
+                )
+            })
+            .provide(responses![
+                EXAMPLE.post("/forward").expected_body(form! {
+                    "vec_file" => (
+                        "file.bin",
+                        Mime(TopLevel::Application, SubLevel::OctetStream, vec![]),
+                        vec![1, 2, 3]
+                    )
+                })
+            ])
+            .collect()
+    };
+
+    assert_fail!(r#"
+<br>Response Failure: <bn>POST <by>request to \"<bn>http://localhost:4000<bn>/response/forward\" <by>returned <br>1 <by>error(s)
+
+<bb> 1) <br>Request Failure: <bn>POST <by>response provided for \"<bn>https://example.com<bn>/forward\" <by>returned <br>1 <by>error(s)
+
+    <bb> 1.1) <by>Request <by>body form data does not match, expected:
+
+              - <bb>form.<bb>vec_file: <by>File<by> <by>raw body data does not match, expected the following <bg>3 bytes<by>:
+
+                   [<bg>0x01, <bg>0x02, <bg>0x03]
+
+                <by>but got the following <br>8 bytes <by>instead:
+
+                   [<br>0x01, <br>0x02, <br>0x03, <br>0x04, <br>0x05, <br>0x06, <br>0x07, <br>0x08]
+
+
+"#, actual);
+
+}
+
+#[test]
+fn test_with_form_body_multipart_file_text_mismatch() {
+
+    let actual = {
+        API::post("/response/forward")
+            .with_body(form! {
+                "str_file" => (
+                    "readme.md",
+                    Mime(TopLevel::Text, SubLevel::Plain, vec![]),
+                    "Hello World"
+                )
+            })
+            .provide(responses![
+                EXAMPLE.post("/forward").expected_body(form! {
+                    "str_file" => (
+                        "readme.md",
+                        Mime(TopLevel::Text, SubLevel::Plain, vec![]),
+                        "World"
+                    )
+                })
+            ])
+            .collect()
+    };
+
+    assert_fail!(r#"
+<br>Response Failure: <bn>POST <by>request to \"<bn>http://localhost:4000<bn>/response/forward\" <by>returned <br>1 <by>error(s)
+
+<bb> 1) <br>Request Failure: <bn>POST <by>response provided for \"<bn>https://example.com<bn>/forward\" <by>returned <br>1 <by>error(s)
+
+    <bb> 1.1) <by>Request <by>body form data does not match, expected:
+
+              - <bb>form.<bb>str_file: <by>File<by> <by>does not match, expected:
+
+                    \"<bg>World\"
+
+                <by>but got:
+
+                    \"<br>Hello World\"
+
+                <by>difference:
+
+                    \"<gbg>Hello World\"
+
+
+"#, actual);
+
+}
+
+#[test]
+fn test_with_form_body_multipart_file_json_mismatch() {
+
+    let actual = {
+        API::post("/response/forward")
+            .with_body(form! {
+                "json_file" => (
+                    "data.json",
+                    Mime(TopLevel::Application, SubLevel::Json, vec![]),
+                    object! {
+                        "key" => "value",
+                        "additional" => "key"
+                    }
+                )
+            })
+            .provide(responses![
+                EXAMPLE.post("/forward").expected_body(form! {
+                    "json_file" => (
+                        "data.json",
+                        Mime(TopLevel::Application, SubLevel::Json, vec![]),
+                        object! {
+                            "key" => "valueTwo"
+                        }
+                    )
+                })
+            ])
+            .collect()
+    };
+
+    assert_fail!(r#"
+<br>Response Failure: <bn>POST <by>request to \"<bn>http://localhost:4000<bn>/response/forward\" <by>returned <br>1 <by>error(s)
+
+<bb> 1) <br>Request Failure: <bn>POST <by>response provided for \"<bn>https://example.com<bn>/forward\" <by>returned <br>1 <by>error(s)
+
+    <bb> 1.1) <by>Request <by>body form data does not match, expected:
+
+              - <bb>form.<bb>json_file: <by>File<by> <by>body JSON does not match, expected:
+
+                    - <bb>json.<bb>key: <bg>String <by>does not match, expected:
+
+                          \"<bg>value\"
+
+                      <by>but got:
+
+                          \"<br>valueTwo\"
+
+                      <by>difference:
+
+                          \"<gbr>value <gbg>valueTwo\"
+
+
+"#, actual);
+
+}
+
+#[test]
+fn test_with_form_body_multipart_file_json_mismatch_exact() {
+
+    let actual = {
+        API::post("/response/forward")
+            .with_body(form! {
+                "json_file" => (
+                    "data.json",
+                    Mime(TopLevel::Application, SubLevel::Json, vec![]),
+                    object! {
+                        "key" => "value",
+                        "additional" => "key"
+                    }
+                )
+            })
+            .provide(responses![
+                EXAMPLE.post("/forward").expected_exact_body(form! {
+                    "json_file" => (
+                        "data.json",
+                        Mime(TopLevel::Application, SubLevel::Json, vec![]),
+                        object! {
+                            "key" => "valueTwo"
+                        }
+                    )
+                })
+            ])
+            .collect()
+    };
+
+    assert_fail!(r#"
+<br>Response Failure: <bn>POST <by>request to \"<bn>http://localhost:4000<bn>/response/forward\" <by>returned <br>1 <by>error(s)
+
+<bb> 1) <br>Request Failure: <bn>POST <by>response provided for \"<bn>https://example.com<bn>/forward\" <by>returned <br>1 <by>error(s)
+
+    <bb> 1.1) <by>Request <by>body form data does not match, expected:
+
+              - <bb>form.<bb>json_file: <by>File<by> <by>body JSON does not match, expected:
+
+                    - <bb>json.<bb>key: <bg>String <by>does not match, expected:
+
+                          \"<bg>value\"
+
+                      <by>but got:
+
+                          \"<br>valueTwo\"
+
+                      <by>difference:
+
+                          \"<gbr>value <gbg>valueTwo\"
+
+                    - <bb>json: <bg>Object <by>has <br>1 <by>additional unexpected key(s) (<br>additional)
 
 
 "#, actual);

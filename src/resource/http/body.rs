@@ -236,7 +236,8 @@ pub fn validate_http_body(
                         let errors = util::form::compare(
                             &expected,
                             &actual,
-                            expected_exact_body
+                            expected_exact_body,
+                            options
                         );
 
                         // Exit early when there are no errors

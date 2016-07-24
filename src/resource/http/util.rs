@@ -13,6 +13,7 @@ use std::str;
 // External Dependencies ------------------------------------------------------
 use json;
 use colored::*;
+use hyper::mime::Mime;
 use hyper::status::StatusCode;
 use hyper::header::{Headers, ContentType};
 
@@ -100,6 +101,38 @@ pub fn validate_http_request<T: HttpLike>(
             expected_exact_body
         );
     }
+
+    errors
+
+}
+
+pub fn validate_http_multipart_body(
+    options: &Options,
+    actual_body: &Vec<u8>,
+    actual_mime: &Mime,
+    expected_body: &Vec<u8>,
+    expected_mime: &Mime,
+    expected_exact_body: bool
+
+) -> Vec<String> {
+
+    let mut headers = Headers::new();
+    headers.set(ContentType(expected_mime.clone()));
+
+    let expected_body = http_body_from_parts(expected_body.clone(), &headers);
+    headers.set(ContentType(actual_mime.clone()));
+
+    let actual_body = http_body_from_parts(actual_body.clone(), &headers);
+
+    let mut errors = Vec::new();
+    validate_http_body(
+        &mut errors,
+        &options,
+        actual_body,
+        "",
+        &expected_body,
+        expected_exact_body
+    );
 
     errors
 
