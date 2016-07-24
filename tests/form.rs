@@ -308,7 +308,7 @@ fn test_with_form_body_multipart_file_raw_mismatch() {
 
 <bb> 1) <br>Request Failure: <bn>POST <by>response provided for \"<bn>https://example.com<bn>/forward\" <by>returned <br>1 <by>error(s)
 
-    <bb> 1.1) <by>Request <by>body form data does not match, expected:
+    <bb> 1.1) <by>Request <by>body form data does not match:
 
               - <bb>form.<bb>vec_file: <by>File<by> <by>raw body data does not match, expected the following <bg>3 bytes<by>:
 
@@ -352,9 +352,9 @@ fn test_with_form_body_multipart_file_text_mismatch() {
 
 <bb> 1) <br>Request Failure: <bn>POST <by>response provided for \"<bn>https://example.com<bn>/forward\" <by>returned <br>1 <by>error(s)
 
-    <bb> 1.1) <by>Request <by>body form data does not match, expected:
+    <bb> 1.1) <by>Request <by>body form data does not match:
 
-              - <bb>form.<bb>str_file: <by>File<by> <by>does not match, expected:
+              - <bb>form.<bb>str_file: <by>File<by> <by>text body does not match, expected:
 
                     \"<bg>World\"
 
@@ -405,9 +405,9 @@ fn test_with_form_body_multipart_file_json_mismatch() {
 
 <bb> 1) <br>Request Failure: <bn>POST <by>response provided for \"<bn>https://example.com<bn>/forward\" <by>returned <br>1 <by>error(s)
 
-    <bb> 1.1) <by>Request <by>body form data does not match, expected:
+    <bb> 1.1) <by>Request <by>body form data does not match:
 
-              - <bb>form.<bb>json_file: <by>File<by> <by>body JSON does not match, expected:
+              - <bb>form.<bb>json_file: <by>File<by> <by>body JSON does not match:
 
                     - <bb>json.<bb>key: <bg>String <by>does not match, expected:
 
@@ -460,9 +460,9 @@ fn test_with_form_body_multipart_file_json_mismatch_exact() {
 
 <bb> 1) <br>Request Failure: <bn>POST <by>response provided for \"<bn>https://example.com<bn>/forward\" <by>returned <br>1 <by>error(s)
 
-    <bb> 1.1) <by>Request <by>body form data does not match, expected:
+    <bb> 1.1) <by>Request <by>body form data does not match:
 
-              - <bb>form.<bb>json_file: <by>File<by> <by>body JSON does not match, expected:
+              - <bb>form.<bb>json_file: <by>File<by> <by>body JSON does not match:
 
                     - <bb>json.<bb>key: <bg>String <by>does not match, expected:
 

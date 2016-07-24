@@ -148,7 +148,7 @@ fn test_provided_response_with_expected_body_text_mismatch_diff_added() {
 
 <bb> 1) <br>Request Failure: <bn>POST <by>response provided for \"<bn>https://example.com<bn>/forward\" <by>returned <br>1 <by>error(s)
 
-    <bb> 1.1) <by>Request <by>does not match, expected:
+    <bb> 1.1) <by>Request <by>text body does not match, expected:
 
               \"<bg>Response\"
 
@@ -183,7 +183,7 @@ fn test_provided_response_with_expected_body_text_mismatch_diff_removed() {
 
 <bb> 1) <br>Request Failure: <bn>POST <by>response provided for \"<bn>https://example.com<bn>/forward\" <by>returned <br>1 <by>error(s)
 
-    <bb> 1.1) <by>Request <by>does not match, expected:
+    <bb> 1.1) <by>Request <by>text body does not match, expected:
 
               \"<bg>Response Body\"
 
@@ -373,7 +373,7 @@ fn test_provided_response_with_expected_body_json_mismatch() {
 
 <bb> 1) <br>Request Failure: <bn>POST <by>response provided for \"<bn>https://example.com<bn>/forward\" <by>returned <br>1 <by>error(s)
 
-    <bb> 1.1) <by>Request <by>body JSON does not match, expected:
+    <bb> 1.1) <by>Request <by>body JSON does not match:
 
               - <bb>json.<bb>key: <bg>String <by>does not match, expected:
 
@@ -445,7 +445,7 @@ fn test_provided_response_with_expected_body_json_mismatch_exact() {
 
 <bb> 1) <br>Request Failure: <bn>POST <by>response provided for \"<bn>https://example.com<bn>/forward\" <by>returned <br>1 <by>error(s)
 
-    <bb> 1.1) <by>Request <by>body JSON does not match, expected:
+    <bb> 1.1) <by>Request <by>body JSON does not match:
 
               - <bb>json.<bb>key: <bg>String <by>does not match, expected:
 
@@ -566,7 +566,7 @@ fn test_provided_response_with_expected_body_json_compare_depth_one() {
 
 <bb> 1) <br>Request Failure: <bn>POST <by>response provided for \"<bn>https://example.com<bn>/forward\" <by>returned <br>1 <by>error(s)
 
-    <bb> 1.1) <by>Request <by>body JSON does not match, expected:
+    <bb> 1.1) <by>Request <by>body JSON does not match:
 
               - <bb>json.<bb>key: <bg>String <by>does not match, expected:
 
@@ -720,7 +720,7 @@ fn test_provided_response_with_expected_body_form_mismatch() {
 
 <bb> 1) <br>Request Failure: <bn>POST <by>response provided for \"<bn>https://example.com<bn>/forward\" <by>returned <br>1 <by>error(s)
 
-    <bb> 1.1) <by>Request <by>body form data does not match, expected:
+    <bb> 1.1) <by>Request <by>body form data does not match:
 
               - <bb>form.<bb>array[]: <bg>Array <by>with <br>4 <by>item(s) does not match expected length of <bg>5
 
@@ -818,7 +818,7 @@ fn test_provided_response_with_expected_body_form_mismatch_exact() {
 
 <bb> 1) <br>Request Failure: <bn>POST <by>response provided for \"<bn>https://example.com<bn>/forward\" <by>returned <br>1 <by>error(s)
 
-    <bb> 1.1) <by>Request <by>body form data does not match, expected:
+    <bb> 1.1) <by>Request <by>body form data does not match:
 
               - <bb>form.<bb>array[]: <bg>Array <by>with <br>4 <by>item(s) does not match expected length of <bg>5
 

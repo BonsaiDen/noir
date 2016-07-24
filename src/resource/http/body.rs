@@ -172,7 +172,7 @@ pub fn validate_http_body(
                         format!(
                             "{} {}\n\n        \"{}\"\n\n    {}\n\n        \"{}\"\n\n    {}\n\n        \"{}\"",
                             context.yellow(),
-                            "does not match, expected:".yellow(),
+                            "text body does not match, expected:".yellow(),
                             expected.green().bold(),
                             "but got:".yellow(),
                             actual.red().bold(),
@@ -212,7 +212,7 @@ pub fn validate_http_body(
                         format!(
                             "{} {}\n\n        {}",
                             context.yellow(),
-                            "body JSON does not match, expected:".yellow(),
+                            "body JSON does not match:".yellow(),
                             util::json::format(errors.unwrap_err())
                         )
 
@@ -248,7 +248,7 @@ pub fn validate_http_body(
                         format!(
                             "{} {}\n\n        {}",
                             context.yellow(),
-                            "body form data does not match, expected:".yellow(),
+                            "body form data does not match:".yellow(),
                             util::form::format(errors.unwrap_err())
                         )
 

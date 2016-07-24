@@ -47,7 +47,7 @@ fn test_body_text_mismatch_diff_added() {
     assert_fail!(r#"
 <br>Response Failure: <bn>GET <by>request to \"<bn>http://localhost:4000<bn>/get/hello\" <by>returned <br>1 <by>error(s)
 
-<bb> 1) <by>Response <by>does not match, expected:
+<bb> 1) <by>Response <by>text body does not match, expected:
 
         \"<bg>Hello     \\n\"
 
@@ -76,7 +76,7 @@ fn test_body_text_mismatch_diff_removed() {
     assert_fail!(r#"
 <br>Response Failure: <bn>GET <by>request to \"<bn>http://localhost:4000<bn>/get/hello\" <by>returned <br>1 <by>error(s)
 
-<bb> 1) <by>Response <by>does not match, expected:
+<bb> 1) <by>Response <by>text body does not match, expected:
 
         \"<bg>Hello World Message\\n\"
 
@@ -274,7 +274,7 @@ fn test_body_with_expected_json_mismatch() {
     assert_fail!(r#"
 <br>Response Failure: <bn>POST <by>request to \"<bn>http://localhost:4000<bn>/echo\" <by>returned <br>1 <by>error(s)
 
-<bb> 1) <by>Response <by>body JSON does not match, expected:
+<bb> 1) <by>Response <by>body JSON does not match:
 
         - <bb>json.<bb>key: <bg>String <by>does not match, expected:
 
@@ -342,7 +342,7 @@ fn test_body_with_expected_json_mismatch_exact() {
     assert_fail!(r#"
 <br>Response Failure: <bn>POST <by>request to \"<bn>http://localhost:4000<bn>/echo\" <by>returned <br>1 <by>error(s)
 
-<bb> 1) <by>Response <by>body JSON does not match, expected:
+<bb> 1) <by>Response <by>body JSON does not match:
 
         - <bb>json.<bb>key: <bg>String <by>does not match, expected:
 
@@ -510,7 +510,7 @@ fn test_body_with_expected_json_compare_depth_one() {
     assert_fail!(r#"
 <br>Response Failure: <bn>POST <by>request to \"<bn>http://localhost:4000<bn>/echo\" <by>returned <br>1 <by>error(s)
 
-<bb> 1) <by>Response <by>body JSON does not match, expected:
+<bb> 1) <by>Response <by>body JSON does not match:
 
         - <bb>json.<bb>key: <bg>String <by>does not match, expected:
 

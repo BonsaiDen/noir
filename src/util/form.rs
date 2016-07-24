@@ -239,7 +239,6 @@ fn compare_form_fields(
                         ))
                     }
 
-                    // TODO IW: Fix text file assertion text
                     for error in validate_http_multipart_body(
                         &options,
                         data_b,

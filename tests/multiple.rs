@@ -72,7 +72,7 @@ fn test_multiple_errors_text_body() {
 
 <bb> 2) <by>Response <by>header \"<bb>Server\" <by>was expected <bg>to be present<by>, but <br>is missing<by>.
 
-<bb> 3) <by>Response <by>does not match, expected:
+<bb> 3) <by>Response <by>text body does not match, expected:
 
         \"<bg>Hello World\"
 
