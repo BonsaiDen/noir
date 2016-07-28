@@ -34,13 +34,13 @@ pub use self::endpoint::HttpEndpoint;
 pub use self::response::HttpResponse;
 
 
-// Abstraction for Http Responses ---------------------------------------------
-pub trait HttpLike {
+// Abstraction for HTTP Responses/Requests ------------------------------------
+pub trait HttpResource {
     fn headers(&self) -> &Headers;
     fn into_http_body(&mut self) -> HttpBody where Self: Sized;
 }
 
-impl HttpLike for Response {
+impl HttpResource for Response {
 
     fn headers(&self) -> &Headers {
         &self.headers

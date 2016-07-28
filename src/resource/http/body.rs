@@ -24,6 +24,7 @@ use util;
 use Options;
 use super::HttpFormData;
 use super::form::{
+    HttpFormDataField,
     http_form_into_body_parts,
     http_form_into_fields,
     parse_form_data
@@ -139,163 +140,16 @@ impl From<HttpFormData> for HttpBody {
     }
 }
 
-pub fn validate_http_body(
-    errors: &mut Vec<String>,
-    options: &Options,
-    actual_body: HttpBody,
-    context: &str,
-    expected_body: &HttpBody,
-    expected_exact_body: bool
-) {
 
-    // Quick check before we perform heavy weight parsing
-    // This might cause false negative for JSON, but we'll perform a deep
-    // compare anyway.
-    if actual_body.data == expected_body.data {
-        return;
-    }
-
-    // Parse and compare different body types
-    let body = parse_http_body(&actual_body);
-    errors.push(match body {
-
-        Ok(actual) => match actual {
-            ParsedHttpBody::Text(actual) => {
-                match str::from_utf8(expected_body.data.as_slice()) {
-                    Ok(expected) => {
-
-                        let (expected, actual, diff) = util::diff::text(
-                            expected,
-                            actual
-                        );
-
-                        format!(
-                            "{} {}\n\n        \"{}\"\n\n    {}\n\n        \"{}\"\n\n    {}\n\n        \"{}\"",
-                            context.yellow(),
-                            "text body does not match, expected:".yellow(),
-                            expected.green().bold(),
-                            "but got:".yellow(),
-                            actual.red().bold(),
-                            "difference:".yellow(),
-                            diff
-                        )
-
-                    },
-                    Err(err) => format!(
-                        "{} {}\n\n        {}",
-                        context.yellow(),
-                        "body, expected text provided by test contains invalid UTF-8:".yellow(),
-                        format!("{:?}", err).red().bold()
-                    )
-                }
-            },
-            ParsedHttpBody::Json(actual) => {
-                let expected_json = util::json::parse(
-                    expected_body.data.as_slice(),
-                    "body JSON provided by test"
-                );
-                match expected_json {
-                    Ok(expected) => {
-
-                        let errors = util::json::compare(
-                            &expected,
-                            &actual,
-                            options.json_compare_depth,
-                            expected_exact_body
-                        );
-
-                        // Exit early when there are no errors
-                        if errors.is_ok() {
-                            return;
-                        }
-
-                        format!(
-                            "{} {}\n\n        {}",
-                            context.yellow(),
-                            "body JSON does not match:".yellow(),
-                            util::json::format(errors.unwrap_err())
-                        )
-
-                    },
-                    Err(err) => {
-                        format!(
-                            "{} {} {}",
-                            context.yellow(),
-                            "body, expected".yellow(),
-                            err
-                        )
-                    }
-                }
-            },
-            ParsedHttpBody::Form(actual) => {
-                match parse_http_body(expected_body) {
-                    Ok(ParsedHttpBody::Form(expected)) => {
-
-                        let expected = http_form_into_fields(expected);
-                        let actual = http_form_into_fields(actual);
-                        let errors = util::form::compare(
-                            &expected,
-                            &actual,
-                            expected_exact_body,
-                            options
-                        );
-
-                        // Exit early when there are no errors
-                        if errors.is_ok() {
-                            return;
-                        }
-
-                        format!(
-                            "{} {}\n\n        {}",
-                            context.yellow(),
-                            "body form data does not match:".yellow(),
-                            util::form::format(errors.unwrap_err())
-                        )
-
-                    },
-                    _ => unreachable!()
-                }
-            },
-            ParsedHttpBody::Raw(actual) => {
-                format!(
-                    "{} {}\n\n       [{}]\n\n    {}\n\n       [{}]",
-
-                    context.yellow(),
-
-                    format!(
-                        "{} {}{}",
-                        "raw body data does not match, expected the following".yellow(),
-                        format!("{} bytes", expected_body.data.len()).green().bold(),
-                        ":".yellow()
-                    ),
-                    util::raw::format_green(expected_body.data.as_slice()),
-                    format!(
-                        "{} {} {}",
-                        "but got the following".yellow(),
-                        format!("{} bytes", actual.len()).red().bold(),
-                        "instead:".yellow()
-                    ),
-                    util::raw::format_red(actual),
-                )
-            }
-        },
-
-        Err(err) => {
-            format!("{} {}", context.yellow(), err)
-        }
-
-    });
-
-}
-
-pub enum ParsedHttpBody<'a> {
+// Parsing --------------------------------------------------------------------
+enum ParsedHttpBody<'a> {
     Text(&'a str),
     Json(json::JsonValue),
     Form(HttpFormData),
     Raw(&'a [u8])
 }
 
-pub fn parse_http_body(body: &HttpBody) -> Result<ParsedHttpBody, String> {
+fn parse_http_body(body: &HttpBody) -> Result<ParsedHttpBody, String> {
 
     if let Some(mime) = body.mime.as_ref() {
         match mime.clone() {
@@ -341,5 +195,319 @@ pub fn parse_http_body(body: &HttpBody) -> Result<ParsedHttpBody, String> {
     } else {
         Ok(ParsedHttpBody::Raw(&body.data[..]))
     }
+}
+
+
+// Formatting -----------------------------------------------------------------
+pub fn format_http_body(body: &HttpBody) -> String {
+    match parse_http_body(body) {
+        Ok(actual) => match actual {
+            ParsedHttpBody::Text(text) => {
+                let text = format!("{:?}", text);
+                format!(
+                    "{}\n\n        \"{}\"",
+                    "body dump:".yellow(),
+                    &text[1..text.len() - 1].purple().bold()
+                )
+            },
+
+            ParsedHttpBody::Json(json) => {
+                format!(
+                    "{}\n\n        {}",
+                    "body dump:".yellow(),
+                    // TODO IW: Support JSON highlighting
+                    json::stringify_pretty(json, 4)
+                        .lines()
+                        .collect::<Vec<&str>>()
+                        .join("\n        ").cyan()
+                )
+            },
+
+            ParsedHttpBody::Form(form) => {
+
+                let fields = http_form_into_fields(form);
+                let field_count = fields.len();
+
+                let fields = fields.into_iter().enumerate().map(|(i, field)| {
+                    match field {
+                        HttpFormDataField::Field(name, value) => {
+                            let value = format!("{:?}", value);
+                            format!(
+                                "{} {} \"{}\" {}\n\n              \"{}\"\n",
+                                format!("{:2})", i + 1).blue().bold(),
+                                "Field".yellow(),
+                                name.cyan(),
+                                "dump:".yellow(),
+                                &value[1..value.len() - 1].purple().bold()
+                            )
+                        },
+                        HttpFormDataField::Array(name, values) => {
+                            format!(
+                                "{} {} \"{}\" ({}) {}\n\n              {}\n",
+                                format!("{:2})", i + 1).blue().bold(),
+                                "Array".yellow(),
+                                name.cyan(),
+                                format!("{} items", values.len()).purple().bold(),
+                                "dump:".yellow(),
+                                values.into_iter().map(|value| {
+                                    let value = format!("{:?}", value);
+                                    format!("\"{}\"", &value[1..value.len() - 1].purple().bold())
+
+                                }).collect::<Vec<String>>().join(", ")
+                            )
+                        },
+                        HttpFormDataField::FileVec(name, filename, mime, data) => {
+
+                            // Parse file data into a HttpBody
+                            let mut headers = Headers::new();
+                            headers.set(ContentType(mime.clone()));
+                            let body = http_body_from_parts(data, &headers);
+
+                            // Format the body
+                            let body = format_http_body(&body).split('\n').map(|line| {
+                                format!("      {}", line)
+
+                            }).collect::<Vec<String>>().join("\n");
+
+                            format!(
+                                "{} {} \"{}\" (\"{}\", {}) {}\n",
+                                format!("{:2})", i + 1).blue().bold(),
+                                "File".yellow(),
+                                name.cyan(),
+                                filename.purple().bold(),
+                                format!("{}", mime).purple().bold(),
+                                body.trim_left()
+                            )
+
+                        },
+                        _ => unreachable!()
+                    }
+
+                }).collect::<Vec<String>>().join("\n        ");
+
+                format!(
+                    "{}\n\n        {}",
+                    format!(
+                        "{} {}{}",
+                        "form dump with".yellow(),
+                        format!("{} fields", field_count).cyan(),
+                        ":".yellow()
+                    ),
+                    fields
+                )
+
+            },
+
+            // Format as 16 column wide rows of hexadecimal numbers
+            ParsedHttpBody::Raw(data) => {
+                format!(
+                    "{}\n\n       [{}]",
+                    format!(
+                        "{} {}{}",
+                        "raw body dump of".yellow(),
+                        format!("{} bytes", data.len()).cyan(),
+                        ":".yellow()
+                    ),
+                    util::raw::format_purple(data)
+                )
+            }
+        },
+        Err(err) => err
+    }
+}
+
+
+// Validation -----------------------------------------------------------------
+pub fn validate_http_body(
+    errors: &mut Vec<String>,
+    context: &str,
+    expected_body: &HttpBody,
+    actual_body: HttpBody,
+    compare_exact: bool,
+    options: &Options
+) {
+
+    // Quick check before we perform heavy weight parsing
+    // This might cause false negative for JSON, but we'll perform a deep
+    // compare anyway.
+    if actual_body.data == expected_body.data {
+        return;
+    }
+
+    // Parse and compare different body types
+    let mut error = match parse_http_body(&actual_body) {
+        Ok(actual) => match actual {
+            ParsedHttpBody::Text(actual) => compare_text_body(
+                context, expected_body, actual
+            ),
+            ParsedHttpBody::Json(actual) => compare_json_body(
+                context, expected_body, actual,
+                compare_exact,
+                options.json_compare_depth
+            ),
+            ParsedHttpBody::Form(actual) => compare_form_body(
+                context, expected_body, actual,
+                compare_exact,
+                options
+            ),
+            ParsedHttpBody::Raw(actual) => compare_raw_body(
+                context, expected_body, actual
+            )
+        },
+        Err(err) => Some(format!("{} {}", context.yellow(), err))
+    };
+
+    if let Some(error) = error.take() {
+        errors.push(error);
+    }
+
+}
+
+fn compare_text_body(
+    context: &str,
+    expected: &HttpBody,
+    actual: &str
+
+) -> Option<String> {
+    match str::from_utf8(expected.data.as_slice()) {
+        Ok(expected) => {
+
+            let (expected, actual, diff) = util::diff::text(
+                expected,
+                actual
+            );
+
+            Some(format!(
+                "{} {}\n\n        \"{}\"\n\n    {}\n\n        \"{}\"\n\n    {}\n\n        \"{}\"",
+                context.yellow(),
+                "text body does not match, expected:".yellow(),
+                expected.green().bold(),
+                "but got:".yellow(),
+                actual.red().bold(),
+                "difference:".yellow(),
+                diff
+            ))
+
+        },
+        Err(err) => Some(format!(
+            "{} {}\n\n        {}",
+            context.yellow(),
+            "body, expected text provided by test contains invalid UTF-8:".yellow(),
+            format!("{:?}", err).red().bold()
+        ))
+    }
+}
+
+fn compare_json_body(
+    context: &str,
+    expected: &HttpBody,
+    actual: json::JsonValue,
+    compare_exact: bool,
+    compare_depth: usize
+
+) -> Option<String> {
+
+    let expected_json = util::json::parse(
+        expected.data.as_slice(),
+        "body JSON provided by test"
+    );
+
+    match expected_json {
+        Ok(expected) => {
+
+            let errors = util::json::compare(
+                &expected,
+                &actual,
+                compare_depth,
+                compare_exact
+            );
+
+            // Exit early when there are no errors
+            if errors.is_ok() {
+                None
+
+            } else {
+                Some(format!(
+                    "{} {}\n\n        {}",
+                    context.yellow(),
+                    "body JSON does not match:".yellow(),
+                    util::json::format(errors.unwrap_err())
+                ))
+            }
+
+        },
+        Err(err) => Some(format!(
+            "{} {} {}",
+            context.yellow(),
+            "body, expected".yellow(),
+            err
+        ))
+    }
+
+}
+
+fn compare_form_body(
+    context: &str,
+    expected: &HttpBody,
+    actual: HttpFormData,
+    compare_exact: bool,
+    options: &Options
+
+) -> Option<String> {
+    match parse_http_body(expected) {
+        Ok(ParsedHttpBody::Form(expected)) => {
+
+            let expected = http_form_into_fields(expected);
+            let actual = http_form_into_fields(actual);
+            let errors = util::form::compare(
+                &expected,
+                &actual,
+                compare_exact,
+                options
+            );
+
+            // Exit early when there are no errors
+            if errors.is_ok() {
+                None
+
+            } else {
+                Some(format!(
+                    "{} {}\n\n        {}",
+                    context.yellow(),
+                    "body form data does not match:".yellow(),
+                    util::form::format(errors.unwrap_err())
+                ))
+            }
+
+
+        },
+        _ => unreachable!()
+    }
+}
+
+fn compare_raw_body(
+    context: &str,
+    expected: &HttpBody,
+    actual: &[u8]
+
+) -> Option<String> {
+    Some(format!(
+        "{} {}\n\n       [{}]\n\n    {}\n\n       [{}]",
+        context.yellow(),
+        format!(
+            "{} {}{}",
+            "raw body data does not match, expected the following".yellow(),
+            format!("{} bytes", expected.data.len()).green().bold(),
+            ":".yellow()
+        ),
+        util::raw::format_green(expected.data.as_slice()),
+        format!(
+            "{} {} {}",
+            "but got the following".yellow(),
+            format!("{} bytes", actual.len()).red().bold(),
+            "instead:".yellow()
+        ),
+        util::raw::format_red(actual),
+    ))
 }
 

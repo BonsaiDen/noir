@@ -240,12 +240,12 @@ fn compare_form_fields(
                     }
 
                     for error in validate_http_multipart_body(
-                        &options,
-                        data_b,
-                        mime_b,
                         data_a,
                         mime_a,
-                        check_additional_keys
+                        data_b,
+                        mime_b,
+                        check_additional_keys,
+                        options,
                     ) {
                         let error = error.split('\n').enumerate().map(|(i, line)| {
                             if i == 0 {

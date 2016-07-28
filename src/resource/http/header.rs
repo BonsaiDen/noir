@@ -17,7 +17,6 @@ use hyper::header::{Header, Headers, HeaderView, HeaderFormat};
 
 // Internal Dependencies ------------------------------------------------------
 use util;
-use super::HttpLike;
 
 
 /// An abstraction over different `hyper::Header` implementations.
@@ -59,12 +58,34 @@ pub fn http_header_into_tuple(header: HttpHeader) -> (String, Vec<u8>) {
     (header.name, header.value)
 }
 
-pub fn validate_http_request_headers<T: HttpLike>(
+
+// Formatting -----------------------------------------------------------------
+pub fn format_http_headers(headers: &Headers) -> String {
+
+    let mut headers = headers.iter().map(|header| {
+        (header.name().to_string(), header.value_string().clone())
+
+    }).collect::<Vec<(String, String)>>();
+
+    headers.sort();
+
+    let max_name_length = headers.iter().map(|h| h.0.len()).max().unwrap_or(0);
+
+    headers.into_iter().map(|(name, value)| {
+        format!("{: >2$}: {}", name.cyan(), value.purple().bold(), max_name_length)
+
+    }).collect::<Vec<String>>().join("\n        ")
+
+}
+
+
+// Validation -----------------------------------------------------------------
+pub fn validate_http_headers(
     errors: &mut Vec<String>,
-    result: &mut T,
     context: &str,
     expected_headers: &Headers,
-    unexpected_headers: &mut Vec<String>
+    unexpected_headers: &mut Vec<String>,
+    actual_headers: &Headers
 ) {
 
     // Sort for stable error ordering
@@ -74,7 +95,7 @@ pub fn validate_http_request_headers<T: HttpLike>(
     });
 
     for header in headers {
-        if let Some(expected_value) = result.headers().get_raw(header.name()) {
+        if let Some(expected_value) = actual_headers.get_raw(header.name()) {
             let actual_value = header.value_string();
             if expected_value[0].as_slice() != actual_value.as_bytes() {
 
@@ -118,7 +139,7 @@ pub fn validate_http_request_headers<T: HttpLike>(
     unexpected_headers.sort();
 
     for header in unexpected_headers {
-        if let Some(_) = result.headers().get_raw(header) {
+        if let Some(_) = actual_headers.get_raw(header) {
             errors.push(format!(
                 "{} {} \"{}\" {} {}{} {}{}",
                 context.yellow(),

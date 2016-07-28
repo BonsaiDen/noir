@@ -12,7 +12,7 @@ use std::sync::{Arc, Mutex};
 
 // External Dependencies ------------------------------------------------------
 use colored::*;
-use hyper::Client;
+use hyper::{Client, Error};
 use hyper::method::Method;
 use hyper::client::Response;
 use hyper::status::StatusCode;
@@ -109,7 +109,7 @@ pub struct HttpRequest<A: HttpApi> {
     expected_status: Option<StatusCode>,
     expected_headers: Headers,
     expected_body: Option<HttpBody>,
-    expected_exact_body: bool,
+    compare_exact: bool,
 
     unexpected_headers: Vec<String>,
 
@@ -253,7 +253,7 @@ impl<A: HttpApi> HttpRequest<A> {
     /// [collapsed](terminal://body_with_expected_json_mismatch)
     pub fn expected_body<S: Into<HttpBody>>(mut self, body: S) -> Self {
         self.expected_body = Some(body.into());
-        self.expected_exact_body = false;
+        self.compare_exact = false;
         self
     }
 
@@ -276,7 +276,7 @@ impl<A: HttpApi> HttpRequest<A> {
     /// If the actual response body does not match the expected one.
     pub fn expected_exact_body<S: Into<HttpBody>>(mut self, body: S) -> Self {
         self.expected_body = Some(body.into());
-        self.expected_exact_body = true;
+        self.compare_exact = true;
         self
     }
 
@@ -349,7 +349,7 @@ impl<A: HttpApi> HttpRequest<A> {
         // Limit ourselves to one test at a time in order to ensure correct
         // handling of mocked requests and responses
         let (errors, error_count, suppressed_count) = if let Ok(_) = REQUEST_LOCK.lock() {
-            self.request()
+            self.send()
 
         } else {
             (vec![format!(
@@ -410,45 +410,7 @@ impl<A: HttpApi> HttpRequest<A> {
 
     }
 
-    fn request(&mut self) -> (Vec<String>, usize, usize) {
-
-        // Convert body into Mime and Vec<u8>
-        let (content_mime, body) = if let Some(body) = self.request_body.take() {
-            util::http_body_into_parts(body)
-
-        } else {
-            (None, None)
-        };
-
-        // Set Content-Type based on body data if:
-        // A. The body has a Mime
-        // B. No other Content-Type has been set on the request
-        if let Some(content_mime) = content_mime {
-            if !self.request_headers.has::<ContentType>() {
-                self.request_headers.set(ContentType(content_mime));
-            }
-        }
-
-        // Create Client
-        let mut client = Client::new();
-        client.set_read_timeout(Some(self.options.api_request_timeout));
-        client.set_write_timeout(Some(self.options.api_request_timeout));
-
-        // Setup Request
-        let mut request = client.request(
-            self.method.clone(),
-            self.api.url_with_path(self.path.as_str()).as_str()
-
-        ).headers(
-            self.request_headers.clone()
-        );
-
-        // Set body, if present
-        if let Some(body) = body.as_ref() {
-            request = request.body(
-                &body[..]
-            );
-        }
+    fn send(&mut self) -> (Vec<String>, usize, usize) {
 
         // Provide responses to request interceptors
         ResponseProvider::provide(
@@ -459,9 +421,14 @@ impl<A: HttpApi> HttpRequest<A> {
             mock.setup();
         }
 
-        // Send response and validate
-        let errors = match request.send() {
-            Ok(response) => self.validate(response),
+        // Set up hyper client
+        let mut client = Client::new();
+        client.set_read_timeout(Some(self.options.api_request_timeout));
+        client.set_write_timeout(Some(self.options.api_request_timeout));
+
+        // Send request and validate response
+        let errors = match self.http_request(&mut client) {
+            Ok(response) => self.validate_response(response),
             Err(_) => (vec![format!(
                 "{} {} {}{}",
                 "API Failure:".red().bold(),
@@ -480,37 +447,103 @@ impl<A: HttpApi> HttpRequest<A> {
 
     }
 
-    fn validate(&mut self, mut response: Response) -> (Vec<String>, usize, usize) {
+    fn http_request(&mut self, client: &mut Client) -> Result<Response, Error> {
 
+        let (content_mime, body) = if let Some(body) = self.request_body.take() {
+            util::http_body_into_parts(body)
+
+        } else {
+            (None, None)
+        };
+
+        if let Some(content_mime) = content_mime {
+            // Set Content-Type based on body data if:
+            // A. The body has a Mime
+            // B. No other Content-Type has been set on the request
+            if !self.request_headers.has::<ContentType>() {
+                self.request_headers.set(ContentType(content_mime));
+            }
+        }
+
+        let request = client.request(
+            self.method.clone(),
+            self.api.url_with_path(self.path.as_str()).as_str()
+
+        ).headers(
+            self.request_headers.clone()
+        );
+
+        if let Some(body) = body.as_ref() {
+            request.body(&body[..]).send()
+
+        } else {
+            request.send()
+        }
+
+    }
+
+    fn validate_response(&mut self, mut response: Response) -> (Vec<String>, usize, usize) {
+
+        // Request dumping
         let mut errors = Vec::new();
         if self.dump_response {
-            util::dump_http_like(
+            util::dump_http_resource(
                 &mut errors,
                 &mut response,
                 "Response"
             );
         }
 
+        // Validate Response
         let status = response.status;
-        errors.append(&mut util::validate_http_request(
-            &mut response,
-            &self.options,
+        errors.append(&mut util::validate_http_resource(
             "Response",
-            Some(status),
             self.expected_status,
             &self.expected_headers,
             &mut self.unexpected_headers,
             &self.expected_body,
-            self.expected_exact_body
+            &mut response,
+            Some(status),
+            self.compare_exact,
+            &self.options
         ));
 
-        let mut response_errors = Vec::new();
-        let mut error_count = errors.len();
-        let index_offset = match self.options.error_suppress_cascading {
-            true => 0,
-            false => error_count
+        // Validate Resource Requests
+        let (mut response_errors, total_error_count) = self.validate_requests(errors.len());
+
+        // Suppress cascading response errors that may be the result from
+        // previous resource request errors
+        if !response_errors.is_empty() &&
+            self.options.error_suppress_cascading {
+
+            // Remove the suppressed errors
+            let suppressed_count = errors.len();
+            errors.clear();
+
+            errors.append(&mut response_errors);
+            (errors, total_error_count - suppressed_count, suppressed_count)
+
+        } else {
+            errors.append(&mut response_errors);
+            (errors, total_error_count, 0)
+        }
+
+    }
+
+    fn validate_requests(&self, response_error_count: usize) -> (Vec<String>, usize) {
+
+        // Correct error index offset if response errors are suppressed
+        let index_offset = if self.options.error_suppress_cascading {
+            0
+
+        } else {
+            response_error_count
         };
 
+        let mut total_error_count = response_error_count;
+        let mut response_errors = Vec::new();
+
+        // Validate requests to all provided and unprovided responses
         for (
             mut response,
             response_index,
@@ -521,7 +554,7 @@ impl<A: HttpApi> HttpRequest<A> {
             let errors = response.validate(response_index, request_index);
             if !errors.is_empty() {
                 let header = response.validate_header(errors.len());
-                error_count += errors.len();
+                total_error_count += errors.len();
                 response_errors.push(format_response_errors(
                     header,
                     index_offset + response_index + 1,
@@ -534,27 +567,14 @@ impl<A: HttpApi> HttpRequest<A> {
         for mut request in ResponseProvider::additional_requests() {
             if let Some(error) = request.validate() {
                 response_errors.push(error);
-                error_count += 1;
+                total_error_count += 1;
             }
         }
 
+        // Reset the global response provider for the next test
         ResponseProvider::reset();
 
-        // Suppress cascading errors that may be the result from response errors
-        if !response_errors.is_empty() &&
-            self.options.error_suppress_cascading {
-
-            // Remove the suppressed errors
-            let suppressed_count = errors.len();
-            errors.clear();
-
-            errors.append(&mut response_errors);
-            (errors, error_count - suppressed_count, suppressed_count)
-
-        } else {
-            errors.append(&mut response_errors);
-            (errors, error_count, 0)
-        }
+        (response_errors, total_error_count)
 
     }
 
@@ -647,7 +667,7 @@ pub fn http_request<A: HttpApi>(
         expected_status: None,
         expected_headers: Headers::new(),
         expected_body: None,
-        expected_exact_body: false,
+        compare_exact: false,
 
         unexpected_headers: Vec::new(),
 

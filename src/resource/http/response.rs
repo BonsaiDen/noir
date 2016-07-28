@@ -45,7 +45,7 @@ pub struct HttpResponse<E: HttpEndpoint> {
     expected_headers: Headers,
     unexpected_headers: Vec<String>,
     expected_body: Option<HttpBody>,
-    expected_exact_body: bool,
+    compare_exact: bool,
 
     request: Option<Box<MockRequest>>
 }
@@ -185,7 +185,7 @@ impl<E: HttpEndpoint> HttpResponse<E> {
     /// [collapsed](terminal://provided_response_with_expected_body_form_mismatch)
     pub fn expected_body<S: Into<HttpBody>>(mut self, body: S) -> Self {
         self.expected_body = Some(body.into());
-        self.expected_exact_body = false;
+        self.compare_exact = false;
         self
     }
 
@@ -208,7 +208,7 @@ impl<E: HttpEndpoint> HttpResponse<E> {
     /// If the actual request body does not match the expected one.
     pub fn expected_exact_body<S: Into<HttpBody>>(mut self, body: S) -> Self {
         self.expected_body = Some(body.into());
-        self.expected_exact_body = true;
+        self.compare_exact = true;
         self
     }
 
@@ -226,6 +226,54 @@ impl<E: HttpEndpoint> HttpResponse<E> {
     pub fn dump(mut self) -> Self {
         self.dump_request = true;
         self
+    }
+
+    // Internal ---------------------------------------------------------------
+    fn http_response(&mut self) -> Vec<u8> {
+
+        let (content_mime, mut body) = if let Some(body) = self.response_body.take() {
+            util::http_body_into_parts(body)
+
+        } else {
+            (None, None)
+        };
+
+        if let Some(content_mime) = content_mime {
+            // Set Content-Type based on body data if:
+            // A. The body has a Mime
+            // B. No other Content-Type has been set on the request
+            if !self.response_headers.has::<ContentType>() {
+                self.response_headers.set(ContentType(content_mime));
+            }
+        }
+
+        // Set Content-Length based on body (unless already specified)
+        if !self.response_headers.has::<ContentLength>() && body.is_none() {
+            // Explicitly set 0 to avoid having to wait for read timeouts
+            self.response_headers.set(ContentLength(0));
+        }
+
+        let mut data = Vec::new();
+        {
+            let mut res = ServerResponse::new(
+                &mut data,
+                &mut self.response_headers
+            );
+
+            if let Some(status) = self.response_status {
+                *res.status_mut() = status;
+            }
+
+            if let Some(body) = body.take() {
+                res.send(&body[..]).ok();
+
+            } else {
+                res.start().unwrap().end().ok();
+            }
+        }
+
+        data
+
     }
 
 }
@@ -257,57 +305,7 @@ impl<E: HttpEndpoint> MockResponse for HttpResponse<E> {
             Err(err)
 
         } else {
-            let mut data: Vec<u8> = Vec::new();
-            {
-
-                // Convert body into Mime and Vec<u8>
-                let (content_mime, mut body) = if let Some(body) = self.response_body.take() {
-                    util::http_body_into_parts(body)
-
-                } else {
-                    (None, None)
-                };
-
-                // Set Content-Type based on body data if:
-                // A. The body has a Mime
-                // B. No other Content-Type has been set on the request
-                if let Some(content_mime) = content_mime {
-                    if !self.response_headers.has::<ContentType>() {
-                        self.response_headers.set(ContentType(content_mime));
-                    }
-                }
-
-                // Set Content-Length based on body (unless already specified)
-                if !self.response_headers.has::<ContentLength>() {
-                    if body.is_none() {
-                        // Explicitly set 0 to avoid having to wait for read
-                        // timeouts
-                        self.response_headers.set(ContentLength(0));
-                    }
-                }
-
-                // Create Response
-                let mut res = ServerResponse::new(
-                    &mut data, &mut self.response_headers
-                );
-
-                // Set status code if specified
-                if let Some(status) = self.response_status {
-                    *res.status_mut() = status;
-                }
-
-                // Send body if specified
-                if let Some(body) = body.take() {
-                    res.send(&body[..]).ok();
-
-                // Empty body
-                } else {
-                    res.start().unwrap().end().ok();
-                }
-            }
-
-            Ok(data)
-
+            Ok(self.http_response())
         }
 
     }
@@ -325,7 +323,7 @@ impl<E: HttpEndpoint> MockResponse for HttpResponse<E> {
 
             let request = HttpRequest::downcast_mut(request).unwrap();
             if self.dump_request {
-                util::dump_http_like(
+                util::dump_http_resource(
                     &mut errors, request, "Request"
                 );
             }
@@ -343,16 +341,16 @@ impl<E: HttpEndpoint> MockResponse for HttpResponse<E> {
                 ));
             }
 
-            errors.append(&mut util::validate_http_request(
-                request,
-                &self.options,
+            errors.append(&mut util::validate_http_resource(
                 "Request",
-                None,
                 None,
                 &self.expected_headers,
                 &mut self.unexpected_headers,
                 &self.expected_body,
-                self.expected_exact_body
+                request,
+                None,
+                self.compare_exact,
+                &self.options
             ));
 
             errors
@@ -369,7 +367,6 @@ impl<E: HttpEndpoint> MockResponse for HttpResponse<E> {
         }
 
     }
-
 
     fn validate_header(
         &self,
@@ -414,7 +411,7 @@ pub fn http_response<E: HttpEndpoint>(
         unexpected_headers: Vec::new(),
         expected_headers: Headers::new(),
         expected_body: None,
-        expected_exact_body: false,
+        compare_exact: false,
 
         request: None
     }

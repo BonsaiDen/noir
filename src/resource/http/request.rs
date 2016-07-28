@@ -19,7 +19,7 @@ use hyper::header::Headers;
 
 // Internal Dependencies ------------------------------------------------------
 use mock::MockRequest;
-use super::{HttpLike, HttpBody};
+use super::{HttpResource, HttpBody};
 use super::body::http_body_from_parts;
 
 
@@ -102,7 +102,7 @@ impl MockRequest for HttpRequest {
 
 }
 
-impl HttpLike for HttpRequest {
+impl HttpResource for HttpRequest {
 
     fn headers(&self) -> &Headers {
         &self.headers
