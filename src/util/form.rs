@@ -13,6 +13,7 @@ use std::str;
 
 // External Dependencies ------------------------------------------------------
 use colored::*;
+use hyper::mime::Mime;
 
 
 // Internal Dependencies ------------------------------------------------------
@@ -58,44 +59,44 @@ pub fn format(errors: Vec<(Vec<String>, String)>) -> String {
 
 // Recursive Compare Function -------------------------------------------------
 fn compare_form(
-    a: &[HttpFormDataField],
-    b: &[HttpFormDataField],
+    expected: &[HttpFormDataField],
+    actual: &[HttpFormDataField],
     check_additional_keys: bool,
     options: &Options,
     path: Vec<String>
 
 ) -> Vec<(Vec<String>, String)> {
 
-    if a.is_empty() && b.is_empty() {
+    if expected.is_empty() && actual.is_empty() {
         return vec![];
     }
 
-    let mut a_fields = map_form_fields(a);
-    let mut b_fields = map_form_fields(b);
+    let mut expected_fields = map_form_fields(expected);
+    let mut actual_fields = map_form_fields(actual);
 
-    a_fields.sort_by(|a, b| a.0.cmp(b.0));
-    b_fields.sort_by(|a, b| a.0.cmp(b.0));
+    expected_fields.sort_by(|a, b| a.0.cmp(b.0));
+    actual_fields.sort_by(|a, b| a.0.cmp(b.0));
 
     let mut missing_fields = Vec::new();
     let mut errors = vec![];
 
-    for (a_name, a_type, a_field) in a_fields {
+    for (expected_name, expected_type, expected_field) in expected_fields {
 
         let mut found = false;
-        b_fields.retain(|&(ref b_name, b_type, ref b_field)| {
-            if a_name == *b_name {
+        actual_fields.retain(|&(ref actual_name, actual_type, ref actual_field)| {
+            if expected_name == *actual_name {
 
                 let mut field_path = path.clone();
-                field_path.push(format!(".{}", a_name.blue().bold()));
-                errors.append(&mut compare_form_fields(
+                field_path.push(format!(".{}", expected_name.blue().bold()));
+                errors.append(&mut compare_form_field(
                     field_path,
                     "Field",
                     check_additional_keys,
                     options,
-                    a_type,
-                    b_type,
-                    a_field,
-                    b_field
+                    expected_type,
+                    actual_type,
+                    expected_field,
+                    actual_field
                 ));
 
                 found = true;
@@ -107,7 +108,7 @@ fn compare_form(
         });
 
         if !found {
-            missing_fields.push((a_name, a_type, a_field));
+            missing_fields.push((expected_name, expected_type, expected_field));
         }
 
     }
@@ -117,9 +118,9 @@ fn compare_form(
     missing_field_errors(FormFieldType::File, &mut errors, &missing_fields);
 
     if check_additional_keys {
-        additional_field_errors(FormFieldType::Field, &mut errors, &b_fields);
-        additional_field_errors(FormFieldType::Array, &mut errors, &b_fields);
-        additional_field_errors(FormFieldType::File, &mut errors, &b_fields);
+        additional_field_errors(FormFieldType::Field, &mut errors, &actual_fields);
+        additional_field_errors(FormFieldType::Array, &mut errors, &actual_fields);
+        additional_field_errors(FormFieldType::File, &mut errors, &actual_fields);
     }
 
     errors
@@ -128,141 +129,77 @@ fn compare_form(
 
 
 // Form Field Comparision -----------------------------------------------------
-fn compare_form_fields(
+fn compare_form_field(
     path: Vec<String>,
     name: &'static str,
     check_additional_keys: bool,
     options: &Options,
-    type_a: FormFieldType,
-    type_b: FormFieldType,
-    a: &HttpFormDataField,
-    b: &HttpFormDataField
+    expected_type: FormFieldType,
+    actual_type: FormFieldType,
+    expected: &HttpFormDataField,
+    actual: &HttpFormDataField
 
 ) -> Vec<(Vec<String>, String)> {
 
-    if type_a == type_b {
+    if expected_type == actual_type {
 
         let mut errors = vec![];
-        match *a {
-
-            HttpFormDataField::Field(_, ref value_a) => {
-                if let HttpFormDataField::Field(_, ref value_b) = *b {
-                    if value_a != value_b {
-                        let (expected, actual, diff) = util::diff::text(value_b, value_a);
-                        errors.push((
-                            path.clone(),
-                            format!(
-                                "{} {}\n\n              \"{}\"\n\n          {}\n\n              \"{}\"\n\n          {}\n\n              \"{}\"",
-                                name.green().bold(),
-                                "value does not match, expected:".yellow(),
-                                expected.green().bold(),
-                                "but got:".yellow(),
-                                actual.red().bold(),
-                                "difference:".yellow(),
-                                diff
-                            )
-                        ))
-                    }
+        match *expected {
+            HttpFormDataField::Field(_, ref expected_value) =>  {
+                if let HttpFormDataField::Field(_, ref actual_value) = *actual {
+                    compare_field(
+                        &mut errors, path, name, expected_value, actual_value
+                    );
                 }
             },
-
-            HttpFormDataField::Array(_, ref value_a) => {
-                if let HttpFormDataField::Array(_, ref value_b) = *b {
-
-                    let len_a = value_a.len();
-                    let len_b = value_b.len();
-
-                    if len_a != len_b {
-                        errors.push((
-                            path.clone(),
-                            format!(
-                                "{} {} {} {} {}",
-                                "Array".green().bold(),
-                                "with".yellow(),
-                                format!("{}", len_b).red().bold(),
-                                "item(s) does not match expected length of".yellow(),
-                                format!("{}", len_a).green().bold()
-                            )
-                        ));
-                    }
-
-                    for (index, (a_item, b_item)) in value_a.iter().zip(value_b).enumerate() {
-
-                        let mut item_path = path.clone();
-                        item_path.push(format!("[{}]", index).purple().bold().to_string());
-
-                        let a = HttpFormDataField::Field("".to_string(), a_item.to_string());
-                        let b = HttpFormDataField::Field("".to_string(), b_item.to_string());
-
-                        errors.append(&mut compare_form_fields(
-                            item_path,
-                            "ArrayItem",
-                            check_additional_keys,
-                            options,
-                            FormFieldType::Field,
-                            FormFieldType::Field,
-                            &a,
-                            &b
-                        ));
-
-                    }
-
-                }
-            },
-
-            HttpFormDataField::FileVec(_, ref filename_a, ref mime_a, ref data_a) => {
-                if let HttpFormDataField::FileVec(_, ref filename_b, ref mime_b, ref data_b) = *b {
-
-                    if filename_a != filename_b {
-                        errors.push((
-                            path.clone(),
-                            format!(
-                                "{} (\"{}\") {} (\"{}\")",
-                                "Filename".green().bold(),
-                                filename_b.red().bold(),
-                                "does not match expected value".yellow(),
-                                filename_a.green().bold()
-                            )
-                        ))
-                    }
-
-                    if mime_a != mime_b {
-                        errors.push((
-                            path.clone(),
-                            format!(
-                                "{} ({}) {} ({})",
-                                "MIME type".green().bold(),
-                                format!("{}", mime_b).red().bold(),
-                                "does not match expected value".yellow(),
-                                format!("{}", mime_a).green().bold()
-                            )
-                        ))
-                    }
-
-                    for error in validate_http_multipart_body(
-                        data_a,
-                        mime_a,
-                        data_b,
-                        mime_b,
+            HttpFormDataField::Array(_, ref expected_values) => {
+                if let HttpFormDataField::Array(_, ref actual_values) = *actual {
+                    compare_array(
+                        &mut errors,
+                        path,
                         check_additional_keys,
                         options,
-                    ) {
-                        let error = error.split('\n').enumerate().map(|(i, line)| {
-                            if i == 0 {
-                                line.to_string()
+                        expected_values,
+                        actual_values
+                    );
+                }
+            },
+            HttpFormDataField::FileVec(
+                _,
+                ref expected_filename,
+                ref expected_mime,
+                ref expected_body
 
-                            } else {
-                                format!("      {}", line)
-                            }
+            ) => {
+                if let HttpFormDataField::FileVec(
+                    _,
+                    ref actual_filename,
+                    ref actual_mime,
+                    ref actual_body
 
-                        }).collect::<Vec<String>>().join("\n") ;
-
-                        errors.push((
-                            path.clone(),
-                            format!("{}{}", "File".yellow(), error)
-                        ))
-                    }
-
+                ) = *actual {
+                    compare_file_name(
+                        &mut errors,
+                        path.clone(),
+                        expected_filename,
+                        actual_filename
+                    );
+                    compare_file_mime(
+                        &mut errors,
+                        path.clone(),
+                        expected_mime,
+                        actual_mime
+                    );
+                    compare_file_body(
+                        &mut errors,
+                        path.clone(),
+                        check_additional_keys,
+                        options,
+                        expected_body,
+                        expected_mime,
+                        actual_body,
+                        actual_mime
+                    );
                 }
             },
             _ => unreachable!()
@@ -276,11 +213,162 @@ fn compare_form_fields(
             format!(
                 "{} {} {} {}",
                 "Expected a".yellow(),
-                type_a.as_str().green().bold(),
+                expected_type.as_str().green().bold(),
                 "but found a".yellow(),
-                type_b.as_str().red().bold()
+                actual_type.as_str().red().bold()
             )
         )]
+    }
+
+}
+
+fn compare_field(
+    errors: &mut Vec<(Vec<String>, String)>,
+    path: Vec<String>,
+    name: &'static str,
+    expected: &str,
+    actual: &str
+) {
+    if actual != expected {
+        let (expected, actual, diff) = util::diff::text(expected, actual);
+        errors.push((
+            path.clone(),
+            format!(
+                "{} {}\n\n              \"{}\"\n\n          {}\n\n              \"{}\"\n\n          {}\n\n              \"{}\"",
+                name.green().bold(),
+                "value does not match, expected:".yellow(),
+                expected.green().bold(),
+                "but got:".yellow(),
+                actual.red().bold(),
+                "difference:".yellow(),
+                diff
+            )
+        ))
+    }
+}
+
+fn compare_array(
+    errors: &mut Vec<(Vec<String>, String)>,
+    path: Vec<String>,
+    check_additional_keys: bool,
+    options: &Options,
+    expected: &[String],
+    actual: &[String]
+) {
+
+    let expected_len = expected.len();
+    let actual_len = actual.len();
+
+    if expected_len != actual_len {
+        errors.push((
+            path.clone(),
+            format!(
+                "{} {} {} {} {}",
+                "Array".green().bold(),
+                "with".yellow(),
+                format!("{}", actual_len).red().bold(),
+                "item(s) does not match expected length of".yellow(),
+                format!("{}", expected_len).green().bold()
+            )
+        ));
+    }
+
+    for (index, (a_item, b_item)) in expected.iter().zip(actual).enumerate() {
+
+        let mut item_path = path.clone();
+        item_path.push(format!("[{}]", index).purple().bold().to_string());
+
+        let expected = HttpFormDataField::Field("".to_string(), a_item.to_string());
+        let actual = HttpFormDataField::Field("".to_string(), b_item.to_string());
+
+        errors.append(&mut compare_form_field(
+            item_path,
+            "ArrayItem",
+            check_additional_keys,
+            options,
+            FormFieldType::Field,
+            FormFieldType::Field,
+            &expected,
+            &actual
+        ));
+
+    }
+
+}
+
+fn compare_file_name(
+    errors: &mut Vec<(Vec<String>, String)>,
+    path: Vec<String>,
+    expected: &str,
+    actual: &str
+) {
+    if expected != actual {
+        errors.push((
+            path.clone(),
+            format!(
+                "{} (\"{}\") {} (\"{}\")",
+                "Filename".green().bold(),
+                actual.red().bold(),
+                "does not match expected value".yellow(),
+                expected.green().bold()
+            )
+        ))
+    }
+}
+
+fn compare_file_mime(
+    errors: &mut Vec<(Vec<String>, String)>,
+    path: Vec<String>,
+    expected: &Mime,
+    actual: &Mime
+) {
+    if expected != actual {
+        errors.push((
+            path.clone(),
+            format!(
+                "{} ({}) {} ({})",
+                "MIME type".green().bold(),
+                format!("{}", actual).red().bold(),
+                "does not match expected value".yellow(),
+                format!("{}", expected).green().bold()
+            )
+        ))
+    }
+}
+
+fn compare_file_body(
+    errors: &mut Vec<(Vec<String>, String)>,
+    path: Vec<String>,
+    check_additional_keys: bool,
+    options: &Options,
+    expected_body: &[u8],
+    expected_mime: &Mime,
+    actual_body: &[u8],
+    actual_mime: &Mime
+) {
+
+    for error in validate_http_multipart_body(
+        expected_body,
+        expected_mime,
+        actual_body,
+        actual_mime,
+        check_additional_keys,
+        options,
+    ) {
+        let error = error.split('\n').enumerate().map(|(i, line)| {
+            if i == 0 {
+                line.to_string()
+
+            } else {
+                format!("      {}", line)
+            }
+
+        }).collect::<Vec<String>>().join("\n") ;
+
+        errors.push((
+            path.clone(),
+            format!("{}{}", "File".yellow(), error)
+        ))
     }
 
 }
@@ -468,7 +556,7 @@ mod tests {
         ]);
 
         cmp(form!{ "field" => "value" }, form!{ "field" => "other value" }, vec![
-            (vec![".<bb>field"], "<bg>Field <by>value does not match, expected:\n\n              \"<bg>other value\"\n\n          <by>but got:\n\n              \"<br>value\"\n\n          <by>difference:\n\n              \"<gbr>other value\"")
+            (vec![".<bb>field"], "<bg>Field <by>value does not match, expected:\n\n              \"<bg>value\"\n\n          <by>but got:\n\n              \"<br>other value\"\n\n          <by>difference:\n\n              \"<gbg>other value\"")
         ]);
 
         cmp(form!{ "field" => "value" }, form!{ "field" => vec!["1"] }, vec![
@@ -514,7 +602,7 @@ mod tests {
         ]);
 
         cmp(form!{ "array[]" => vec!["item"] }, form!{ "array[]" => vec!["other item"] }, vec![
-            (vec![".<bb>array[]", "<bp>[0]"], "<bg>ArrayItem <by>value does not match, expected:\n\n              \"<bg>other item\"\n\n          <by>but got:\n\n              \"<br>item\"\n\n          <by>difference:\n\n              \"<gbr>other item\"")
+            (vec![".<bb>array[]", "<bp>[0]"], "<bg>ArrayItem <by>value does not match, expected:\n\n              \"<bg>item\"\n\n          <by>but got:\n\n              \"<br>other item\"\n\n          <by>difference:\n\n              \"<gbg>other item\"")
         ]);
 
     }
@@ -593,6 +681,64 @@ mod tests {
 
         }, vec![
             (vec![".<bb>file"], "<bg>MIME type (<br>text/html) <by>does not match expected value (<bg>text/plain)")
+        ]);
+
+        cmp(form!{
+            "file" => (
+                "filename",
+                Mime(TopLevel::Application, SubLevel::OctetStream, vec![]),
+                vec![0, 1, 2, 3, 4]
+            )
+
+        }, form!{
+            "file" => (
+                "filename",
+                Mime(TopLevel::Application, SubLevel::OctetStream, vec![]),
+                vec![6, 4, 3, 2, 1, 0]
+            )
+
+        }, vec![
+            (vec![".<bb>file"], "<by>File<by> <by>raw body data does not match, expected the following <bg>5 bytes<by>:\n      \n             [<bg>0x00, <bg>0x01, <bg>0x02, <bg>0x03, <bg>0x04]\n      \n          <by>but got the following <br>6 bytes <by>instead:\n      \n             [<br>0x06, <br>0x04, <br>0x03, <br>0x02, <br>0x01, <br>0x00]")
+        ]);
+
+        cmp(form!{
+            "file" => (
+                "filename",
+                Mime(TopLevel::Text, SubLevel::Plain, vec![]),
+                "Data"
+            )
+
+        }, form!{
+            "file" => (
+                "filename",
+                Mime(TopLevel::Text, SubLevel::Plain, vec![]),
+                "Other Data"
+            )
+
+        }, vec![
+            (vec![".<bb>file"], "<by>File<by> <by>text body does not match, expected:\n      \n              \"<bg>Data\"\n      \n          <by>but got:\n      \n              \"<br>Other Data\"\n      \n          <by>difference:\n      \n              \"<gbg>Other Data\"")
+        ]);
+
+        cmp(form!{
+            "file" => (
+                "filename",
+                Mime(TopLevel::Application, SubLevel::Json, vec![]),
+                object! {
+                    "key" => "value"
+                }
+            )
+
+        }, form!{
+            "file" => (
+                "filename",
+                Mime(TopLevel::Application, SubLevel::Json, vec![]),
+                object! {
+                    "key" => "otherValue"
+                }
+            )
+
+        }, vec![
+            (vec![".<bb>file"], "<by>File<by> <by>body JSON does not match:\n      \n              - <bb>json.<bb>key: <bg>String <by>does not match, expected:\n      \n                    \"<bg>otherValue\"\n      \n                <by>but got:\n      \n                    \"<br>value\"\n      \n                <by>difference:\n      \n                    \"<gbr>otherValue <gbg>value\"")
         ]);
 
     }

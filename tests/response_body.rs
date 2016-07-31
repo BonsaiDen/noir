@@ -726,39 +726,39 @@ fn test_provided_response_with_expected_body_form_mismatch() {
 
               - <bb>form.<bb>array[]<bp>[3]: <bg>ArrayItem <by>value does not match, expected:
 
-                    \"<bg>5\\n\"
+                    \"<bg>4\"
 
                 <by>but got:
 
-                    \"<br>4\"
+                    \"<br>5\\n\"
 
                 <by>difference:
 
-                    \"<gbr>5\\n <gbg>4\"
+                    \"<gbr>4 <gbg>5\\n\"
 
               - <bb>form.<bb>field: <bg>Field <by>value does not match, expected:
 
-                    \"<bg>different someValue\\n\"
+                    \"<bg>someValue\\n\"
 
                 <by>but got:
 
-                    \"<br>someValue\\n\"
+                    \"<br>different someValue\\n\"
 
                 <by>difference:
 
-                    \"<gbr>different someValue\\n\"
+                    \"<gbg>different someValue\\n\"
 
               - <bb>form.<bb>mismatchedType: <bg>Field <by>value does not match, expected:
 
-                    \"<bg>array\"
+                    \"<bg>plain\"
 
                 <by>but got:
 
-                    \"<br>plain\"
+                    \"<br>array\"
 
                 <by>difference:
 
-                    \"<gbr>array <gbg>plain\"
+                    \"<gbr>plain <gbg>array\"
 
               - <bb>form.<bb>str_file: <bg>MIME type (<br>text/html) <by>does not match expected value (<bg>text/plain)
 
@@ -824,39 +824,39 @@ fn test_provided_response_with_expected_body_form_mismatch_exact() {
 
               - <bb>form.<bb>array[]<bp>[3]: <bg>ArrayItem <by>value does not match, expected:
 
-                    \"<bg>5\\n\"
+                    \"<bg>4\"
 
                 <by>but got:
 
-                    \"<br>4\"
+                    \"<br>5\\n\"
 
                 <by>difference:
 
-                    \"<gbr>5\\n <gbg>4\"
+                    \"<gbr>4 <gbg>5\\n\"
 
               - <bb>form.<bb>field: <bg>Field <by>value does not match, expected:
 
-                    \"<bg>different someValue\\n\"
+                    \"<bg>someValue\\n\"
 
                 <by>but got:
 
-                    \"<br>someValue\\n\"
+                    \"<br>different someValue\\n\"
 
                 <by>difference:
 
-                    \"<gbr>different someValue\\n\"
+                    \"<gbg>different someValue\\n\"
 
               - <bb>form.<bb>mismatchedType: <bg>Field <by>value does not match, expected:
 
-                    \"<bg>array\"
+                    \"<bg>plain\"
 
                 <by>but got:
 
-                    \"<br>plain\"
+                    \"<br>array\"
 
                 <by>difference:
 
-                    \"<gbr>array <gbg>plain\"
+                    \"<gbr>plain <gbg>array\"
 
               - <bb>form.<bb>str_file: <bg>MIME type (<br>text/html) <by>does not match expected value (<bg>text/plain)
 
