@@ -83,8 +83,8 @@ fn compare_form(
     for (expected_name, expected_type, expected_field) in expected_fields {
 
         let mut found = false;
-        actual_fields.retain(|&(ref actual_name, actual_type, ref actual_field)| {
-            if expected_name == *actual_name {
+        actual_fields.retain(|&(actual_name, actual_type, actual_field)| {
+            if expected_name == actual_name {
 
                 let mut field_path = path.clone();
                 field_path.push(format!(".{}", expected_name.blue().bold()));

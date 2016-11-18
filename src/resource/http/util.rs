@@ -86,7 +86,7 @@ pub fn validate_http_resource<T: HttpResource>(
         actual.headers()
     );
 
-    if let Some(ref expected_body) = expected_body.as_ref() {
+    if let Some(expected_body) = expected_body.as_ref() {
         let body = actual.into_http_body();
         validate_http_body(
             &mut errors,

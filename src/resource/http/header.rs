@@ -139,7 +139,7 @@ pub fn validate_http_headers(
     unexpected_headers.sort();
 
     for header in unexpected_headers {
-        if let Some(_) = actual_headers.get_raw(header) {
+        if actual_headers.get_raw(header).is_some() {
             errors.push(format!(
                 "{} {} \"{}\" {} {}{} {}{}",
                 context.yellow(),

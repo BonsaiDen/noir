@@ -348,7 +348,7 @@ impl<A: HttpApi> HttpRequest<A> {
 
         // Limit ourselves to one test at a time in order to ensure correct
         // handling of mocked requests and responses
-        let (errors, error_count, suppressed_count) = if let Ok(_) = REQUEST_LOCK.lock() {
+        let (errors, error_count, suppressed_count) = if REQUEST_LOCK.lock().is_ok() {
             self.send()
 
         } else {
