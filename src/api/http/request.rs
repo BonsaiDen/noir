@@ -348,7 +348,8 @@ impl<A: HttpApi> HttpRequest<A> {
 
         // Limit ourselves to one test at a time in order to ensure correct
         // handling of mocked requests and responses
-        let (errors, error_count, suppressed_count) = if REQUEST_LOCK.lock().is_ok() {
+        #[cfg_attr(feature = "clippy", allow(if_let_redundant_pattern_matching))]
+        let (errors, error_count, suppressed_count) = if let Ok(_) = REQUEST_LOCK.lock() {
             self.send()
 
         } else {
